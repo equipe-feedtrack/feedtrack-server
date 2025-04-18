@@ -1,0 +1,34 @@
+{
+  "name": "feedtrack-server",
+  "version": "1.0.0",
+  "description": "Api para sistema de controle de feedback",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --watch src --exec ts-node src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/equipe-feedtrack/feedtrack-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/equipe-feedtrack/feedtrack-server/issues"
+  },
+  "homepage": "https://github.com/equipe-feedtrack/feedtrack-server#readme",
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "nodemon": "^3.1.9",
+    "prisma": "^6.6.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.6.0",
+    "@types/express": "^5.0.1",
+    "express": "^5.1.0"
+  }
+}
