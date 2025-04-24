@@ -18,3 +18,4 @@ model clientes {
   nome String @db.VarChar(55)
   telefone String @db.VarChar(11)
 }
+
