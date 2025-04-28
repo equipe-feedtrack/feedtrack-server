@@ -9,13 +9,13 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model clientes {
   id Int @id @default(autoincrement())
-  nome String @db.VarChar(55)
-  telefone String @db.VarChar(11)
+  nome String
+  telefone String
 }
 
