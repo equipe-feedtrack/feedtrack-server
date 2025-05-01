@@ -1,37 +1,4 @@
 {
-<<<<<<< HEAD
-  "name": "feedtrack-server",
-  "version": "1.0.0",
-  "description": "Api para sistema de controle de feedback",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --watch src --exec ts-node src/index.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/equipe-feedtrack/feedtrack-server.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/equipe-feedtrack/feedtrack-server/issues"
-  },
-  "homepage": "https://github.com/equipe-feedtrack/feedtrack-server#readme",
-  "devDependencies": {
-    "@types/node": "^22.14.1",
-    "nodemon": "^3.1.9",
-    "prisma": "^6.6.0",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.6.0",
-    "@types/express": "^5.0.1",
-    "express": "^5.1.0"
-=======
   "name": "feedtrack-node-api",
   "version": "1.0.0",
   "description": "FeedTrack é um sistema de coleta e análise de feedbacks voltado para empresas que desejam melhorar a experiência do cliente. Ele automatiza o envio de questionários após a venda e coleta opiniões sobre atendimento, produto, entrega e outros pontos-chave. Os dados são armazenados, analisados e transformados em relatórios inteligentes que auxiliam gestores na tomada de decisões estratégicas. O sistema também permite identificar o cliente que realizou a compra, segmentar públicos e manter um canal ativo de comunicação para divulgação de novidades, eventos e ações de relacionamento. Além disso, faz uso do ambiente de execução node e linguagem de programação TypeScript.",
@@ -61,6 +28,5 @@
     "@types/node": "^22.15.3",
     "sucrase": "^3.35.0",
     "typescript": "^5.8.3"
->>>>>>> master
   }
 }

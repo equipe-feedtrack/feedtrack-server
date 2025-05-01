@@ -6,7 +6,6 @@ empresa a monitorar seu desenvolvimento e a alinhar estratégias de crescimento.
 
 Gestão de Experiência e Relacionamento com o Cliente por meio da coleta automatizada de feedbacks e análise de dados.
 
-
 Funcionários podem registrar, atualizar produtos, cadastrar clientes, registro manual de feedback, envio de formulários e também observações sobre o cliente.
 
 Administrador pode gerenciar funcionários, gerenciar produtos, registrar feedback, criar observações.
@@ -31,11 +30,7 @@ Cuida da comunicação ativa com o cliente (novidades, eventos, promoções).
 🔧 Entidades Principais
 Cliente
 A pessoa que realizou uma compra e pode receber pesquisas.
-Atributos: nome, telefone, email, data_cadastro, preferências, segmento
-
-Compra
-Representa uma transação comercial feita pelo cliente.
-Atributos: cliente_id, produto, data_compra, valor_total
+Atributos: nome, telefone, email, data_cadastro, preferencias.
 
 Pesquisa (formulários)
 Questionário enviado ao cliente.
