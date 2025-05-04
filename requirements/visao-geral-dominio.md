@@ -50,7 +50,7 @@ Nota de Satisfação (ex: escala de 0 a 10)
 Segmento de Cliente (ex: recorrente, novo, inativo)
 
 🧠 Regras de Negócio (algumas)
-Uma pesquisa só pode ser enviada após a confirmação de uma compra.
+Uma pesquisa só pode ser enviada após a confirmação de uma compra (ou dados).
 Um cliente não deve receber a mesma pesquisa mais de uma vez por compra.
 Caso um cliente tenha comprado recentemente não deve ser enviado a pesquisa novamente referente a compra por um período mínimo de 7 dias.
 Respostas são vinculadas a um cliente e compra específicos.
