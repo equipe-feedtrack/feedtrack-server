@@ -13,9 +13,42 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model clientes {
+enum tipo_usuario {
+  FUNCIONARIO
+  ADMINISTRADOR
+}
+
+model usuarios {
+  id Int @id @default(autoincrement())
+  nome String
+  usuario String @unique
+  senha String
+  telefone String
+  endereco String
+  tipo_usuario tipo_usuario // 'cliente' ou 'funcionario'
+}
+
+model vendedores {
   id Int @id @default(autoincrement())
   nome String
   telefone String
 }
 
+model clientes {
+  id Int @id @default(autoincrement())
+  nome String
+  telefone String
+
+}
+
+model produtos {
+  id Int @id @default(autoincrement())
+}
+
+model compras {
+ id Int @id @default(autoincrement())
+}
+
+model feedback{
+  id Int @id @default(autoincrement())
+}
