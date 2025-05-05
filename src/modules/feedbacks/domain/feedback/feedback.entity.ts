@@ -4,7 +4,7 @@ class Feedback implements IFeedback {
 
     //Atributos//
     private _id: string;
-    private _formulario_id: string; // Associace com a entidade formulario
+    private _formulario_id: string; // Associace com a entidade formulario ainda vai mudar o tipo
     private _pergunta_id: number;
     private _resposta_texto: string;
     private _nota: number;
@@ -69,10 +69,8 @@ class Feedback implements IFeedback {
         this.data_resposta = feedback.data_resposta;
     }
 
-
-    // Eu posso criar o Feedback sem necessariamente possuir um formulário já predefinido.
     //Métodos//
-    public static criar(props: CriarFeedbackProps): Feedback {
+    public static criar(props: CriarFeedbackProps): Feedback {   // Eu posso criar o Feedback sem necessariamente possuir um formulário para envio caso seja feito presencialmente.
 
         let {
             formulario_id,
@@ -92,6 +90,8 @@ class Feedback implements IFeedback {
             nota,
             data_resposta: data_resposta ?? new Date()
         });
+
+        // Ajustar para os inputs do front.
     }
 }
 

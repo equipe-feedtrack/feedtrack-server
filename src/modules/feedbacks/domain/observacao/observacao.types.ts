@@ -1,0 +1,5 @@
+interface IObservacao {
+
+}
+
+export {IObservacao}
