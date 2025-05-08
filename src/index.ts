@@ -1,6 +1,6 @@
+import { Produto } from 'modules/produtos/produto.entity';
 import { Feedback } from './modules/feedbacks/domain/feedback/feedback.entity';
 import { Formulario } from './modules/formulario/domain/formulario/formulario.entity';
-
 
 
 

@@ -1,0 +1,25 @@
+testar as exceções de Pergunta!!
+
+import {
+  PerguntaNaoEncontradaException,
+  PerguntaDuplicadaException,
+  ErroPersistenciaException,
+  ValidacaoPerguntaException
+} from "./exceptions/PerguntaExceptions";
+
+async function criarPergunta(texto: string): Promise<void> {
+  if (!texto || texto.trim() === "") {
+    throw new ValidacaoPerguntaException(["Texto da pergunta não pode estar vazio."]);
+  }
+
+  const existe = await verificarSePerguntaExiste(texto);
+  if (existe) {
+    throw new PerguntaDuplicadaException(texto);
+  }
+
+  try {
+    await salvarPerguntaNoBanco(texto);
+  } catch (err) {
+    throw new ErroPersistenciaException("salvar", err as Error);
+  }
+}
