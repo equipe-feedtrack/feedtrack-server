@@ -1,40 +1,58 @@
+import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaDuplicadaException, PerguntaNaoEncontradaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
 import { IPergunta } from "./pergunta.types";
 
 class Pergunta implements IPergunta{
 
 private _id: number;
 private _texto: string;
-private _tipo: 'texto' | 'nota' | 'multipla_escolha';
+private _tipo: string;
 private _opcoes?: string[] | undefined;
 private _ordem: number;
 
 
-get id(): number {
+public get id(): number {
   return this._id;
+}
+
+private set id(value: number) {
+  if(value == null || value == undefined) {
+    throw new PerguntaNaoEncontradaException(value);
+  }
+  
+  this._id = value;
 }
 
 get texto(): string {
   return this._texto;
 }
 
-private set texto(value: string) {
-  if (!value) {
-    throw new Error('O texto da pergunta é obrigatório.');
+private set texto(texto: string) {
+  if (!texto || texto.trim() === "") {
+    throw new PerguntaTextoVazioException();
   }
-  this._texto = value;
+
+  // if (texto === texto) {
+  //     throw new PerguntaDuplicadaException();
+  // }
+
+  this._texto = texto;
 }
 
-get tipo(): 'nota' | 'texto' | 'multipla_escolha' {
+get tipo(): string {
   return this._tipo;
 }
 
- private set tipo(value: 'nota' | 'texto' | 'multipla_escolha') {
-  if (!['nota', 'texto', 'multipla_escolha'].includes(value)) {
-    throw new Error("O tipo de pergunta deve ser 'nota', 'texto' ou 'multipla_escolha'.");
+ private set tipo(tipo) {
+   const tiposValidos  =  ['nota', 'texto', 'multipla_escolha'];
+  if (!tiposValidos .includes(tipo)) {
+    throw new TipoPerguntaInvalidoException(tipo);
   }
-  this._tipo = value;
+  if ((tipo === "multipla_escolha" || tipo === "texto") && tipo.length === 0) {
+    throw new OpcoesObrigatoriasException();
+  }
+  this._tipo = tipo;
   // Limpar opções se o tipo mudar para algo que não seja múltipla escolha
-  if (value !== 'multipla_escolha') {
+  if (tipo !== 'multipla_escolha') {
     this._opcoes = undefined;
   }
 }
@@ -43,8 +61,8 @@ public get opcoes(): string[] | undefined {
   return this._opcoes;
 }
 
-private set opcoes(value: string[] | undefined) {
-  this._opcoes = value;
+private set opcoes(opcoes: string[] | undefined) { 
+  this._opcoes = opcoes;
 }
 
 
@@ -59,27 +77,39 @@ private set ordem(value: number) {
   this._ordem = value;
 }
 
-constructor(data: IPergunta) {
-    this._id = data.id ?? Date.now(); // Simulação de ID
-    this._texto = data.texto;
-    this._tipo = data.tipo;
-    this._opcoes = data.opcoes;
-    this._ordem = data.ordem;
-    this.validar();
+constructor(pergunta: IPergunta) {
+    this._id = pergunta.id ?? Date.now(); // Simulação de ID
+    this.texto = pergunta.texto;
+    this.tipo = pergunta.tipo;
+    this.opcoes = pergunta.opcoes;
+    this.ordem = pergunta.ordem;
+    Pergunta.validarOpcoes(this.tipo, this.opcoes);
+  }
+
+  private static validarOpcoes(tipo: string, opcoes: string[] | undefined): void {
+    if ((tipo === "multipla_escolha" && opcoes != undefined)) {
+      if (opcoes.length === 0) {
+        throw new OpcoesObrigatoriasException();
+      }
+
+      if (tipo === "multipla_escolha" && opcoes.length < 2) {
+        throw new QuantidadeMinimaOpcoesException(2);
+      }
+
+      const duplicadas = opcoes.filter((item, i, arr) => arr.indexOf(item) !== i);
+      if (duplicadas.length > 0) {
+        throw new OpcaoDuplicadaException(duplicadas[0]);
+      }
+    }
+    
+    if (tipo === "nota" && opcoes != undefined && opcoes.length > 0) {
+      throw new ValidacaoPerguntaException([
+        "Perguntas do tipo 'nota' não devem ter opções."
+      ]);
+    }
 
   }
 
-private validar(): void {
-  if (!this.texto) {
-    throw new Error('O texto da pergunta é obrigatório.');
-  }
-  if (!['nota', 'texto', 'multipla_escolha'].includes(this.tipo)) {
-    throw new Error("O tipo de pergunta deve ser 'nota', 'texto' ou 'multipla_escolha'.");
-  }
-  if (this.ordem < 1) {
-    throw new Error('A ordem da pergunta deve ser maior ou igual a 1.');
-  }
-}
 }
 
 export {Pergunta}

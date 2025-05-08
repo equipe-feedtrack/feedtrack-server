@@ -2,7 +2,7 @@
 interface IPergunta {
     id: number;
     texto: string;
-    tipo: 'nota' | 'texto' | 'multipla_escolha';
+    tipo: string;
     opcoes?: string[];
     ordem: number;
   }
