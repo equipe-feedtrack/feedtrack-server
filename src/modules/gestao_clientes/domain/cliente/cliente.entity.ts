@@ -1,7 +1,6 @@
-import { CriarClienteProps, ICliente } from "./cliente.types";
+import { ICliente, CriarClienteProps } from "./cliente.types";
 
 class Cliente implements ICliente {
-
     private _id: string;
     private _nome: string;
     private _telefone: string;
@@ -52,44 +51,50 @@ class Cliente implements ICliente {
         this._dataCadastro = value;
     }
 
-    // Construtor
-    constructor(props: CriarClienteProps) {
-        this.id = crypto.randomUUID();
+    // Construtor: Agora aceitando um objeto do tipo ICliente
+    constructor(props: ICliente) {
+        this.id = props.id || crypto.randomUUID();  // Gera o id se não vier no objeto
         this.nome = props.nome;
         this.telefone = props.telefone;
-        this.email = props.email ?? "";
+        this.email = props.email ?? "";  // Se o email não for informado, coloca um string vazia
         this.cidade = props.cidade;
-        this.dataCadastro = new Date();
+        this.dataCadastro = props.dataCadastro || new Date();  // Gera a dataCadastro se não vier no objeto
     }
 
-    // Método 1: Atualizar dados
-    public atualizarDados(dados: Partial<Omit<ICliente, "id" | "dataCadastro">>): void {
+    // Método: Criar contato
+    public static criarContato(props: CriarClienteProps): Cliente {
+        return new Cliente({
+            ...props, // Passa os dados de CriarClienteProps
+            id: crypto.randomUUID(), // Gerar ID automaticamente
+            dataCadastro: new Date() // Gerar data de cadastro automaticamente
+        });
+    }
+
+    // Método: Atualizar contato
+    public atualizarContato(dados: Partial<Omit<ICliente, "id" | "dataCadastro">>): void {
         if (dados.nome) this.nome = dados.nome;
         if (dados.telefone) this.telefone = dados.telefone;
         if (dados.email !== undefined) this.email = dados.email;
         if (dados.cidade) this.cidade = dados.cidade;
     }
 
-    // Método 2: Agendar contato
-    public agendarContato(): string {
-        const dataContato = new Date();
-        dataContato.setDate(dataContato.getDate() + 1);
-        return `Contato agendado para: ${dataContato.toLocaleString()}`;
+    // Método: Deletar contato (simulação lógica)
+    public deletarContato(): void {
+        this._nome = "";
+        this._telefone = "";
+        this._email = "";
+        this._cidade = "";
     }
 
-    // Método 3 (novo): Validar contato
-    public validarContato(): boolean {
-        return !!this.telefone && this.telefone.trim().length >= 10;
-    }
-
-    // Método 4: Exibir resumo
-    public exibirResumo(): string {
+    // Método: Ler contato (retorna os dados)
+    public lerContato(): string {
         return `
-        Cliente: ${this.nome}
-        Telefone: ${this.telefone}
-        Cidade: ${this.cidade}
-        Email: ${this.email || "Não informado"}
-        Cadastrado em: ${this.dataCadastro.toLocaleDateString()}
+        ID: ${this.id}
+        Nome: ${this.nome || "Removido"}
+        Telefone: ${this.telefone || "Removido"}
+        Email: ${this.email || "Removido"}
+        Cidade: ${this.cidade || "Removido"}
+        Cadastrado em: ${this.dataCadastro.toLocaleString()}
         `.trim();
     }
 }
