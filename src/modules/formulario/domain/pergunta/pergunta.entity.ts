@@ -1,26 +1,14 @@
+import { Entity } from "@shared/domain/entity";
 import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaDuplicadaException, PerguntaNaoEncontradaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
-import { IPergunta } from "./pergunta.types";
+import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
 
-class Pergunta implements IPergunta{
+class Pergunta extends Entity<IPergunta> implements IPergunta{
 
-private _id: number;
 private _texto: string;
 private _tipo: string;
 private _opcoes?: string[] | undefined;
 private _ordem: number;
 
-
-public get id(): number {
-  return this._id;
-}
-
-private set id(value: number) {
-  if(value == null || value == undefined) {
-    throw new PerguntaNaoEncontradaException(value);
-  }
-  
-  this._id = value;
-}
 
 get texto(): string {
   return this._texto;
@@ -65,7 +53,6 @@ private set opcoes(opcoes: string[] | undefined) {
   this._opcoes = opcoes;
 }
 
-
 get ordem(): number {
   return this._ordem;
 }
@@ -78,7 +65,7 @@ private set ordem(value: number) {
 }
 
 constructor(pergunta: IPergunta) {
-    this._id = pergunta.id ?? Date.now(); // Simulação de ID
+    super(pergunta.id)
     this.texto = pergunta.texto;
     this.tipo = pergunta.tipo;
     this.opcoes = pergunta.opcoes;
@@ -87,19 +74,21 @@ constructor(pergunta: IPergunta) {
   }
 
   private static validarOpcoes(tipo: string, opcoes: string[] | undefined): void {
+
     if ((tipo === "multipla_escolha" && opcoes != undefined)) {
       if (opcoes.length === 0) {
         throw new OpcoesObrigatoriasException();
-      }
+      };
 
       if (tipo === "multipla_escolha" && opcoes.length < 2) {
         throw new QuantidadeMinimaOpcoesException(2);
-      }
+      };
 
       const duplicadas = opcoes.filter((item, i, arr) => arr.indexOf(item) !== i);
       if (duplicadas.length > 0) {
         throw new OpcaoDuplicadaException(duplicadas[0]);
-      }
+      };
+
     }
     
     if (tipo === "nota" && opcoes != undefined && opcoes.length > 0) {
@@ -108,6 +97,23 @@ constructor(pergunta: IPergunta) {
       ]);
     }
 
+  }
+
+  public static criar(props: CriarPerguntaProps): Pergunta{
+    const { texto, tipo, opcoes, ordem } = props;
+      return new Pergunta ({texto,
+        tipo,
+        opcoes,
+        ordem});
+  }
+
+  public static recuperar(props: RecuperarPerguntaProps): Pergunta {
+    
+    if(!props.id) {
+      throw new PerguntaNaoEncontradaException(props.id);
+    };
+
+    return new Pergunta (props);
   }
 
 }

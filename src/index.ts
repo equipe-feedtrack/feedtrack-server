@@ -1,7 +1,13 @@
+require('module-alias/register');  // Para funcionar junto com o sucrase.
+
 import { Produto } from 'modules/produtos/produto.entity';
 import { Feedback } from './modules/feedbacks/domain/feedback/feedback.entity';
 import { Formulario } from './modules/formulario/domain/formulario/formulario.entity';
+import { Pergunta } from '@modules/formulario/domain/pergunta/pergunta.entity';
 
+// Testando pergunta
+const pergunta = Pergunta.criar( { texto: 'Como você avalia sua experiência geral?', tipo: 'texto', opcoes: ['Sim', 'Não', 'Parcialmente'], ordem: 1 });
+console.log(pergunta);
 
 
 /// Falta eu mexer nessa parte.!! (Yago)
@@ -44,6 +50,7 @@ import { Formulario } from './modules/formulario/domain/formulario/formulario.en
 // }
 
 
+//Testando Feedback
 
 // const feedback = Feedback.criar({
 //   formulario_id: 'form123',
@@ -57,6 +64,7 @@ import { Formulario } from './modules/formulario/domain/formulario/formulario.en
 
 
 
+//Cleilson.
 
 // import express from 'express';
 // import { PrismaClient } from '@prisma/client';
