@@ -10,7 +10,7 @@ class PerguntaException extends DomainException {
 }
 
 class PerguntaNaoEncontradaException extends PerguntaException {
-    public constructor(public perguntaId: number) {
+    public constructor(public perguntaId: string) {
         super(`Pergunta com ID ${perguntaId} não foi encontrada.`);
         this.name = 'PerguntaNaoEncontradaException';
     }

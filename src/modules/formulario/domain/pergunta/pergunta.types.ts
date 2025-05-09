@@ -1,12 +1,18 @@
-
 interface IPergunta {
-    id: number;
+    id?: string;
     texto: string;
     tipo: string;
     opcoes?: string[];
     ordem: number;
   }
 
-  type CriarPerguntaProps =  Omit<IPergunta, 'id'>[];
+  type CriarPerguntaProps =  Omit<IPergunta, 'id'>;
 
-  export {IPergunta, CriarPerguntaProps}
+  type RecuperarPerguntaProps = Required<IPergunta>;
+
+  export {
+    IPergunta,
+     CriarPerguntaProps,
+     RecuperarPerguntaProps
+    
+    }

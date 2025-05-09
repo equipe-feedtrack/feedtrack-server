@@ -64,12 +64,6 @@ abstract class Entity<T> {
         return padraoUUID.test(UUID);
     } 
 
-    // Novo método estático genérico para criar e retornar UUID + entidade
-    public static createWithUUID<T extends Entity<any>>(this: new () => T): { id: string; entity: T } {
-        const entity = new this();
-        return { id: entity.id, entity };
-    }
-
 }
 
 export { Entity }
