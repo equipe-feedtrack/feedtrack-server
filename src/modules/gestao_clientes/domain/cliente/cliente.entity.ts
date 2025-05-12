@@ -7,6 +7,12 @@ class Cliente implements ICliente {
     private _email: string;
     private _cidade: string;
     private _dataCadastro: Date;
+    private _ativo: boolean = true;
+    private _vendedorResponsavel: string; 
+  
+
+   
+
 
     // Getters e Setters
     public get id(): string {
@@ -50,6 +56,19 @@ class Cliente implements ICliente {
     private set dataCadastro(value: Date) {
         this._dataCadastro = value;
     }
+    public get ativo(): boolean {
+        return this._ativo;
+    }
+    private set ativo(value: boolean) {
+        this._ativo = value;
+    }
+    public get vendedorResponsavel(): string {
+        return this._vendedorResponsavel;
+    }
+    private set vendedorResponsavel(value: string) {
+        this._vendedorResponsavel = value;
+    }
+
 
     // Construtor: Agora aceitando um objeto do tipo ICliente
     constructor(props: ICliente) {
@@ -59,6 +78,8 @@ class Cliente implements ICliente {
         this.email = props.email ?? "";  // Se o email não for informado, coloca um string vazia
         this.cidade = props.cidade;
         this.dataCadastro = props.dataCadastro || new Date();  // Gera a dataCadastro se não vier no objeto
+        this.ativo = props.ativo;
+        this.vendedorResponsavel = props.vendedorResponsavel;
     }
 
     // Método: Criar contato
@@ -80,11 +101,8 @@ class Cliente implements ICliente {
 
     // Método: Deletar contato (simulação lógica)
     public deletarContato(): void {
-        this._nome = "";
-        this._telefone = "";
-        this._email = "";
-        this._cidade = "";
-    }
+        this.ativo = false; // 🔄 Modificado
+      }
 
     // Método: Ler contato (retorna os dados)
     public lerContato(): string {

@@ -4,8 +4,11 @@ interface ICliente {
     telefone: string;             
     email?: string;                
     cidade: string;
-    vendedorResponsavel?: string; 
-    dataCadastro: Date;           
+    vendedorResponsavel: string; 
+    dataCadastro: Date;
+    ativo: boolean;
+
+
   }
   
   // Tipo para criação de Cliente (sem o id e dataCadastro, pois são automáticos)
