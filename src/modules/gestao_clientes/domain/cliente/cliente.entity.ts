@@ -115,6 +115,9 @@ class Cliente implements ICliente {
         Cadastrado em: ${this.dataCadastro.toLocaleString()}
         `.trim();
     }
+    private static validarTelefone() {
+        
+    }
 }
 
 export { Cliente };
