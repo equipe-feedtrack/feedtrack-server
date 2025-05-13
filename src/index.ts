@@ -1,49 +1,40 @@
 import { Feedback } from './modules/feedbacks/domain/feedback/feedback.entity';
 import { Formulario } from './modules/formulario/domain/formulario/formulario.entity';
 import { Cliente } from './modules/gestao_clientes/domain/cliente/cliente.entity';
-import { CriarClienteProps } from './modules/gestao_clientes/domain/cliente/cliente.types';
 
 
 
-
-
-
-/* Criando um cliente
-const dadosCliente: CriarClienteProps = {
-    nome: "João da Silva",
-    telefone: "11999999999",
-    email: "joao@email.com",
-    cidade: "São Paulo"
-};
-
-// Criar cliente
-const cliente = Cliente.criarContato(dadosCliente);
 /*
-// Testando o método de leitura (lerContato)
-console.log("Contato criado:\n", cliente.lerContato());
+// Criar um cliente
+const cliente1 = Cliente.criarContato({
+  nome: "Ana Paula",
+  telefone: "11999998888",
+  email: "ana@exemplo.com",
+  cidade: "Curitiba",
+  vendedorResponsavel: "Carlos"
+});
 
-// Testando o método de atualizar dados
-const novosDados = {
-    nome: "João de Oliveira",
-    telefone: "11988888888",
-    email: "joao.oliveira@email.com",
-    cidade: "Rio de Janeiro"
-};
-cliente.atualizarContato(novosDados);
-
-// Testando o método de leitura (lerContato) após atualização
-console.log("\nContato após atualização:\n", cliente.lerContato());
-
-// Testando o método de deletar dados
-cliente.deletarContato();
-
-// Testando o método de leitura (lerContato) após deletar
-console.log("\nContato após deletar:\n", cliente.lerContato());
+console.log("✅ Cliente criado:");
+console.log(cliente1.lerContato());
 */
+/*
+// Atualizar o cliente
+cliente1.atualizarContato({
+  telefone: "11911112222",
+  cidade: "São Paulo"
+});
 
+console.log("\n✏️ Cliente atualizado:");
+console.log(cliente1.lerContato());
+*/
+/*
+// Deletar (simular exclusão lógica)
+cliente1.deletarContato();
 
-
-
+console.log("\n❌ Cliente deletado logicamente:");
+console.log(cliente1.lerContato());
+console.log("Ativo:", cliente1.ativo);
+*/
 /////////////////////
 
 

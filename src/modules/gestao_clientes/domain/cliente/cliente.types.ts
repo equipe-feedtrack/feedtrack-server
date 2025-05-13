@@ -1,17 +1,15 @@
 interface ICliente {
-    id: string;                    
-    nome: string;                  
-    telefone: string;             
-    email?: string;                
-    cidade: string;
-    vendedorResponsavel: string; 
-    dataCadastro: Date;
-    ativo: boolean;
+  id: string;
+  nome: string;
+  telefone: string;
+  email?: string;
+  cidade: string;
+  vendedorResponsavel: string;
+  dataCadastro: Date;
+  ativo: boolean;
+}
 
+// Tipo para criação de Cliente (sem id, dataCadastro e ativo — são automáticos)
+type CriarClienteProps = Omit<ICliente, "id" | "dataCadastro" | "ativo">;
 
-  }
-  
-  // Tipo para criação de Cliente (sem o id e dataCadastro, pois são automáticos)
-  type CriarClienteProps = Omit<ICliente, "id" | "dataCadastro">;
-  
-  export { ICliente, CriarClienteProps };
+export { ICliente, CriarClienteProps };
