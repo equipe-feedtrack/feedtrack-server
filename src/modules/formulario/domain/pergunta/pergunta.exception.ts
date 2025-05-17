@@ -68,10 +68,13 @@ class ErroPersistenciaException extends PerguntaException {
     }
 }
 
-class ValidacaoPerguntaException  extends PerguntaException {
-    public constructor(public mensagens: string[]) {
-        super(`Erro de validação da pergunta: ${mensagens.join("; ")}`);
+class ValidacaoPerguntaException extends PerguntaException {
+    public mensagens: string[];
+
+    public constructor(message: string = "Perguntas desse tipo não devem ter opções.") {
+        super(message);
         this.name = 'ValidacaoPerguntaException';
+        this.message = message;
     }
 }
 

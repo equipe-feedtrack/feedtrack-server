@@ -102,7 +102,7 @@ class Formulario implements IFormulario{
         this._perguntas.push(novaPergunta);
       }
 
-    removerPergunta(perguntaId: number): void {
+    removerPergunta(perguntaId: string): void {
         this._perguntas = this._perguntas.filter((p) => p.id !== perguntaId);
     }
 

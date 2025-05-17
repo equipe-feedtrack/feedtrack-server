@@ -1,8 +1,54 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+require('module-alias/register'); // Para funcionar junto com o sucrase.
 const pergunta_entity_1 = require("@modules/formulario/domain/pergunta/pergunta.entity");
-const pergunta = pergunta_entity_1.Pergunta.criar({ texto: 'Como você avalia sua experiência geral?', tipo: 'nota', opcoes: ['Sim', 'Não', 'Parcialmente'], ordem: 1 });
-console.log(pergunta);
+const domain_exception_1 = require("@shared/domain/domain.exception");
+const fs_1 = require("fs");
+const pergunta_map_1 = require("@modules/formulario/mappers/pergunta.map");
+// Testando pergunta
+try {
+    const pergunta = pergunta_entity_1.Pergunta.criar({ texto: 'Como você avalia sua experiência geral?', tipo: 'nota', opcoes: ["1", "2", "3"], ordem: 1 });
+    console.log(pergunta);
+    let propspergunta = {
+        id: '4ede92e2-5a0c-4b0c-85d7-c4eed09ee7a5',
+        texto: 'fale de sua experiência',
+        tipo: 'texto',
+        ordem: 1
+    };
+    let pergunta2 = pergunta_entity_1.Pergunta.recuperar(propspergunta);
+    console.log(pergunta2);
+    //////////////////////////////////////////////////////
+    //Persistinto e Recuperando em Arquivo - File System//
+    //////////////////////////////////////////////////////
+    let arrayperguntas = [];
+    arrayperguntas.push(pergunta.toDTO());
+    arrayperguntas.push(pergunta2.toDTO());
+    (0, fs_1.writeFile)('perguntas.json', JSON.stringify(arrayperguntas), function (error) {
+        if (error)
+            throw error;
+        console.log('Arquivo Salvo com Sucesso!');
+        (0, fs_1.readFile)('perguntas.json', (error, dadoGravadoArquivo) => {
+            if (error)
+                throw error;
+            console.log('Leitura de Arquivo!');
+            let categoriasSalvas = JSON.parse(dadoGravadoArquivo.toString());
+            categoriasSalvas.forEach(categoriaJSON => {
+                console.log(categoriaJSON);
+                console.log(pergunta_map_1.PerguntaMap.toDomain(categoriaJSON));
+            });
+        });
+    });
+}
+catch (error) {
+    if (error instanceof domain_exception_1.DomainException) {
+        console.log('Execeção de Dóminio');
+        console.log(error.message);
+    }
+    else {
+        console.log('Outras Exceções');
+        console.log(error.message);
+    }
+}
 /// Falta eu mexer nessa parte.!! (Yago)
 // // Exemplo de Modelo Base para Feedback (sem alterações necessárias)
 // const modeloBaseFeedback = new Formulario({
@@ -35,6 +81,7 @@ console.log(pergunta);
 // } catch (error: any) {
 //   console.error('Erro:', error.message);
 // }
+//Testando Feedback
 // const feedback = Feedback.criar({
 //   formulario_id: 'form123',
 //   pergunta_id: 11,
@@ -43,6 +90,7 @@ console.log(pergunta);
 //    data_resposta: new Date()  // opcional
 // });
 // console.log(feedback)
+//Cleilson.
 // import express from 'express';
 // import { PrismaClient } from '@prisma/client';
 // const app = express();
