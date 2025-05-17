@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Pergunta = void 0;
 const entity_1 = require("@shared/domain/entity");
 const pergunta_exception_1 = require("./pergunta.exception");
+const pergunta_map_1 = require("@modules/formulario/mappers/pergunta.map");
 class Pergunta extends entity_1.Entity {
     get texto() {
         return this._texto;
@@ -52,45 +53,67 @@ class Pergunta extends entity_1.Entity {
         super(pergunta.id);
         this.texto = pergunta.texto;
         this.tipo = pergunta.tipo;
-        this.opcoes = pergunta.opcoes;
         this.ordem = pergunta.ordem;
-        Pergunta.validarOpcoes(this.tipo, this.opcoes);
+        this.opcoes = Pergunta.validarOpcoes(this.tipo, pergunta.opcoes);
     }
     static validarOpcoes(tipo, opcoes) {
-        if ((tipo === "multipla_escolha" && opcoes != undefined)) {
-            if (opcoes.length === 0) {
+        if (tipo === "texto") {
+            if (opcoes !== undefined) {
+                throw new pergunta_exception_1.ValidacaoPerguntaException();
+            }
+            return undefined;
+        }
+        if (tipo === "nota") {
+            const opcoesValidas = opcoes ?? ["1", "2", "3", "4", "5"];
+            if (opcoesValidas.length === 0 || opcoesValidas === undefined) {
                 throw new pergunta_exception_1.OpcoesObrigatoriasException();
             }
-            ;
-            if (tipo === "multipla_escolha" && opcoes.length < 2) {
+            const naoNumericas = opcoesValidas.filter(o => isNaN(Number(o)));
+            if (naoNumericas.length > 0) {
+                throw new pergunta_exception_1.ValidacaoPerguntaException();
+            }
+            return opcoesValidas;
+        }
+        if (tipo === "multipla_escolha") {
+            if (!opcoes || opcoes.length === 0) {
+                throw new pergunta_exception_1.OpcoesObrigatoriasException();
+            }
+            if (opcoes.length < 2) {
                 throw new pergunta_exception_1.QuantidadeMinimaOpcoesException(2);
             }
-            ;
             const duplicadas = opcoes.filter((item, i, arr) => arr.indexOf(item) !== i);
             if (duplicadas.length > 0) {
                 throw new pergunta_exception_1.OpcaoDuplicadaException(duplicadas[0]);
             }
-            ;
+            return opcoes;
         }
-        if (tipo === "nota" && opcoes != undefined && opcoes.length > 0) {
-            throw new pergunta_exception_1.ValidacaoPerguntaException([
-                "Perguntas do tipo 'nota' não devem ter opções."
-            ]);
-        }
+        throw new pergunta_exception_1.TipoPerguntaInvalidoException(tipo);
     }
     static criar(props) {
-        const { texto, tipo, opcoes, ordem } = props;
-        return new Pergunta({ texto,
+        const { texto, tipo, ordem, opcoes } = props;
+        const opcoesDefinidas = tipo === "texto" ? undefined : opcoes;
+        return new Pergunta({
+            texto,
             tipo,
-            opcoes,
-            ordem });
+            opcoes: opcoesDefinidas,
+            ordem
+        });
     }
     static recuperar(props) {
-        if (!props.id) {
-            throw new pergunta_exception_1.PerguntaNaoEncontradaException(props.id);
+        const { id, texto, tipo, ordem, opcoes } = props;
+        if (!id) {
+            throw new pergunta_exception_1.PerguntaNaoEncontradaException(id);
         }
-        ;
-        return new Pergunta(props);
+        const opcoesDefinidas = tipo === "multipla_escolha" || tipo === "nota" ? opcoes : undefined;
+        return new Pergunta({ id, texto, tipo, ordem, opcoes: opcoesDefinidas });
+    }
+    static deletar() {
+    }
+    ///////////
+    //Métodos//
+    ///////////
+    toDTO() {
+        return pergunta_map_1.PerguntaMap.toDTO(this);
     }
 }
 exports.Pergunta = Pergunta;

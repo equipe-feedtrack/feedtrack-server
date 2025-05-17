@@ -4,10 +4,66 @@ import { Produto } from 'modules/produtos/produto.entity';
 import { Feedback } from './modules/feedbacks/domain/feedback/feedback.entity';
 import { Formulario } from './modules/formulario/domain/formulario/formulario.entity';
 import { Pergunta } from '@modules/formulario/domain/pergunta/pergunta.entity';
+import { RecuperarPerguntaProps } from '@modules/formulario/domain/pergunta/pergunta.types';
+import { DomainException } from '@shared/domain/domain.exception';
+import { readFile, writeFile } from 'fs';
+import { PerguntaMap } from '@modules/formulario/mappers/pergunta.map';
+
 
 // Testando pergunta
-const pergunta = Pergunta.criar( { texto: 'Como você avalia sua experiência geral?', tipo: 'texto', opcoes: ['Sim', 'Não', 'Parcialmente'], ordem: 1 });
-console.log(pergunta);
+
+try {
+    const pergunta = Pergunta.criar( { texto: 'Como você avalia sua experiência geral?', tipo: 'nota', opcoes:["1","2","3"], ordem: 1 });
+    console.log(pergunta);
+
+     let propspergunta: RecuperarPerguntaProps = {
+        id: '4ede92e2-5a0c-4b0c-85d7-c4eed09ee7a5',
+        texto: 'fale de sua experiência',
+        tipo: 'texto',
+        ordem: 1 
+    };
+     let pergunta2 = Pergunta.recuperar(propspergunta);
+    console.log(pergunta2);
+
+    //////////////////////////////////////////////////////
+    //Persistinto e Recuperando em Arquivo - File System//
+    //////////////////////////////////////////////////////
+
+    let arrayperguntas = [];
+    arrayperguntas.push(pergunta.toDTO());
+	arrayperguntas.push(pergunta2.toDTO());
+
+     writeFile('perguntas.json', JSON.stringify(arrayperguntas), function (error:any) {
+        if (error) throw error;
+        console.log('Arquivo Salvo com Sucesso!');
+        readFile('perguntas.json', (error, dadoGravadoArquivo) => {
+            if (error) throw error;
+            console.log('Leitura de Arquivo!');
+            let categoriasSalvas: [] = JSON.parse(dadoGravadoArquivo.toString());
+            categoriasSalvas.forEach(categoriaJSON => {
+                console.log(categoriaJSON);
+                console.log(PerguntaMap.toDomain(categoriaJSON));
+            })
+        });
+    });
+
+
+
+
+
+
+
+
+} catch (error:any) {
+    if (error instanceof DomainException) {
+        console.log('Execeção de Dóminio');
+        console.log(error.message);
+    }
+    else {
+        console.log('Outras Exceções');
+        console.log(error.message);
+    }
+}
 
 
 /// Falta eu mexer nessa parte.!! (Yago)

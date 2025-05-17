@@ -1,0 +1,22 @@
+import { Pergunta } from "../domain/pergunta/pergunta.entity";
+import { IPergunta, RecuperarPerguntaProps } from "../domain/pergunta/pergunta.types";
+
+class PerguntaMap {
+
+    public static toDTO(pergunta: Pergunta): IPergunta {
+        return {
+            id: pergunta.id,
+            texto: pergunta.texto,
+            tipo: pergunta.tipo,
+            opcoes: pergunta.opcoes,
+            ordem: pergunta.ordem
+        }
+    }
+
+    public static toDomain(categoria: RecuperarPerguntaProps): Pergunta {
+        return Pergunta.recuperar(categoria);
+    }
+
+}
+
+export { PerguntaMap }

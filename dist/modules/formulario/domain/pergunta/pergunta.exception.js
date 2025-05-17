@@ -77,10 +77,10 @@ class ErroPersistenciaException extends PerguntaException {
 }
 exports.ErroPersistenciaException = ErroPersistenciaException;
 class ValidacaoPerguntaException extends PerguntaException {
-    constructor(mensagens) {
-        super(`Erro de validação da pergunta: ${mensagens.join("; ")}`);
-        this.mensagens = mensagens;
+    constructor(message = "Perguntas desse tipo não devem ter opções.") {
+        super(message);
         this.name = 'ValidacaoPerguntaException';
+        this.message = message;
     }
 }
 exports.ValidacaoPerguntaException = ValidacaoPerguntaException;

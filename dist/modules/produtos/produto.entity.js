@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Produto = void 0;
 const entity_1 = require("../../shared/domain/entity");
 const produto_exception_1 = require("./produto.exception");
-const produto_map_1 = require("modules/mappers/produto.map");
+const produto_map_1 = require("@modules/produtos/mappers/produto.map");
 class Produto extends entity_1.Entity {
     ///////////////
     //Gets e Sets//

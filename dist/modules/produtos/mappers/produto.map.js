@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProdutoMap = void 0;
 const produto_entity_1 = require("modules/produtos/produto.entity");
-const client_1 = require("@prisma/client");
 class ProdutoMap {
     static toDTO(produto) {
         return {
@@ -19,9 +18,6 @@ class ProdutoMap {
     }
     static toDomain(produto) {
         return produto_entity_1.Produto.recuperar(produto);
-    }
-    static toStatusProdutoPrisma(status) {
-        return client_1.StatusProdutoPrisma[status.toString()];
     }
 }
 exports.ProdutoMap = ProdutoMap;

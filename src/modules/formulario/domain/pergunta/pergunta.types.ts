@@ -8,11 +8,11 @@ interface IPergunta {
 
   type CriarPerguntaProps =  Omit<IPergunta, 'id'>;
 
-  type RecuperarPerguntaProps = Required<IPergunta>;
+ type RecuperarPerguntaProps = Omit<IPergunta, 'opcoes'> & { opcoes?: string[] } & {id: string;};
 
   export {
     IPergunta,
-     CriarPerguntaProps,
-     RecuperarPerguntaProps
+    CriarPerguntaProps,
+    RecuperarPerguntaProps
     
     }

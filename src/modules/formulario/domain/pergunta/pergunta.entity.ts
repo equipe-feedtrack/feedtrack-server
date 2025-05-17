@@ -1,6 +1,7 @@
 import { Entity } from "@shared/domain/entity";
 import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaDuplicadaException, PerguntaNaoEncontradaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
 import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
+import { PerguntaMap } from "@modules/formulario/mappers/pergunta.map";
 
 class Pergunta extends Entity<IPergunta> implements IPergunta{
 
@@ -8,7 +9,6 @@ private _texto: string;
 private _tipo: string;
 private _opcoes?: string[] | undefined;
 private _ordem: number;
-
 
 get texto(): string {
   return this._texto;
@@ -68,53 +68,86 @@ constructor(pergunta: IPergunta) {
     super(pergunta.id)
     this.texto = pergunta.texto;
     this.tipo = pergunta.tipo;
-    this.opcoes = pergunta.opcoes;
     this.ordem = pergunta.ordem;
-    Pergunta.validarOpcoes(this.tipo, this.opcoes);
+    this.opcoes = Pergunta.validarOpcoes(this.tipo, pergunta.opcoes);
+  }
+ private static validarOpcoes(tipo: string, opcoes: string[] | undefined): string[] | undefined {
+  if (tipo === "texto") {
+    if (opcoes !== undefined) {
+      throw new ValidacaoPerguntaException();
+    }
+    return undefined;
   }
 
-  private static validarOpcoes(tipo: string, opcoes: string[] | undefined): void {
+  if (tipo === "nota") {
+    const opcoesValidas = opcoes ?? ["1", "2", "3", "4", "5"];
 
-    if ((tipo === "multipla_escolha" && opcoes != undefined)) {
-      if (opcoes.length === 0) {
-        throw new OpcoesObrigatoriasException();
-      };
-
-      if (tipo === "multipla_escolha" && opcoes.length < 2) {
-        throw new QuantidadeMinimaOpcoesException(2);
-      };
-
-      const duplicadas = opcoes.filter((item, i, arr) => arr.indexOf(item) !== i);
-      if (duplicadas.length > 0) {
-        throw new OpcaoDuplicadaException(duplicadas[0]);
-      };
-
-    }
-    
-    if (tipo === "nota" && opcoes != undefined && opcoes.length > 0) {
-      throw new ValidacaoPerguntaException([
-        "Perguntas do tipo 'nota' não devem ter opções."
-      ]);
+    if (opcoesValidas.length === 0 || opcoesValidas === undefined) {
+      throw new OpcoesObrigatoriasException();
     }
 
+    const naoNumericas = opcoesValidas.filter(o => isNaN(Number(o)));
+    if (naoNumericas.length > 0) {
+      throw new ValidacaoPerguntaException();
+    }
+
+    return opcoesValidas;
   }
 
-  public static criar(props: CriarPerguntaProps): Pergunta{
-    const { texto, tipo, opcoes, ordem } = props;
-      return new Pergunta ({texto,
-        tipo,
-        opcoes,
-        ordem});
+  if (tipo === "multipla_escolha") {
+    if (!opcoes || opcoes.length === 0) {
+      throw new OpcoesObrigatoriasException();
+    }
+
+    if (opcoes.length < 2) {
+      throw new QuantidadeMinimaOpcoesException(2);
+    }
+
+    const duplicadas = opcoes.filter((item, i, arr) => arr.indexOf(item) !== i);
+    if (duplicadas.length > 0) {
+      throw new OpcaoDuplicadaException(duplicadas[0]);
+    }
+
+    return opcoes;
   }
 
+  throw new TipoPerguntaInvalidoException(tipo);
+}
+ public static criar(props: CriarPerguntaProps): Pergunta {
+  const { texto, tipo, ordem, opcoes } = props;
+
+  const opcoesDefinidas = tipo === "texto" ? undefined : opcoes;
+
+  return new Pergunta({
+    texto,
+    tipo,
+    opcoes: opcoesDefinidas,
+    ordem
+  });
+}
   public static recuperar(props: RecuperarPerguntaProps): Pergunta {
-    
-    if(!props.id) {
-      throw new PerguntaNaoEncontradaException(props.id);
-    };
+    const { id, texto, tipo, ordem, opcoes } = props;
 
-    return new Pergunta (props);
+    if (!id) {
+      throw new PerguntaNaoEncontradaException(id);
+    }
+
+    const opcoesDefinidas = tipo === "multipla_escolha" || tipo === "nota" ? opcoes : undefined;
+
+    return new Pergunta({ id, texto, tipo, ordem, opcoes: opcoesDefinidas });
   }
+
+  public static deletar() {
+    
+  }
+
+   ///////////
+    //Métodos//
+    ///////////
+
+    public toDTO(): IPergunta {
+        return PerguntaMap.toDTO(this);
+    }
 
 }
 
