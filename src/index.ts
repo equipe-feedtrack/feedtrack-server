@@ -1,14 +1,8 @@
-require('module-alias/register');  // Para funcionar junto com o sucrase.
-
-import { Produto } from 'modules/produtos/produto.entity';
-import { Feedback } from './modules/feedbacks/domain/feedback/feedback.entity';
-import { Formulario } from './modules/formulario/domain/formulario/formulario.entity';
 import { Pergunta } from '@modules/formulario/domain/pergunta/pergunta.entity';
 import { RecuperarPerguntaProps } from '@modules/formulario/domain/pergunta/pergunta.types';
+import { PerguntaMap } from '@modules/formulario/mappers/pergunta.map';
 import { DomainException } from '@shared/domain/domain.exception';
 import { readFile, writeFile } from 'fs';
-import { PerguntaMap } from '@modules/formulario/mappers/pergunta.map';
-
 
 // Testando pergunta
 

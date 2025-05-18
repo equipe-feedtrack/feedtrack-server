@@ -1,7 +1,7 @@
 {
     "code-runner.clearPreviousOutput": true,
     "code-runner.executorMap": {
-        "javascript": "ts-node -r tsconfig-paths/register src/index.ts", // vincular o nodemon com o sucrase
-        "typescript": "npx sucrase-node",
+        "javascript": "node",
+        "typescript": "npm run dev:console",
     }
 }

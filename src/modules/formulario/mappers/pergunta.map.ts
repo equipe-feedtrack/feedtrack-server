@@ -19,4 +19,4 @@ class PerguntaMap {
 
 }
 
-export { PerguntaMap }
+export { PerguntaMap };

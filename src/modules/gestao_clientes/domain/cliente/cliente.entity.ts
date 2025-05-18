@@ -122,13 +122,13 @@ class Cliente implements ICliente {
   // ---------- EXIBE OS DADOS DO CLIENTE ----------
   public lerContato(): string {
     return `
-ID: ${this.id}
-Nome: ${this.nome || "Removido"}
-Telefone: ${this.telefone || "Removido"}
-Email: ${this.email || "Removido"}
-Cidade: ${this.cidade || "Removido"}
-Cadastrado em: ${this.dataCadastro.toLocaleString()}
-    `.trim();
+    ID: ${this.id}
+    Nome: ${this.nome || "Removido"}
+    Telefone: ${this.telefone || "Removido"}
+    Email: ${this.email || "Removido"}
+    Cidade: ${this.cidade || "Removido"}
+    Cadastrado em: ${this.dataCadastro.toLocaleString()}
+        `.trim();
   }
 }
 

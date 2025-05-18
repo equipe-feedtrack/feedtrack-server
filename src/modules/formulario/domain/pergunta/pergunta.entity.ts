@@ -1,7 +1,7 @@
-import { Entity } from "@shared/domain/entity";
-import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaDuplicadaException, PerguntaNaoEncontradaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
-import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
 import { PerguntaMap } from "@modules/formulario/mappers/pergunta.map";
+import { Entity } from "@shared/domain/entity";
+import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaNaoEncontradaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
+import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
 
 class Pergunta extends Entity<IPergunta> implements IPergunta{
 
@@ -151,4 +151,4 @@ constructor(pergunta: IPergunta) {
 
 }
 
-export {Pergunta}
+export { Pergunta };

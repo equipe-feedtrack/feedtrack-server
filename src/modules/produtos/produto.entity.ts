@@ -1,6 +1,6 @@
+import { ProdutoMap } from "@modules/produtos/mappers/produto.map";
 import { Entity } from "../../shared/domain/entity";
 import { ProdutoExceptions } from "./produto.exception";
-import { ProdutoMap } from "@modules/produtos/mappers/produto.map";
 import { CriarProdutoProps, IProduto, RecuperarProdutoProps, StatusProduto } from "./produto.types";
 
 class Produto extends Entity<IProduto> implements IProduto {
