@@ -4,7 +4,7 @@ import { PerguntaMap } from '@modules/formulario/mappers/pergunta.map';
 import { DomainException } from '@shared/domain/domain.exception';
 import { readFile, writeFile } from 'fs';
 
-// Testando pergunta
+// Criando  e recuperando  perguntas.
 
 try {
     const pergunta = Pergunta.criar( { texto: 'Como você avalia sua experiência geral?', tipo: 'nota', opcoes:["1","2","3"], ordem: 1 });
@@ -50,7 +50,7 @@ try {
 
 } catch (error:any) {
     if (error instanceof DomainException) {
-        console.log('Execeção de Dóminio');
+        console.log('Execeção de Dominio');
         console.log(error.message);
     }
     else {
