@@ -13,6 +13,11 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+enum StatusProdutoPrisma {
+  ATIVO
+  INATIVO
+}
+
 enum tipo_usuario {
   FUNCIONARIO
   ADMINISTRADOR
@@ -43,6 +48,13 @@ model clientes {
 
 model produtos {
   id Int @id @default(autoincrement())
+  nome String
+  descricao String
+  valor Decimal
+  dataCriacao DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
+  dataExclusao DateTime?
+  status StatusProdutoPrisma @default(ATIVO)
 }
 
 model compras {

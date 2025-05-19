@@ -3,6 +3,7 @@ import { Produto } from "modules/produtos/produto.entity";
 import { IProduto, RecuperarProdutoProps, StatusProduto } from "modules/produtos/produto.types";
 import { StatusProdutoPrisma } from "@prisma/client";
 
+
 class ProdutoMap {
 
     public static toDTO(produto: Produto): IProduto {
@@ -11,7 +12,6 @@ class ProdutoMap {
           nome: produto.nome,
           descricao: produto.descricao,
           valor: produto.valor,
-          estoque: produto.estoque,
           dataCriacao: produto.dataCriacao,
           dataAtualizacao: produto.dataAtualizacao,
           dataExclusao: produto.dataExclusao,

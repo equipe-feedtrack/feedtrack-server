@@ -48,13 +48,7 @@ class ValorMinimoProdutoInvalido extends ProdutoException {
     }
 }
 
-class EstoqueMinimoProdutoInvalido extends ProdutoException {
-    public constructor(message:string = '⚠️ O estoque mínimo do produto é inválido.') {
-        super(message);
-        this.name = 'EstoqueMinimoProdutoInvalido'
-        this.message = message;
-    }
-}
+
 
 
 
@@ -71,7 +65,7 @@ const ProdutoExceptions = {
     DescricaoProdutoTamanhoMinimoInvalido: DescricaoProdutoTamanhoMinimoInvalido,
     DescricaoProdutoTamanhoMaximoInvalido: DescricaoProdutoTamanhoMaximoInvalido,
     ValorMinimoProdutoInvalido: ValorMinimoProdutoInvalido,
-    EstoqueMinimoProdutoInvalido: EstoqueMinimoProdutoInvalido,
+    
     
 }
 

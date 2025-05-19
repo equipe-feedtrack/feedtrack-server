@@ -2,7 +2,7 @@ import { IDatasControle, KeysDatasControle } from "../../shared/domain/data.type
 
 enum StatusProduto {
     ATIVO = "ATIVO",
-    DESATIVO = "DESATIVO"
+    INATIVO = "INATIVO",
 }
 
 //Todos os atributos/propriedades que um produto deve ter no sistema
@@ -12,7 +12,6 @@ interface IProduto extends IDatasControle {
     nome: string;
     descricao: string;
     valor: number;
-    estoque: number;
     status?: StatusProduto
 }
 
