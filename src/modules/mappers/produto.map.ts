@@ -1,7 +1,7 @@
 
 import { Produto } from "modules/produtos/produto.entity";
 import { IProduto, RecuperarProdutoProps, StatusProduto } from "modules/produtos/produto.types";
-import { StatusProdutoPrisma } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 
 class ProdutoMap {
@@ -25,10 +25,9 @@ class ProdutoMap {
 
         
 
-    public static toStatusProdutoPrisma(status: StatusProduto): StatusProdutoPrisma{
-        return StatusProdutoPrisma[status.toString() as keyof typeof StatusProdutoPrisma];
+    public static toStatusProdutoPrisma(status: StatusProduto): typeof PrismaClient["$Enums"]["StatusProdutoPrisma"] {
+        return PrismaClient["$Enums"]["StatusProdutoPrisma"][status.toString() as keyof typeof PrismaClient["$Enums"]["StatusProdutoPrisma"]];
     }
-
 
 }
 

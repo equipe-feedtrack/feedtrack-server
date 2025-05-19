@@ -1,12 +1,5 @@
-import * as PrismaClient from "@prisma/client";
-import { StatusProdutoPrisma } from "@prisma/client";
-import { $Enums } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
-console.log($Enums.StatusProdutoPrisma);
+const prisma = new PrismaClient();
 
-
-console.log(PrismaClient);
-
-console.log(StatusProdutoPrisma.ATIVO);
-console.log(StatusProdutoPrisma.INATIVO);
-
+console.log(prisma.$queryRaw`SELECT '${PrismaClient.StatusProdutoPrisma.ATIVO}'`);

@@ -2,6 +2,7 @@
   "name": "feedtrack-node-api",
   "version": "1.0.0",
   "description": "FeedTrack é um sistema de coleta e análise de feedbacks voltado para empresas que desejam melhorar a experiência do cliente. Ele automatiza o envio de questionários após a venda e coleta opiniões sobre atendimento, produto, entrega e outros pontos-chave. Os dados são armazenados, analisados e transformados em relatórios inteligentes que auxiliam gestores na tomada de decisões estratégicas. O sistema também permite identificar o cliente que realizou a compra, segmentar públicos e manter um canal ativo de comunicação para divulgação de novidades, eventos e ações de relacionamento. Além disso, faz uso do ambiente de execução node e linguagem de programação TypeScript.",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "nodemon npx ts-node src/index.ts",
@@ -28,12 +29,13 @@
   "devDependencies": {
     "@types/node": "^22.15.3",
     "nodemon": "^3.1.10",
+    "prisma": "^6.8.2",
     "sucrase": "^3.35.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@prisma/client": "^6.8.2",
     "@types/express": "^5.0.1",
-    "express": "^5.1.0",
-    "prisma": "^6.7.0"
+    "express": "^5.1.0"
   }
 }
