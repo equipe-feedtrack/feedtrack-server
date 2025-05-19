@@ -46,7 +46,7 @@ model clientes {
 
 }
 
-model produtos {
+model produto {
   id Int @id @default(autoincrement())
   nome String
   descricao String
