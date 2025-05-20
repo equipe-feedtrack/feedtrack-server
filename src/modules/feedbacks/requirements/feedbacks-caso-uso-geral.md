@@ -7,7 +7,7 @@ Como o sistema, quando o cliente responde, eu salvo essas respostas, porque elas
 
 Como um gestor, eu quero ver todas as respostas recebidas para que eu possa entender a percepção do cliente.
 
-📌 Entidades
+<!-- 📌 Entidades
 Feedback
 
 id, pesquisa_id, pergunta_id, respostaTexto, nota, dataResposta (Criado)
@@ -15,18 +15,18 @@ id, pesquisa_id, pergunta_id, respostaTexto, nota, dataResposta (Criado)
 📌 Regras de Negócio
 Associar Formulário à Feedback correto
 
-Validar tipo de resposta (nota, texto, múltipla escolha)
+Validar tipo de resposta (nota, texto, múltipla escolha) -->
 
 📌 Tarefas do Desenvolvedor
  Criar model Resposta
 
- Validar estrutura do formulário
+ Validar estrutura do formulário 
 
  Implementar salvamento e versionamento
 
  Gerar timestamp e vinculação correta
 
- Cobrir com testes
+ Cobrir com testes -->
 
 2. Geração de Relatórios e Observações
 História de Usuário:
