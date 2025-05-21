@@ -3,7 +3,7 @@ import { Pergunta } from "../pergunta/pergunta.entity";
 
 interface IFormulario {
 
-  formularioId: number;
+  formularioId?: string;
   titulo: string;
   descricao?: string;
   modeloPadrao: boolean;

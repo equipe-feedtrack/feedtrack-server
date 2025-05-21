@@ -1,10 +1,10 @@
+import { Entity } from "@shared/domain/entity";
 import { Pergunta } from "../pergunta/pergunta.entity";
 import { CriarFormularioProps, IFormulario } from "./formulario.types";
 
 
-class Formulario implements IFormulario{
+class Formulario  extends Entity<IFormulario> implements IFormulario{
     
-    private _formularioId: number;
     private _titulo: string;
     private _descricao?: string;
     private _modeloPadrao: boolean;
@@ -12,14 +12,6 @@ class Formulario implements IFormulario{
     private _dataCriacao: Date;
     private _perguntas: Pergunta[] = [];
     private _modeloBaseId?: number;
-
-    public get formularioId(): number {
-        return this._formularioId;
-    }
-
-    private set formularioId(value: number) {
-        this._formularioId = value;
-    } 
 
     get titulo(): string {
         return this._titulo;
@@ -80,7 +72,7 @@ class Formulario implements IFormulario{
 
 
      constructor(formulario: IFormulario) {
-        this.formularioId = formulario.formularioId ?? Date.now();
+       super(formulario.formularioId)
         this.titulo = formulario.titulo;
         this.descricao = formulario.descricao;
         this.modeloPadrao = formulario.modeloPadrao;
@@ -91,15 +83,8 @@ class Formulario implements IFormulario{
       }
     
     
-      adicionarPergunta(pergunta: Pergunta): void {
-        const novaPergunta = new Pergunta({
-            id: pergunta.id, 
-            texto: pergunta.texto,
-            tipo: pergunta.tipo,
-            opcoes: pergunta.opcoes,
-            ordem: pergunta.ordem
-        });
-        this._perguntas.push(novaPergunta);
+      private static adicionarPergunta(formulario: CriarFormularioProps): any {
+        
       }
 
     removerPergunta(perguntaId: string): void {

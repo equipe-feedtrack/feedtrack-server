@@ -1,6 +1,6 @@
 // import { IEnvioFormulario } from "./envioFormulario.types";
 
-// class EnvioFormulario implements IEnvioFormulario {
+// class EnvioFormulario extends Formulario  implements IEnvioFormulario {
 //   private _id: number;
 //   private _formularioId: number; // Pegar do fromulário
 //   private _clienteId: number; // Pegar do Cliente
@@ -63,7 +63,7 @@
 //   // Não faz sentido ter um setter para data de envio, geralmente é definida na criação
 
 //   constructor(EnvioFormulario: IEnvioFormulario {
-//     formularioId: number;
+//     super(EnvioFormulario.formularioId)
 //     clienteId: number;
 //     canal: 'whatsapp' | 'email';
 //     statusEnvio?: 'pendente' | 'enviado' | 'respondido';
