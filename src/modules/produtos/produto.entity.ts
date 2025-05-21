@@ -12,7 +12,6 @@ class Produto extends Entity<IProduto> implements IProduto {
     private _nome: string;
     private _descricao: string;
     private _valor: number;
-    private _estoque: number;
     private _dataCriacao?: Date | undefined;
     private _dataAtualizacao?: Date | undefined;
     private _dataExclusao?: Date | null | undefined;
@@ -27,7 +26,7 @@ class Produto extends Entity<IProduto> implements IProduto {
     public static readonly TAMANHO_MINIMO_DESCRICAO = 10;
     public static readonly TAMANHO_MAXIMO_DESCRICAO = 200;
     public static readonly VALOR_MINIMO = 0;
-    public static readonly ESTOQUE_MINIMO = 0;
+
 
     ///////////////
     //Gets e Sets//
@@ -84,18 +83,7 @@ class Produto extends Entity<IProduto> implements IProduto {
         this._valor = valor;
     }
 
-    public get estoque(): number {
-        return this._estoque;
-    }
 
-    private set estoque(estoque: number) {
-
-        if (estoque < Produto.ESTOQUE_MINIMO) {
-            throw new ProdutoExceptions.EstoqueMinimoProdutoInvalido();
-        }
-
-        this._estoque = estoque;
-    }
 
     public get dataCriacao(): Date | undefined {
         return this._dataCriacao;
@@ -133,13 +121,12 @@ class Produto extends Entity<IProduto> implements IProduto {
     //Construtor//
     //////////////
 
-    private constructor(produto: IProduto) {
+    constructor(produto: IProduto) {
 
         super(produto.id);
         this.nome = produto.nome;
         this.descricao = produto.descricao;
         this.valor = produto.valor;
-        this.estoque = produto.estoque;
         this.dataCriacao = produto.dataCriacao;
         this.dataAtualizacao = produto.dataAtualizacao;
         this.dataExclusao = produto.dataExclusao;
@@ -150,9 +137,10 @@ class Produto extends Entity<IProduto> implements IProduto {
     //Static Factory Method//
     /////////////////////////
 
-    public static criar(props: CriarProdutoProps): Produto {
+    public static criarProduto(props: CriarProdutoProps): Produto {
         return new Produto(props);
     }
+
 
     public static recuperar(props: RecuperarProdutoProps): Produto {
         return new Produto(props);

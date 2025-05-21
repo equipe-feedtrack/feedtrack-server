@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    include: ['**/*.spec.ts', '**/*.test.ts'], // Garante que Vitest reconheça seus testes
     exclude: [...configDefaults.exclude],
   },
  resolve: {

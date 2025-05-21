@@ -40,12 +40,21 @@ class TelefoneClienteInvalido extends ClienteException {
   }
 }
 
+class QtdMinimaProdutosClienteInvalida extends ClienteException {
+    public constructor(message:string = '⚠️ A quantidade mínima de produtos é inválida.') {
+        super(message);
+        this.name = 'QtdMinimaProdutosClienteInvalida'
+        this.message = message;
+    }
+}
+
 const ClienteExceptions = {
   ClienteException,
   NomeClienteTamanhoMinimoInvalido,
   NomeClienteTamanhoMaximoInvalido,
   EmailClienteInvalido,
   TelefoneClienteInvalido,
+  QtdMinimaProdutosClienteInvalida
 };
 
 export {
