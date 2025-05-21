@@ -26,7 +26,7 @@ class Produto extends Entity<IProduto> implements IProduto {
     public static readonly TAMANHO_MINIMO_DESCRICAO = 10;
     public static readonly TAMANHO_MAXIMO_DESCRICAO = 200;
     public static readonly VALOR_MINIMO = 0;
-    
+
 
     ///////////////
     //Gets e Sets//
@@ -83,7 +83,7 @@ class Produto extends Entity<IProduto> implements IProduto {
         this._valor = valor;
     }
 
-    
+
 
     public get dataCriacao(): Date | undefined {
         return this._dataCriacao;
@@ -121,7 +121,7 @@ class Produto extends Entity<IProduto> implements IProduto {
     //Construtor//
     //////////////
 
-    private constructor(produto: IProduto) {
+    constructor(produto: IProduto) {
 
         super(produto.id);
         this.nome = produto.nome;
@@ -137,9 +137,10 @@ class Produto extends Entity<IProduto> implements IProduto {
     //Static Factory Method//
     /////////////////////////
 
-    public static criar(props: CriarProdutoProps): Produto {
+    public static criarProduto(props: CriarProdutoProps): Produto {
         return new Produto(props);
     }
+
 
     public static recuperar(props: RecuperarProdutoProps): Produto {
         return new Produto(props);

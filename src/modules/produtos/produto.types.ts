@@ -20,7 +20,7 @@ interface IProduto extends IDatasControle {
 //Garantir a integridade dos dados de um objeto
 type CriarProdutoProps = Omit<IProduto, "id" | KeysDatasControle | "status">;
 
-//Atributos que são necessários para recuperar uma categoria
+//Atributos que são necessários para recuperar um produto
 //Tipo representa um dos estados do ciclo de vida da entidade
 type RecuperarProdutoProps = IProduto & {
     id: NonNullable<IProduto['id']>

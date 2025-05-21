@@ -1,24 +1,33 @@
-import { ICliente, CriarClienteProps } from "./cliente.types";
+import { Produto } from "modules/produtos/produto.entity";
+import { ICliente, CriarClienteProps, StatusCliente, RecuperarClienteProps } from "./cliente.types";
+import { ClienteExceptions } from "./cliente.exeption";
+import { Entity } from "@shared/domain/entity";
+import { ClienteMap } from "modules/mappers/cliente.map";
 
-class Cliente implements ICliente {
-  private _id: string;
+
+class Cliente extends Entity<ICliente> implements ICliente {
+
+  // -------- ATRIBUTOS DA CLASSE CLIENTE -------
+
   private _nome: string;
   private _telefone: string;
   private _email: string;
   private _cidade: string;
-  private _dataCadastro: Date;
-  private _ativo: boolean = true;
+  private _status?: StatusCliente | undefined;
+  private _dataCriacao?: Date | undefined;
+  private _dataAtualizacao?: Date | undefined;
+  private _dataExclusao?: Date | null | undefined;
   private _vendedorResponsavel: string;
+  private _produtos: Array<Produto>;
+
+
+  // ---------- CONSTANTES -------------------------------
+
+  public static readonly QTD_MINIMA_PRODUTOS = 1;
+
 
   // ---------- GETTERS e SETTERS COM VALIDAÇÃO ----------
 
-  public get id(): string {
-    return this._id;
-  }
-  private set id(value: string) {
-    if (!value) throw new Error("ID é obrigatório.");
-    this._id = value;
-  }
 
   public get nome(): string {
     return this._nome;
@@ -54,22 +63,40 @@ class Cliente implements ICliente {
     this._cidade = value?.trim() ?? '';
   }
 
-  public get dataCadastro(): Date {
-    return this._dataCadastro;
-  }
-  private set dataCadastro(value: Date) {
-    if (!(value instanceof Date) || isNaN(value.getTime())) {
-      throw new Error("Data de cadastro inválida.");
-    }
-    this._dataCadastro = value;
+  public get dataCriacao(): Date | undefined {
+    return this._dataCriacao;
   }
 
-  public get ativo(): boolean {
-    return this._ativo;
+  private set dataCriacao(value: Date | undefined) {
+    this._dataCriacao = value;
   }
-  private set ativo(value: boolean) {
-    this._ativo = !!value;
+
+  public get dataAtualizacao(): Date | undefined {
+    return this._dataAtualizacao;
   }
+
+  private set dataAtualizacao(value: Date | undefined) {
+    this._dataAtualizacao = value;
+  }
+
+  public get dataExclusao(): Date | null | undefined {
+    return this._dataExclusao;
+  }
+
+  private set dataExclusao(value: Date | null | undefined) {
+    this._dataExclusao = value;
+  }
+
+  public get status(): StatusCliente | undefined {
+    return this._status;
+  }
+
+  private set status(value: StatusCliente | undefined) {
+    this._status = value;
+  }
+
+
+
 
   public get vendedorResponsavel(): string {
     return this._vendedorResponsavel;
@@ -80,56 +107,70 @@ class Cliente implements ICliente {
     }
     this._vendedorResponsavel = value.trim();
   }
+  public get produtos(): Array<Produto> {
+    return this._produtos;
+  }
+
+  private set produtos(produtos: Array<Produto>) {
+    const qtdProdutos = produtos.length;
+
+    if (qtdProdutos < Cliente.QTD_MINIMA_PRODUTOS) {
+      throw new ClienteExceptions.QtdMinimaProdutosClienteInvalida();
+    }
+    this._produtos = produtos;
+  }
 
   // ---------- CONSTRUTOR ----------
 
-  constructor(props: ICliente) {
-    this.id = props.id || crypto.randomUUID(); // Gera ID se não vier
-    this.nome = props.nome;
-    this.telefone = props.telefone;
-    this.email = props.email ?? '';
-    this.cidade = props.cidade;
-    this.dataCadastro = props.dataCadastro || new Date(); // Data atual se não vier
-    this.ativo = props.ativo;
-    this.vendedorResponsavel = props.vendedorResponsavel;
+  constructor(cliente: ICliente) {
+    super (cliente.id);
+    this.nome = cliente.nome;
+    this.telefone = cliente.telefone;
+    this.email = cliente.email ?? '';
+    this.cidade = cliente.cidade;
+    this.status = cliente.status;
+    this.dataCriacao = cliente.dataCriacao;
+    this.dataAtualizacao = cliente.dataAtualizacao;
+    this.dataExclusao = cliente.dataExclusao;
+    this.vendedorResponsavel = cliente.vendedorResponsavel;
+    this.produtos = (cliente.produtos ?? []).map(produto => Produto.criarProduto(produto));
   }
-
   // ---------- CRIA NOVO CLIENTE ----------
-  public static criarContato(props: CriarClienteProps): Cliente {
-    return new Cliente({
-      ...props,
-      id: crypto.randomUUID(),
-      dataCadastro: new Date(),
-      ativo: true,
-    });
-  }
+    public static criarProduto(props: CriarClienteProps): Cliente {
+        return new Cliente(props);
+    }
 
-  // ---------- ATUALIZA DADOS DO CLIENTE ----------
-  public atualizarContato(dados: Partial<Omit<ICliente, "id" | "dataCadastro">>): void {
-    if (dados.nome) this.nome = dados.nome;
-    if (dados.telefone) this.telefone = dados.telefone;
-    if (dados.email !== undefined) this.email = dados.email;
-    if (dados.cidade) this.cidade = dados.cidade;
-    if (dados.vendedorResponsavel) this.vendedorResponsavel = dados.vendedorResponsavel;
-    if (dados.ativo !== undefined) this.ativo = dados.ativo;
-  }
+    // ---------- CRIA NOVO CLIENTE ----------
 
-  // ---------- DESATIVA O CLIENTE (simula deletar) ----------
-  public deletarContato(): void {
-    this.ativo = false;
-  }
+      public static recuperar(props: RecuperarClienteProps): Cliente {
+        return new Cliente(props);
+    }
+
+  // ---------- MÉTODOS ----------
+    public toDTO(): ICliente {
+        return ClienteMap.toDTO(this);
+    }
+
+    public estaDeletado(): boolean {
+        return this.dataExclusao !== null ? true : false;
+    }
 
   // ---------- EXIBE OS DADOS DO CLIENTE ----------
-  public lerContato(): string {
-    return `
-ID: ${this.id}
-Nome: ${this.nome || "Removido"}
-Telefone: ${this.telefone || "Removido"}
-Email: ${this.email || "Removido"}
-Cidade: ${this.cidade || "Removido"}
-Cadastrado em: ${this.dataCadastro.toLocaleString()}
-    `.trim();
-  }
+public lerContato(): string {
+  const dados = {
+    ID: this.id ?? "Não informado",
+    Nome: this.nome ?? "Removido",
+    Telefone: this.telefone ?? "Removido",
+    Email: this.email ?? "Removido",
+    Cidade: this.cidade ?? "Removido",
+    Cadastrado: this.dataCriacao ? this.dataCriacao.toLocaleString() : "Data não disponível"
+  };
+
+  return Object.entries(dados)
+    .map(([chave, valor]) => `${chave}: ${valor}`)
+    .join("\n")
+    .trim();
+}
 }
 
 export { Cliente };

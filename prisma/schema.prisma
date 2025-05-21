@@ -18,6 +18,13 @@ enum StatusProdutoPrisma {
   INATIVO
 }
 
+enum StatusClientePrisma {
+
+  ATIVO
+  INATIVO
+
+}
+
 enum tipo_usuario {
   FUNCIONARIO
   ADMINISTRADOR
@@ -43,7 +50,14 @@ model clientes {
   id Int @id @default(autoincrement())
   nome String
   telefone String
-
+  email String?
+  cidade String
+  status StatusClientePrisma @default(ATIVO)
+  dataCriacao DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
+  dataExclusao DateTime?
+  vendedorResponsavel String
+  produtos produto[] @relation("ClienteProduto")
 }
 
 model produto {
@@ -55,6 +69,8 @@ model produto {
   dataAtualizacao DateTime @updatedAt
   dataExclusao DateTime?
   status StatusProdutoPrisma @default(ATIVO)
+  clienteId  Int?
+  cliente clientes? @relation("ClienteProduto", fields: [clienteId], references: [id])
 }
 
 model compras {
