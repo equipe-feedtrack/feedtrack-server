@@ -6,7 +6,9 @@ interface IPergunta {
     ordem: number;
   }
 
-  type CriarPerguntaProps =  Omit<IPergunta, 'id'>;
+  type CriarPerguntaProps = Omit<IPergunta, 'id' | 'ordem'> & {
+    ordensUsadas: number[];
+  };
 
  type RecuperarPerguntaProps = Omit<IPergunta, 'opcoes'> & { opcoes?: string[] } & {id: string;};
 
@@ -15,4 +17,4 @@ interface IPergunta {
     CriarPerguntaProps,
     RecuperarPerguntaProps
     
-    }
+  }

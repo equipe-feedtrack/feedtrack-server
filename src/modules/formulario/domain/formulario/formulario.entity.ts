@@ -1,113 +1,172 @@
+import { Entity } from "@shared/domain/entity";
 import { Pergunta } from "../pergunta/pergunta.entity";
-import { CriarFormularioProps, IFormulario } from "./formulario.types";
+import { CriarFormularioProps, IFormulario, RecuperarFormularioProps } from "./formulario.types";
+import { FormularioMap } from "@modules/formulario/mappers/formulario.map";
+import { FormularioTituloVazioException } from "./formulario.exception";
+import { Produto } from "@modules/produtos/produto.entity";
+import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
+import { Funcionario } from "@modules/usuario/funcionario.entity";
 
+class Formulario extends Entity<IFormulario> implements IFormulario {
+ 
+  private _titulo: string;
+  private _descricao?: string | undefined;
+  private _perguntas: Pergunta[];
+  private _cliente: Cliente;
+  private _produto: Produto;
+  private _funcionario: Funcionario;
+  private _ativo: boolean;
+  private _dataCriacao: Date;
+  private _dataAtualizacao: Date;
 
-class Formulario implements IFormulario{
-    
-    private _formularioId: number;
-    private _titulo: string;
-    private _descricao?: string;
-    private _modeloPadrao: boolean;
-    private _ativo: boolean;
-    private _dataCriacao: Date;
-    private _perguntas: Pergunta[] = [];
-    private _modeloBaseId?: number;
-
-    public get formularioId(): number {
-        return this._formularioId;
-    }
-
-    private set formularioId(value: number) {
-        this._formularioId = value;
-    } 
-
-    get titulo(): string {
+      public get titulo(): string {
         return this._titulo;
     }
-
-    private set titulo(value: string) {
-        if (!value) {
-        throw new Error('O título do formulário é obrigatório.');
-        }
-        this._titulo = value;
+    private set titulo(titulo: string) {
+        this._titulo = titulo;
     }
-
-    get descricao(): string | undefined {
+    public get descricao(): string | undefined {
         return this._descricao;
     }
-
-    private set descricao(value: string | undefined) {
-        this._descricao = value;
+    private set descricao(descricao: string | undefined) {
+        this._descricao = descricao;
     }
-
-    get modeloPadrao(): boolean {
-        return this._modeloPadrao;
+    public get perguntas(): Pergunta[] {
+        return this._perguntas;
     }
-
-    private set modeloPadrao(value: boolean) {
-        this._modeloPadrao = value;
+    private set perguntas(perguntas: Pergunta[]) {
+        this._perguntas = perguntas;
     }
-
-    get ativo(): boolean {
+    public get cliente(): Cliente {
+    return this._cliente;
+    }
+    private set cliente(cliente: Cliente) {
+      this._cliente = cliente;
+    }
+    public get produto(): Produto {
+      return this._produto;
+    }
+    private set produto(produto: Produto) {
+      this._produto = produto;
+    }
+    public get funcionario(): Funcionario {
+    return this._funcionario;
+    }
+    private set funcionario(funcionario: Funcionario) {
+      this._funcionario = funcionario;
+    }
+    public get ativo(): boolean {
         return this._ativo;
     }
-
-    private set ativo(value: boolean) {
-        this._ativo = value;
+    private set ativo(ativo: boolean) {
+        this._ativo = ativo;
     }
-
-    get dataCriacao(): Date {
+    public get dataCriacao(): Date {
         return this._dataCriacao;
     }
-    // Não faz sentido ter um setter para data de criação, geralmente é imutável
+    private set dataCriacao(dataCriacao: Date) {
+        this._dataCriacao = dataCriacao;
+    }
+    public get dataAtualizacao(): Date {
+        return this._dataAtualizacao;
+    }
+    private set dataAtualizacao(dataAtualizacao: Date) {
+        this._dataAtualizacao = dataAtualizacao;
+    }
+  
+  private constructor(formulario: IFormulario) {
+    super(formulario.id)
+    this._titulo = formulario.titulo;
+    this._descricao = formulario.descricao;
+    this._perguntas = formulario.perguntas ?? [];
+    this._cliente = formulario.cliente;
+    this._produto = formulario.produto;
+    this._funcionario = formulario.funcionario;
+    this._ativo = formulario.ativo ?? true;
+    this._dataCriacao = formulario.dataCriacao ?? new Date();
+    this._dataAtualizacao = formulario.dataAtualizacao ?? new Date();
 
-    get perguntas(): Pergunta[] | undefined  {
-        return this._perguntas.length > 0 ? this._perguntas : undefined;
+    this.validateFormulario();
+  }
+
+  // Validações básicas
+  private  validateFormulario() {
+    if (!this.titulo || this.titulo.trim().length === 0) {
+      throw new FormularioTituloVazioException;
+    }
+    if (!this.perguntas || this.perguntas.length === 0)
+      throw new Error('Formulário precisa ter ao menos uma pergunta');
+
+    if (!this.cliente || !this.produto || !this.funcionario) {
+      throw new Error('Formulário precisa estar ligado a um cliente, produto e funcionário');
+    }
+    // Pode colocar outras validações aqui...
+  }
+
+  // criar um formulário novo
+  public static criar(formulario: CriarFormularioProps): Formulario {
+    return new Formulario({
+    titulo: formulario.titulo,
+    descricao: formulario.descricao,
+    perguntas: formulario.perguntas,
+    cliente: formulario.cliente,
+    produto: formulario.produto,
+    funcionario: formulario.funcionario,
+    ativo: formulario.ativo,
+    dataCriacao: formulario.dataCriacao,
+    dataAtualizacao: formulario.dataAtualizacao
+  });
+  }
+
+  // recuperar formulário (ex: reconstituir de banco)
+  public static recuperar(formulario: RecuperarFormularioProps): Formulario {
+    return new Formulario(formulario);
+  }
+
+    ///////////
+    //Métodos///
+    ///////////
+
+    public toDTO(): IFormulario {
+        return FormularioMap.toDTO(this);
     }
 
-   private set perguntas(value: Pergunta[] | undefined ) {
-        this._perguntas = value ?? [];
+  // Métodos para manipular perguntas
+  public adicionarPergunta(pergunta: Pergunta): void {
+    // Se quiser, pode validar se pergunta já existe na lista
+    this.perguntas.push(pergunta);
+    this.dataAtualizacao = new Date();
+  }
+
+  public removerPergunta(idPergunta: string): void {
+    this.perguntas = this.perguntas.filter(p => p.id !== idPergunta);
+    this.dataAtualizacao = new Date();
+  }
+
+  // Atualizar título ou descrição
+  public atualizarTitulo(titulo: string): void {
+    if (!titulo || titulo.trim().length === 0) {
+      throw new FormularioTituloVazioException;
     }
-    // Não implementamos um setter direto para perguntas, use os métodos de manipulação
+    this.titulo = titulo;
+    this.dataAtualizacao = new Date();
+  }
 
-    get modeloBaseId(): number | undefined {
-        return this._modeloBaseId;
-    }
-    
-    private set modeloBaseId(value: number | undefined) {
-        this._modeloBaseId = value;
-    }
+  public atualizarDescricao(descricao: string): void {
+    this.descricao = descricao;
+    this.dataAtualizacao = new Date();
+  }
 
+  // Ativar ou desativar formulário
+  public ativar(): void {
+    this.ativo = true;
+    this.dataAtualizacao = new Date();
+  }
 
-     constructor(formulario: IFormulario) {
-        this.formularioId = formulario.formularioId ?? Date.now();
-        this.titulo = formulario.titulo;
-        this.descricao = formulario.descricao;
-        this.modeloPadrao = formulario.modeloPadrao;
-        this.ativo = formulario.ativo ?? true;
-        this._dataCriacao = formulario.dataCriacao ?? new Date();
-        this.perguntas = formulario.perguntas;
-        this.modeloBaseId = formulario.modeloBaseId;
-      }
-    
-    
-      adicionarPergunta(pergunta: Pergunta): void {
-        const novaPergunta = new Pergunta({
-            id: pergunta.id, 
-            texto: pergunta.texto,
-            tipo: pergunta.tipo,
-            opcoes: pergunta.opcoes,
-            ordem: pergunta.ordem
-        });
-        this._perguntas.push(novaPergunta);
-      }
-
-    removerPergunta(perguntaId: string): void {
-        this._perguntas = this._perguntas.filter((p) => p.id !== perguntaId);
-    }
-
-    // Criar o método de adicionar o formulário agora no feedback.
+  public desativar(): void {
+    this.ativo = false;
+    this.dataAtualizacao = new Date();
+  }
 }
 
-
-export {Formulario}
+export{Formulario}

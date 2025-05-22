@@ -35,9 +35,7 @@ get tipo(): string {
   if (!tiposValidos .includes(tipo)) {
     throw new TipoPerguntaInvalidoException(tipo);
   }
-  if ((tipo === "multipla_escolha" || tipo === "texto") && tipo.length === 0) {
-    throw new OpcoesObrigatoriasException();
-  }
+
   this._tipo = tipo;
   // Limpar opções se o tipo mudar para algo que não seja múltipla escolha
   if (tipo !== 'multipla_escolha') {
@@ -57,72 +55,87 @@ get ordem(): number {
   return this._ordem;
 }
 
-private set ordem(value: number) {
-  if (value === undefined || value === null || value < 1) {
-    throw new Error('A ordem da pergunta deve ser maior ou igual a 1.');
-  }
-  this._ordem = value;
+private set ordem(ordem: number) {
+  this._ordem = ordem;
 }
 
-constructor(pergunta: IPergunta) {
+private constructor(pergunta: IPergunta) {
     super(pergunta.id)
     this.texto = pergunta.texto;
     this.tipo = pergunta.tipo;
     this.ordem = pergunta.ordem;
     this.opcoes = Pergunta.validarOpcoes(this.tipo, pergunta.opcoes);
   }
- private static validarOpcoes(tipo: string, opcoes: string[] | undefined): string[] | undefined {
-  if (tipo === "texto") {
-    if (opcoes !== undefined) {
-      throw new ValidacaoPerguntaException();
-    }
-    return undefined;
+private static validarOpcoes(tipo: string, opcoes?: string[]): string[] | undefined {
+  switch (tipo) {
+    case "texto":
+      return this.validarOpcoesTexto(opcoes);
+    case "nota":
+      return this.validarOpcoesNota(opcoes);
+    case "multipla_escolha":
+      return this.validarOpcoesMultiplaEscolha(opcoes);
+    default:
+      throw new TipoPerguntaInvalidoException(tipo);
   }
-
-  if (tipo === "nota") {
-    const opcoesValidas = opcoes ?? ["1", "2", "3", "4", "5"];
-
-    if (opcoesValidas.length === 0 || opcoesValidas === undefined) {
-      throw new OpcoesObrigatoriasException();
-    }
-
-    const naoNumericas = opcoesValidas.filter(o => isNaN(Number(o)));
-    if (naoNumericas.length > 0) {
-      throw new ValidacaoPerguntaException();
-    }
-
-    return opcoesValidas;
-  }
-
-  if (tipo === "multipla_escolha") {
-    if (!opcoes || opcoes.length === 0) {
-      throw new OpcoesObrigatoriasException();
-    }
-
-    if (opcoes.length < 2) {
-      throw new QuantidadeMinimaOpcoesException(2);
-    }
-
-    const duplicadas = opcoes.filter((item, i, arr) => arr.indexOf(item) !== i);
-    if (duplicadas.length > 0) {
-      throw new OpcaoDuplicadaException(duplicadas[0]);
-    }
-
-    return opcoes;
-  }
-
-  throw new TipoPerguntaInvalidoException(tipo);
 }
+
+private static validarOpcoesTexto(opcoes?: string[]): undefined {
+  if (opcoes !== undefined) {
+    throw new ValidacaoPerguntaException();
+  }
+  return undefined;
+}
+
+private static validarOpcoesNota(opcoes?: string[]): string[] {
+  const opcoesValidas = opcoes ?? ["1", "2", "3", "4", "5"];
+
+  if (opcoesValidas.length === 0) {
+    throw new OpcoesObrigatoriasException();
+  }
+
+  const naoNumericas = opcoesValidas.filter(o => isNaN(Number(o)));
+  if (naoNumericas.length > 0) {
+    throw new ValidacaoPerguntaException();
+  }
+
+  return opcoesValidas;
+}
+
+private static validarOpcoesMultiplaEscolha(opcoes?: string[]): string[] {
+  if (!opcoes || opcoes.length === 0) {
+    throw new OpcoesObrigatoriasException();
+  }
+
+  if (opcoes.length < 2) {
+    throw new QuantidadeMinimaOpcoesException(2);
+  }
+
+  const duplicadas = opcoes.filter((item, i, arr) => arr.indexOf(item) !== i);
+  if (duplicadas.length > 0) {
+    throw new OpcaoDuplicadaException(duplicadas[0]);
+  }
+
+  return opcoes;
+}
+
+private static proximaOrdemLivre(ordensUsadas: number[] = []): number {
+  let ordem = 1;
+  while (ordensUsadas.includes(ordem)) {
+    ordem++;
+  }
+  return ordem;
+}
+
  public static criar(props: CriarPerguntaProps): Pergunta {
-  const { texto, tipo, ordem, opcoes } = props;
+  const { texto, tipo, ordensUsadas, opcoes } = props;
 
   const opcoesDefinidas = tipo === "texto" ? undefined : opcoes;
-
+  const novaOrdem = Pergunta.proximaOrdemLivre(ordensUsadas);
   return new Pergunta({
     texto,
     tipo,
     opcoes: opcoesDefinidas,
-    ordem
+    ordem: novaOrdem
   });
 }
   public static recuperar(props: RecuperarPerguntaProps): Pergunta {
@@ -141,8 +154,8 @@ constructor(pergunta: IPergunta) {
     
   }
 
-   ///////////
-    //Métodos//
+    ///////////
+    //Métodos///
     ///////////
 
     public toDTO(): IPergunta {
