@@ -1,7 +1,7 @@
-import { Cliente } from "modules/gestao_clientes/domain/cliente/cliente.entity";
-import { ICliente, CriarClienteProps } from "modules/gestao_clientes/domain/cliente/cliente.types";
-import { ProdutoMap } from "./produto.map";
 import { PrismaClient } from "@prisma/client";
+import { ICliente } from "@modules/gestao_clientes/domain/cliente/cliente.types";
+import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
+import { ProdutoMap } from "./produto.map";
 
 class ClienteMap {
     public static toDTO(cliente: Cliente): ICliente {

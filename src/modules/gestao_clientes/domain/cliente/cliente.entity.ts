@@ -2,7 +2,7 @@ import { Produto } from "modules/produtos/produto.entity";
 import { ICliente, CriarClienteProps, StatusCliente, RecuperarClienteProps } from "./cliente.types";
 import { ClienteExceptions } from "./cliente.exeption";
 import { Entity } from "@shared/domain/entity";
-import { ClienteMap } from "modules/mappers/cliente.map";
+import { ClienteMap } from "@modules/produtos/mappers/cliente.map";
 
 
 class Cliente extends Entity<ICliente> implements ICliente {
