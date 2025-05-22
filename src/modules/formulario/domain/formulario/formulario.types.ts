@@ -1,18 +1,23 @@
+import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 import { Pergunta } from "../pergunta/pergunta.entity";
-
+import { Produto } from "@modules/produtos/produto.entity";
+import { Funcionario } from "@modules/usuario/funcionario.entity";
 
 interface IFormulario {
-
-  formularioId?: string;
+  id?: string;
   titulo: string;
   descricao?: string;
-  modeloPadrao: boolean;
-  ativo: boolean;
-  dataCriacao: Date;
   perguntas?: Pergunta[];
-  modeloBaseId?: number; // Referência ao modelo base, se houver
+  cliente: Cliente;
+  produto: Produto;
+  funcionario: Funcionario;
+  ativo?: boolean;
+  dataCriacao?: Date;
+  dataAtualizacao?: Date;
 }
 
-type CriarFormularioProps =  Omit<IFormulario, 'formularioId'>[];
+type CriarFormularioProps =  Omit<IFormulario, 'id'>;
 
-export{IFormulario, CriarFormularioProps}
+type RecuperarFormularioProps = Required<IFormulario>;
+
+export{IFormulario, CriarFormularioProps, RecuperarFormularioProps}

@@ -13,8 +13,8 @@ class PerguntaMap {
         }
     }
 
-    public static toDomain(categoria: RecuperarPerguntaProps): Pergunta {
-        return Pergunta.recuperar(categoria);
+    public static toDomain(pergunta: RecuperarPerguntaProps): Pergunta {
+        return Pergunta.recuperar(pergunta);
     }
 
 }
