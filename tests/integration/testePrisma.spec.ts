@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import { PrismaClient } from '@prisma/client';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 const prisma = new PrismaClient();
 

@@ -1,11 +1,9 @@
+import { FormularioMap } from "@modules/formulario/mappers/formulario.map";
+import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 import { Entity } from "@shared/domain/entity";
 import { Pergunta } from "../pergunta/pergunta.entity";
-import { CriarFormularioProps, IFormulario, RecuperarFormularioProps } from "./formulario.types";
-import { FormularioMap } from "@modules/formulario/mappers/formulario.map";
 import { FormularioTituloVazioException } from "./formulario.exception";
-import { Produto } from "@modules/produtos/produto.entity";
-import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
-import { Funcionario } from "@modules/usuario/funcionario.entity";
+import { CriarFormularioProps, IFormulario, RecuperarFormularioProps } from "./formulario.types";
 
 class Formulario extends Entity<IFormulario> implements IFormulario {
  
@@ -13,8 +11,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
   private _descricao?: string | undefined;
   private _perguntas: Pergunta[];
   private _cliente: Cliente;
-  private _produto: Produto;
-  private _funcionario: Funcionario;
+  // private _funcionario: Funcionario;
   private _ativo: boolean;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
@@ -43,18 +40,12 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     private set cliente(cliente: Cliente) {
       this._cliente = cliente;
     }
-    public get produto(): Produto {
-      return this._produto;
-    }
-    private set produto(produto: Produto) {
-      this._produto = produto;
-    }
-    public get funcionario(): Funcionario {
-    return this._funcionario;
-    }
-    private set funcionario(funcionario: Funcionario) {
-      this._funcionario = funcionario;
-    }
+    // public get funcionario(): Funcionario {
+    // return this._funcionario;
+    // }
+    // private set funcionario(funcionario: Funcionario) {
+    //   this._funcionario = funcionario;
+    // }
     public get ativo(): boolean {
         return this._ativo;
     }
@@ -80,8 +71,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     this._descricao = formulario.descricao;
     this._perguntas = formulario.perguntas ?? [];
     this._cliente = formulario.cliente;
-    this._produto = formulario.produto;
-    this._funcionario = formulario.funcionario;
+    // this._funcionario = formulario.funcionario;
     this._ativo = formulario.ativo ?? true;
     this._dataCriacao = formulario.dataCriacao ?? new Date();
     this._dataAtualizacao = formulario.dataAtualizacao ?? new Date();
@@ -94,12 +84,6 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     if (!this.titulo || this.titulo.trim().length === 0) {
       throw new FormularioTituloVazioException;
     }
-    if (!this.perguntas || this.perguntas.length === 0)
-      throw new Error('Formulário precisa ter ao menos uma pergunta');
-
-    if (!this.cliente || !this.produto || !this.funcionario) {
-      throw new Error('Formulário precisa estar ligado a um cliente, produto e funcionário');
-    }
     // Pode colocar outras validações aqui...
   }
 
@@ -110,8 +94,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     descricao: formulario.descricao,
     perguntas: formulario.perguntas,
     cliente: formulario.cliente,
-    produto: formulario.produto,
-    funcionario: formulario.funcionario,
+    // funcionario: formulario.funcionario,
     ativo: formulario.ativo,
     dataCriacao: formulario.dataCriacao,
     dataAtualizacao: formulario.dataAtualizacao
@@ -169,4 +152,4 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
   }
 }
 
-export{Formulario}
+export { Formulario };

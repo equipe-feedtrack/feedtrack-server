@@ -1,23 +1,20 @@
-import { Produto } from "modules/produtos/produto.entity";
-import { ICliente, CriarClienteProps, StatusCliente, RecuperarClienteProps } from "./cliente.types";
-import { ClienteExceptions } from "./cliente.exeption";
-import { Entity } from "@shared/domain/entity";
 import { ClienteMap } from "@modules/produtos/mappers/cliente.map";
+import { Produto } from "@modules/produtos/produto.entity";
+import { Entity } from "@shared/domain/entity";
+import { Pessoa } from "@shared/domain/pessoa.entity";
+import { ClienteExceptions } from "./cliente.exeption";
+import { CriarClienteProps, ICliente, RecuperarClienteProps, StatusCliente } from "./cliente.types";
 
-
-class Cliente extends Entity<ICliente> implements ICliente {
+class Cliente extends Entity<ICliente> {
 
   // -------- ATRIBUTOS DA CLASSE CLIENTE -------
-
-  private _nome: string;
-  private _telefone: string;
-  private _email: string;
+  private _pessoa: Pessoa; // Agora consegue puxar da classe genérica Pessoa
   private _cidade: string;
   private _status?: StatusCliente | undefined;
   private _dataCriacao?: Date | undefined;
   private _dataAtualizacao?: Date | undefined;
   private _dataExclusao?: Date | null | undefined;
-  private _vendedorResponsavel: string;
+  private _vendedorResponsavel: string //Funcionario; // Acredito que o código vai ficar assim com o tipo Funcionário! só tem que fazer os ajustes, não precisa cliente herdar de usuario, quem herda é funcionário é administrador porque Cliente é um domínio, ele tem que está associado a outra classe de dminio chamada de Funcinario (Yago).
   private _produtos: Array<Produto>;
 
 
@@ -28,37 +25,18 @@ class Cliente extends Entity<ICliente> implements ICliente {
 
   // ---------- GETTERS e SETTERS COM VALIDAÇÃO ----------
 
-
-  public get nome(): string {
-    return this._nome;
-  }
-  private set nome(value: string) {
-    if (!value || value.trim() === '') throw new Error("Nome do cliente é obrigatório.");
-    this._nome = value.trim();
+    public get pessoa(): Pessoa {
+    return this._pessoa;
   }
 
-  public get telefone(): string {
-    return this._telefone;
-  }
-  private set telefone(value: string) {
-    const regexTelefone = /^[\d\s()+-]{8,24}$/;
-    if (!regexTelefone.test(value)) throw new Error("Telefone inválido.");
-    this._telefone = value;
-  }
-
-  public get email(): string {
-    return this._email;
-  }
-  private set email(value: string) {
-    if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      throw new Error("Email inválido.");
-    }
-    this._email = value;
+  private set pessoa(pessoa: Pessoa) {
+    this._pessoa = pessoa;
   }
 
   public get cidade(): string {
     return this._cidade;
   }
+
   private set cidade(value: string) {
     this._cidade = value?.trim() ?? '';
   }
@@ -95,12 +73,10 @@ class Cliente extends Entity<ICliente> implements ICliente {
     this._status = value;
   }
 
-
-
-
   public get vendedorResponsavel(): string {
     return this._vendedorResponsavel;
   }
+
   private set vendedorResponsavel(value: string) {
     if (!value || value.trim() === '') {
       throw new Error("Vendedor responsável é obrigatório.");
@@ -123,10 +99,12 @@ class Cliente extends Entity<ICliente> implements ICliente {
   // ---------- CONSTRUTOR ----------
 
   constructor(cliente: ICliente) {
-    super (cliente.id);
-    this.nome = cliente.nome;
-    this.telefone = cliente.telefone;
-    this.email = cliente.email ?? '';
+    super (cliente.id); // Vem do Entity.
+    this.pessoa = new Pessoa({ // Vai trazer as informações de Pessoa, agora evitando a repetição de código.
+      nome: cliente.nome,
+      email: cliente.email,
+      telefone: cliente.telefone
+    });
     this.cidade = cliente.cidade;
     this.status = cliente.status;
     this.dataCriacao = cliente.dataCriacao;
@@ -135,12 +113,13 @@ class Cliente extends Entity<ICliente> implements ICliente {
     this.vendedorResponsavel = cliente.vendedorResponsavel;
     this.produtos = (cliente.produtos ?? []).map(produto => Produto.criarProduto(produto));
   }
+
   // ---------- CRIA NOVO CLIENTE ----------
-    public static criarProduto(props: CriarClienteProps): Cliente {
+    public static criarCliente(props: CriarClienteProps): Cliente {
         return new Cliente(props);
     }
 
-    // ---------- CRIA NOVO CLIENTE ----------
+    // ---------- RECUPERAR CLIENTE ----------
 
       public static recuperar(props: RecuperarClienteProps): Cliente {
         return new Cliente(props);
@@ -154,23 +133,23 @@ class Cliente extends Entity<ICliente> implements ICliente {
     public estaDeletado(): boolean {
         return this.dataExclusao !== null ? true : false;
     }
+ 
+  // ---------- EXIBE OS DADOS DO CLIENTE ---------- // NÃO PRECISA PORQUE JÁ RECUPERA OS DADOS ACIMA
+// public lerContato(): Cliente {
+//   const dados = {
+//     ID: this.id ?? "Não informado",
+//     Nome: this.nome ?? "Removido",
+//     Telefone: this.telefone ?? "Removido",
+//     Email: this.email ?? "Removido",
+//     Cidade: this.cidade ?? "Removido",
+//     Cadastrado: this.dataCriacao ? this.dataCriacao.toLocaleString() : "Data não disponível"
+//   };
 
-  // ---------- EXIBE OS DADOS DO CLIENTE ----------
-public lerContato(): string {
-  const dados = {
-    ID: this.id ?? "Não informado",
-    Nome: this.nome ?? "Removido",
-    Telefone: this.telefone ?? "Removido",
-    Email: this.email ?? "Removido",
-    Cidade: this.cidade ?? "Removido",
-    Cadastrado: this.dataCriacao ? this.dataCriacao.toLocaleString() : "Data não disponível"
-  };
-
-  return Object.entries(dados)
-    .map(([chave, valor]) => `${chave}: ${valor}`)
-    .join("\n")
-    .trim();
-}
+//   return Object.entries(dados)
+//     .map(([chave, valor]) => `${chave}: ${valor}`)
+//     .join("\n")
+//     .trim();
+// }
 }
 
 export { Cliente };

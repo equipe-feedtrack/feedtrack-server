@@ -1,4 +1,5 @@
 import { IDatasControle, KeysDatasControle } from "@shared/domain/data.types";
+import { Pessoa } from "@shared/domain/pessoa.entity";
 import { IProduto } from "modules/produtos/produto.types";
 
 enum StatusCliente {

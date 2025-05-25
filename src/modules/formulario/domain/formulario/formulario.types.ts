@@ -1,7 +1,5 @@
 import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 import { Pergunta } from "../pergunta/pergunta.entity";
-import { Produto } from "@modules/produtos/produto.entity";
-import { Funcionario } from "@modules/usuario/funcionario.entity";
 
 interface IFormulario {
   id?: string;
@@ -9,8 +7,7 @@ interface IFormulario {
   descricao?: string;
   perguntas?: Pergunta[];
   cliente: Cliente;
-  produto: Produto;
-  funcionario: Funcionario;
+  // funcionario: Funcionario;
   ativo?: boolean;
   dataCriacao?: Date;
   dataAtualizacao?: Date;
@@ -20,4 +17,4 @@ type CriarFormularioProps =  Omit<IFormulario, 'id'>;
 
 type RecuperarFormularioProps = Required<IFormulario>;
 
-export{IFormulario, CriarFormularioProps, RecuperarFormularioProps}
+export { CriarFormularioProps, IFormulario, RecuperarFormularioProps };
