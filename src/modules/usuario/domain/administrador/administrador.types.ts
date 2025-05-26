@@ -1,5 +1,0 @@
-interface IAdministrador {
-
-}
-
-export {IAdministrador}

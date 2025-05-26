@@ -1,4 +1,4 @@
-import { IDatasControle, KeysDatasControle } from "../../shared/domain/data.types";
+import { IDatasControle, KeysDatasControle } from "../../../../shared/domain/data.types";
 
 enum StatusProduto {
     ATIVO = "ATIVO",

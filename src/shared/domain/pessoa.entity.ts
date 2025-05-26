@@ -1,13 +1,13 @@
 export type PessoaProps = {
     nome: string;
     email?: string;
-    telefone: string;
+    telefone?: string;
 };
 
- class Pessoa  implements PessoaProps {
+ class Pessoa implements PessoaProps {
     private _nome: string;
     private _email?: string;
-    private _telefone: string;
+    private _telefone?: string;
 
     public get nome(): string {
          return this._nome;
@@ -22,10 +22,10 @@ export type PessoaProps = {
     private set email(email: string) {
          this._email = email;
      }
-    public get telefone(): string {
+    public get telefone(): string | undefined {
          return this._telefone;
      }
-    private set telefone(telefone: string) {
+    private set telefone(telefone: string | undefined) {
          this._telefone = telefone;
      }
    
@@ -49,12 +49,13 @@ export type PessoaProps = {
                 this.email = "";
             }
         // Validação do telefone
+         if (telefone !== undefined && telefone !== null) {
         const regexTelefone = /^[\d\s()+-]{8,24}$/;
-        if (!regexTelefone.test(telefone)) {
-        throw new Error("Telefone inválido.");
-        }
+            if (!regexTelefone.test(telefone)) {
+            throw new Error("Telefone inválido.");
+            }
         this.telefone = telefone;
-
+        }
     }
 }
 

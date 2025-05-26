@@ -1,6 +1,6 @@
 import { IDatasControle, KeysDatasControle } from "@shared/domain/data.types";
-import { Pessoa } from "@shared/domain/pessoa.entity";
-import { IProduto } from "modules/produtos/produto.types";
+import {PessoaProps } from "@shared/domain/pessoa.entity";
+import { IProduto } from "@modules/produtos/domain/produtos/produto.types";
 
 enum StatusCliente {
 
@@ -11,9 +11,7 @@ enum StatusCliente {
 
 interface ICliente extends IDatasControle {
   id?: string;
-  nome: string;
-  telefone: string;
-  email?: string;
+  pessoa: PessoaProps;
   cidade: string;
   vendedorResponsavel: string;
   status?: StatusCliente;

@@ -7,6 +7,8 @@ class Funcionario extends Entity<IFuncionario> {
 
     private _pessoa: Pessoa;
     private _cargo: string;
+    private _dataAdimissao: Date;
+    private _status: boolean;
    
     public get pessoa(): Pessoa {
         return this._pessoa;
@@ -22,24 +24,41 @@ class Funcionario extends Entity<IFuncionario> {
         this._cargo = cargo;
     }
 
+    public get dataAdimissao(): Date {
+        return this._dataAdimissao;
+    }
+
+    private set dataAdimissao(dataAdimissao: Date) {
+        this._dataAdimissao = dataAdimissao;
+    }
+
+    public get status(): boolean {
+        return this._status;
+    }
+
+    private set status(value: boolean) {
+        this._status = value;
+    }
+
     constructor(funcionario: IFuncionario){
         super(funcionario.id)
         this.pessoa = new Pessoa ({
-            nome: funcionario.nome,
-            email: funcionario.email,
-            telefone: funcionario.telefone
+            nome: funcionario.pessoa.nome,
+            email: funcionario.pessoa.email,
+            telefone: funcionario.pessoa.telefone
         });
         this.cargo = funcionario.cargo;
+        this.dataAdimissao = funcionario.dataAdimissao;
+        this.status = funcionario.status;
     }
 
-    criarFuncionario(funcionario: IFuncionarioProps): Funcionario {
-        const {nome, email, telefone, cargo} = funcionario;
-
+    public static criarFuncionario(funcionario: IFuncionarioProps): Funcionario {
+        const {pessoa: { nome, email, telefone }, cargo, dataAdimissao, status} = funcionario;
         return new Funcionario(funcionario)
     }
 
      public static recuperar(funcionario: IRecuperarFuncionarioProps): Funcionario {
-    return new Funcionario(funcionario);
+        return new Funcionario(funcionario);
     }
 
 }

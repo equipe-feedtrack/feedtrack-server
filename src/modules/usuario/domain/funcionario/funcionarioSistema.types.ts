@@ -1,5 +1,0 @@
-interface IFuncionarioSistema {
-
-}
-
-export {IFuncionarioSistema}

@@ -1,5 +1,5 @@
-import { ClienteMap } from "@modules/produtos/mappers/cliente.map";
-import { Produto } from "@modules/produtos/produto.entity";
+import { ClienteMap } from "@modules/gestao_clientes/mappers/cliente.map";
+import { Produto } from "@modules/produtos/domain/produtos/produto.entity";
 import { Entity } from "@shared/domain/entity";
 import { Pessoa } from "@shared/domain/pessoa.entity";
 import { ClienteExceptions } from "./cliente.exeption";
@@ -101,9 +101,9 @@ class Cliente extends Entity<ICliente> {
   constructor(cliente: ICliente) {
     super (cliente.id); // Vem do Entity.
     this.pessoa = new Pessoa({ // Vai trazer as informações de Pessoa, agora evitando a repetição de código.
-      nome: cliente.nome,
-      email: cliente.email,
-      telefone: cliente.telefone
+      nome: cliente.pessoa.nome,
+      email: cliente.pessoa.email,
+      telefone: cliente.pessoa.telefone
     });
     this.cidade = cliente.cidade;
     this.status = cliente.status;

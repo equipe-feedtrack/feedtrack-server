@@ -1,9 +1,11 @@
+import {PessoaProps } from "@shared/domain/pessoa.entity";
+
 interface IFuncionario {
     id?: string;
-    nome: string;
-    email?: string;
-    telefone: string;
+    pessoa: PessoaProps;
     cargo: string;
+    dataAdimissao: Date;
+    status: boolean;
 
 };
 

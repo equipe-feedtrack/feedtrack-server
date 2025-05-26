@@ -16,7 +16,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
 
-      public get titulo(): string {
+    public get titulo(): string {
         return this._titulo;
     }
     private set titulo(titulo: string) {
@@ -153,3 +153,4 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
 }
 
 export { Formulario };
+
