@@ -1,5 +1,5 @@
 
-import { Produto } from "../produto.entity";
+import { Produto } from "../domain/produtos/produto.entity";
 import { IProduto, RecuperarProdutoProps, StatusProduto } from "@modules/produtos/domain/produtos/produto.types";
 import { PrismaClient } from "@prisma/client";
 

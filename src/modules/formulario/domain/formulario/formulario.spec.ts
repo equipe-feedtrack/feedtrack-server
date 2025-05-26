@@ -13,9 +13,11 @@ describe("Entidade Formulario", () => {
 
   beforeEach(() => {
      cliente =  Cliente.criarCliente({ 
-      nome: "João da Silva",
-      telefone: "+55 11 91234-5678",
-      email: "joao.silva@email.com",
+      pessoa: {
+      nome:"João",
+      email: "joao@email.com",
+      telefone: "12345678"
+      },
       cidade: "Aracaju",
       vendedorResponsavel: "Yago",
       produtos: [{nome: "Tênis de corrida", descricao: "Tênis profissional para quem já tem experiência", valor: 320}]
