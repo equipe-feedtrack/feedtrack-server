@@ -1,13 +1,12 @@
-import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 import { Pergunta } from "../pergunta/pergunta.entity";
+import { ClienteEssencial } from "@modules/gestao_clientes/domain/cliente/cliente.types";
 
 interface IFormulario {
   id?: string;
   titulo: string;
   descricao?: string;
   perguntas?: Pergunta[];
-  cliente: Cliente;
-  // funcionario: Funcionario;
+  cliente: ClienteEssencial;
   ativo?: boolean;
   dataCriacao?: Date;
   dataAtualizacao?: Date;

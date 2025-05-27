@@ -4,9 +4,62 @@ import { PerguntaMap } from '@modules/formulario/mappers/pergunta.map';
 import { DomainException } from '@shared/domain/domain.exception';
 import { readFile, writeFile } from 'fs';
 
+import { EnviarFormularioUseCase } from '@modules/formulario/domain/envioformulario/application/enviar-formulario.use-case';
+import { EnvioFormularioService } from '@modules/formulario/domain/envioformulario/service/envioFormulario.service';
+import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
+import { Cliente } from '@modules/gestao_clientes/domain/cliente/cliente.entity';
+import { Pessoa } from '@shared/domain/pessoa.entity';
 
+async function main() {
+  
+    const pessoa = new Pessoa({
+  nome: "João",
+  email: "joao@email.com",
+  telefone: "12345678"
+});
+  
+    // 1. Criar o cliente
+  const cliente = Cliente.criarCliente({
+    pessoa,
+    cidade: "Aracaju",
+    vendedorResponsavel: "Yago",
+    produtos: [
+      {
+        nome: "Tênis de corrida",
+        descricao: "Tênis profissional para quem já tem experiência",
+        valor: 320
+      }
+    ]
+  });
+  // 2. somente dados essenciais de Cliente
+  const dadosEssenciais = cliente.recuperarDadosEssenciais();
 
+  // 2. Criar o formulário com as perguntas e cliente
+  const formulario = new Formulario({
+    titulo: "Pesquisa de Satisfação",
+    descricao: "Queremos saber sua opinião!",
+    perguntas: [
+      new Pergunta({ texto: "Você gostou do atendimento?", tipo: "texto", ordem: 1 }),
+      new Pergunta({ texto: "Indicaria para um amigo?", tipo: "multipla_escolha", opcoes: ['não', 'talvez', 'posso indicar'],ordem: 2})
+    ],
+    cliente: dadosEssenciais// 🔥 aqui está a correção principal
+  });
 
+  // 3. Executar o envio
+  const envioService = new EnvioFormularioService();
+  const enviarUseCase = new EnviarFormularioUseCase(envioService);
+
+  await enviarUseCase.execute({
+    destinatario: "cliente@exemplo.com",
+    formulario,
+    canal: "email",
+  });
+  console.log("✅ Formulário enviado com sucesso!");
+}
+
+main().catch((err) => {
+  console.error("❌ Erro ao enviar o formulário:", err);;
+})
 
 //RELACIONADO AO MODULO PERGUNTA! (YAGO)
 // // Criando  e recuperando  perguntas.

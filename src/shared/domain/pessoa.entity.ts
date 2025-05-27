@@ -57,6 +57,14 @@ export type PessoaProps = {
         this.telefone = telefone;
         }
     }
+
+    public dados() {
+        return {
+        nome: this._nome,
+        email: this._email,
+        telefone: this._telefone
+        };
+    }
 }
 
 export { Pessoa }

@@ -7,25 +7,19 @@ class ClienteMap {
     public static toDTO(cliente: Cliente): ICliente {
         return {
             id: cliente.id,
-            pessoa: {
-            nome: cliente.pessoa.nome,
-            email: cliente.pessoa.email,
-            telefone: cliente.pessoa.telefone
-            },
+            pessoa: cliente.pessoa,
             cidade: cliente.cidade,
-            dataCadastro: cliente.dataCadastro, //Ajustar 
-            ativo: cliente.ativo, //Ajustar
+            // dataCadastro: cliente.dataCadastro, //Ajustar 
+            // ativo: cliente.ativo, //Ajustar
             vendedorResponsavel: cliente.vendedorResponsavel,
             produtos: cliente.produtos.map((produto) => { return ProdutoMap.toDTO(produto) }),
 
         }
-
-
     }
 
-    public static toStatusClientePrisma(cliente: Cliente): typeof PrismaClient["$Enums"]["StatusClientePrisma"] {
-        return cliente.ativo ? PrismaClient["$Enums"]["StatusClientePrisma"]["ATIVO"] : PrismaClient["$Enums"]["StatusClientePrisma"]["INATIVO"];
-    }
+    // public static toStatusClientePrisma(cliente: Cliente): typeof PrismaClient["$Enums"]["StatusClientePrisma"] {
+    //     return cliente.ativo ? PrismaClient["$Enums"]["StatusClientePrisma"]["ATIVO"] : PrismaClient["$Enums"]["StatusClientePrisma"]["INATIVO"];
+    // }
 
 }
 

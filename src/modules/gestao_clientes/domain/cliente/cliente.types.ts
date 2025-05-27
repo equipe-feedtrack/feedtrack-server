@@ -1,5 +1,5 @@
 import { IDatasControle, KeysDatasControle } from "@shared/domain/data.types";
-import {PessoaProps } from "@shared/domain/pessoa.entity";
+import {Pessoa, PessoaProps } from "@shared/domain/pessoa.entity";
 import { IProduto } from "@modules/produtos/domain/produtos/produto.types";
 
 enum StatusCliente {
@@ -11,12 +11,21 @@ enum StatusCliente {
 
 interface ICliente extends IDatasControle {
   id?: string;
-  pessoa: PessoaProps;
-  cidade: string;
+  pessoa: Pessoa;
+  cidade?: string;
   vendedorResponsavel: string;
   status?: StatusCliente;
   produtos: Array<IProduto>;
 }
+
+interface ClienteEssencial {
+  nome: string;
+  email?: string;
+  telefone?: string;
+  produtos: Array<IProduto>;
+  vendedorResponsavel: string;
+}
+
 
 // Tipo para criação de Cliente (sem id, dataCadastro e ativo — são automáticos)
 type CriarClienteProps = Omit<ICliente, "id" | KeysDatasControle | "status">;
@@ -27,4 +36,5 @@ type RecuperarClienteProps = ICliente & {
     id: NonNullable<ICliente['id']>
 };
 
-export { ICliente, CriarClienteProps, RecuperarClienteProps, StatusCliente };
+
+export { ICliente, CriarClienteProps, RecuperarClienteProps, StatusCliente, ClienteEssencial };

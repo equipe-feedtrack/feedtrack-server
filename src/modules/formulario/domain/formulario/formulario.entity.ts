@@ -1,16 +1,17 @@
 import { FormularioMap } from "@modules/formulario/mappers/formulario.map";
-import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 import { Entity } from "@shared/domain/entity";
 import { Pergunta } from "../pergunta/pergunta.entity";
 import { FormularioTituloVazioException } from "./formulario.exception";
 import { CriarFormularioProps, IFormulario, RecuperarFormularioProps } from "./formulario.types";
+import { ClienteEssencial } from "@modules/gestao_clientes/domain/cliente/cliente.types";
+import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 
 class Formulario extends Entity<IFormulario> implements IFormulario {
  
   private _titulo: string;
   private _descricao?: string | undefined;
   private _perguntas: Pergunta[];
-  private _cliente: Cliente;
+  private _cliente: ClienteEssencial;
   // private _funcionario: Funcionario;
   private _ativo: boolean;
   private _dataCriacao: Date;
@@ -34,18 +35,14 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     private set perguntas(perguntas: Pergunta[]) {
         this._perguntas = perguntas;
     }
-    public get cliente(): Cliente {
+    public get cliente(): ClienteEssencial {
     return this._cliente;
     }
-    private set cliente(cliente: Cliente) {
+
+    private set cliente(cliente: ClienteEssencial) {
       this._cliente = cliente;
     }
-    // public get funcionario(): Funcionario {
-    // return this._funcionario;
-    // }
-    // private set funcionario(funcionario: Funcionario) {
-    //   this._funcionario = funcionario;
-    // }
+    
     public get ativo(): boolean {
         return this._ativo;
     }
@@ -65,13 +62,14 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
         this._dataAtualizacao = dataAtualizacao;
     }
   
-  private constructor(formulario: IFormulario) {
+  public constructor(formulario: IFormulario) {
     super(formulario.id)
     this._titulo = formulario.titulo;
     this._descricao = formulario.descricao;
     this._perguntas = formulario.perguntas ?? [];
-    this._cliente = formulario.cliente;
-    // this._funcionario = formulario.funcionario;
+    this._cliente = formulario.cliente instanceof Cliente
+      ? formulario.cliente.recuperarDadosEssenciais()
+      : formulario.cliente;
     this._ativo = formulario.ativo ?? true;
     this._dataCriacao = formulario.dataCriacao ?? new Date();
     this._dataAtualizacao = formulario.dataAtualizacao ?? new Date();

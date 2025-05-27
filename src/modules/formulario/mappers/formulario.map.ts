@@ -9,6 +9,7 @@ class FormularioMap {
             titulo: formulario.titulo,
             descricao: formulario.descricao,
             perguntas: formulario.perguntas,
+            cliente: formulario.cliente,
             ativo: formulario.ativo,
             dataCriacao: formulario.dataCriacao,
             dataAtualizacao: formulario.dataAtualizacao

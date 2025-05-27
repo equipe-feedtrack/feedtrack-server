@@ -59,7 +59,7 @@ private set ordem(ordem: number) {
   this._ordem = ordem;
 }
 
-private constructor(pergunta: IPergunta) {
+ constructor(pergunta: IPergunta) {
     super(pergunta.id)
     this.texto = pergunta.texto;
     this.tipo = pergunta.tipo;

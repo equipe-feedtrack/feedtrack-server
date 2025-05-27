@@ -3,7 +3,7 @@ import { Produto } from "@modules/produtos/domain/produtos/produto.entity";
 import { Entity } from "@shared/domain/entity";
 import { Pessoa } from "@shared/domain/pessoa.entity";
 import { ClienteExceptions } from "./cliente.exeption";
-import { CriarClienteProps, ICliente, RecuperarClienteProps, StatusCliente } from "./cliente.types";
+import { ClienteEssencial, CriarClienteProps, ICliente, RecuperarClienteProps, StatusCliente } from "./cliente.types";
 
 class Cliente extends Entity<ICliente> {
 
@@ -29,15 +29,11 @@ class Cliente extends Entity<ICliente> {
     return this._pessoa;
   }
 
-  private set pessoa(pessoa: Pessoa) {
-    this._pessoa = pessoa;
-  }
-
-  public get cidade(): string {
+  public get cidade(): string | undefined {
     return this._cidade;
   }
 
-  private set cidade(value: string) {
+  private set cidade(value: string | undefined) {
     this._cidade = value?.trim() ?? '';
   }
 
@@ -100,11 +96,7 @@ class Cliente extends Entity<ICliente> {
 
   constructor(cliente: ICliente) {
     super (cliente.id); // Vem do Entity.
-    this.pessoa = new Pessoa({ // Vai trazer as informações de Pessoa, agora evitando a repetição de código.
-      nome: cliente.pessoa.nome,
-      email: cliente.pessoa.email,
-      telefone: cliente.pessoa.telefone
-    });
+    this._pessoa = cliente.pessoa; // Vai trazer as informações de Pessoa, agora evitando a repetição de código.
     this.cidade = cliente.cidade;
     this.status = cliente.status;
     this.dataCriacao = cliente.dataCriacao;
@@ -133,6 +125,16 @@ class Cliente extends Entity<ICliente> {
     public estaDeletado(): boolean {
         return this.dataExclusao !== null ? true : false;
     }
+
+    public recuperarDadosEssenciais(): ClienteEssencial { //Passa apenas as informações essenciais!
+    return {
+      nome: this.pessoa.nome,
+      email: this.pessoa.email,
+      telefone: this.pessoa.telefone,
+      produtos: this.produtos,
+      vendedorResponsavel: this.vendedorResponsavel
+    };
+  }
  
   // ---------- EXIBE OS DADOS DO CLIENTE ---------- // NÃO PRECISA PORQUE JÁ RECUPERA OS DADOS ACIMA
 // public lerContato(): Cliente {
