@@ -1,10 +1,10 @@
 import { FormularioMap } from "@modules/formulario/mappers/formulario.map";
+import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
+import { ClienteEssencial } from "@modules/gestao_clientes/domain/cliente/cliente.types";
 import { Entity } from "@shared/domain/entity";
 import { Pergunta } from "../pergunta/pergunta.entity";
 import { FormularioTituloVazioException } from "./formulario.exception";
 import { CriarFormularioProps, IFormulario, RecuperarFormularioProps } from "./formulario.types";
-import { ClienteEssencial } from "@modules/gestao_clientes/domain/cliente/cliente.types";
-import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 
 class Formulario extends Entity<IFormulario> implements IFormulario {
  
@@ -12,7 +12,6 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
   private _descricao?: string | undefined;
   private _perguntas: Pergunta[];
   private _cliente: ClienteEssencial;
-  // private _funcionario: Funcionario;
   private _ativo: boolean;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
@@ -64,15 +63,13 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
   
   public constructor(formulario: IFormulario) {
     super(formulario.id)
-    this._titulo = formulario.titulo;
-    this._descricao = formulario.descricao;
-    this._perguntas = formulario.perguntas ?? [];
-    this._cliente = formulario.cliente instanceof Cliente
-      ? formulario.cliente.recuperarDadosEssenciais()
-      : formulario.cliente;
-    this._ativo = formulario.ativo ?? true;
-    this._dataCriacao = formulario.dataCriacao ?? new Date();
-    this._dataAtualizacao = formulario.dataAtualizacao ?? new Date();
+    this.titulo = formulario.titulo;
+    this.descricao = formulario.descricao;
+    this.perguntas = formulario.perguntas ?? [];
+    this.cliente = formulario.cliente instanceof Cliente ? formulario.cliente.recuperarDadosEssenciais() : formulario.cliente;
+    this.ativo = formulario.ativo ?? true;
+    this.dataCriacao = formulario.dataCriacao ?? new Date();
+    this.dataAtualizacao = formulario.dataAtualizacao ?? new Date();
 
     this.validateFormulario();
   }
@@ -92,7 +89,6 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     descricao: formulario.descricao,
     perguntas: formulario.perguntas,
     cliente: formulario.cliente,
-    // funcionario: formulario.funcionario,
     ativo: formulario.ativo,
     dataCriacao: formulario.dataCriacao,
     dataAtualizacao: formulario.dataAtualizacao
