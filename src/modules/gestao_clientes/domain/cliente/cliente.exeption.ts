@@ -41,11 +41,59 @@ class TelefoneClienteInvalido extends ClienteException {
 }
 
 class QtdMinimaProdutosClienteInvalida extends ClienteException {
-    public constructor(message:string = '⚠️ A quantidade mínima de produtos é inválida.') {
-        super(message);
-        this.name = 'QtdMinimaProdutosClienteInvalida'
-        this.message = message;
-    }
+  constructor(message: string = '⚠️ A quantidade mínima de produtos é inválida.') {
+    super(message);
+    this.name = 'QtdMinimaProdutosClienteInvalida';
+    this.message = message;
+  }
+}
+
+class ClienteNaoEncontrado extends ClienteException {
+  constructor(message: string = '⚠️ Cliente não encontrado.') {
+    super(message);
+    this.name = 'ClienteNaoEncontrado';
+    this.message = message;
+  }
+}
+
+class ClienteJaExistente extends ClienteException {
+  constructor(message: string = '⚠️ Já existe um cliente com esses dados.') {
+    super(message);
+    this.name = 'ClienteJaExistente';
+    this.message = message;
+  }
+}
+
+class IdClienteInvalido extends ClienteException {
+  constructor(message: string = '⚠️ O ID do cliente é inválido.') {
+    super(message);
+    this.name = 'IdClienteInvalido';
+    this.message = message;
+  }
+}
+
+class EnderecoClienteInvalido extends ClienteException {
+  constructor(message: string = '⚠️ O endereço do cliente é inválido ou incompleto.') {
+    super(message);
+    this.name = 'EnderecoClienteInvalido';
+    this.message = message;
+  }
+}
+
+class ConsentimentoLGPDInvalido extends ClienteException {
+  constructor(message: string = '⚠️ Consentimento LGPD do cliente inválido ou ausente.') {
+    super(message);
+    this.name = 'ConsentimentoLGPDInvalido';
+    this.message = message;
+  }
+}
+
+class DataCadastroInvalida extends ClienteException {
+  constructor(message: string = '⚠️ Data de cadastro do cliente inválida.') {
+    super(message);
+    this.name = 'DataCadastroInvalida';
+    this.message = message;
+  }
 }
 
 const ClienteExceptions = {
@@ -54,9 +102,15 @@ const ClienteExceptions = {
   NomeClienteTamanhoMaximoInvalido,
   EmailClienteInvalido,
   TelefoneClienteInvalido,
-  QtdMinimaProdutosClienteInvalida
+  QtdMinimaProdutosClienteInvalida,
+  ClienteNaoEncontrado,
+  ClienteJaExistente,
+  IdClienteInvalido,
+  EnderecoClienteInvalido,
+  ConsentimentoLGPDInvalido,
+  DataCadastroInvalida
 };
 
 export {
-  ClienteExceptions,
+  ClienteExceptions
 };
