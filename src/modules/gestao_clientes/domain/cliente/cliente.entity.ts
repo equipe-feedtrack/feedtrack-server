@@ -2,7 +2,7 @@ import { ClienteMap } from "@modules/gestao_clientes/mappers/cliente.map";
 import { Produto } from "@modules/produtos/domain/produtos/produto.entity";
 import { Entity } from "@shared/domain/entity";
 import { Pessoa } from "@shared/domain/pessoa.entity";
-import { ClienteExceptions } from "./cliente.exeption";
+import { ClienteExceptions } from "./cliente.exception";
 import { ClienteEssencial, CriarClienteProps, ICliente, RecuperarClienteProps, StatusCliente } from "./cliente.types";
 
 class Cliente extends Entity<ICliente> {
