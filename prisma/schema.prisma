@@ -13,42 +13,128 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+enum status_usuarios {
+  ATIVO
+  INATIVO
+}
+
 enum tipo_usuario {
-  FUNCIONARIO
-  ADMINISTRADOR
+  USER
+  ADMIN
+  SUPER_ADMIN
 }
 
-model usuarios {
-  id Int @id @default(autoincrement())
-  nome String
-  usuario String @unique
-  senha String
-  telefone String
-  endereco String
-  tipo_usuario tipo_usuario // 'cliente' ou 'funcionario'
+enum status_formulario {
+  ENVIADO
+  NAO_ENVIADO
 }
 
-model vendedores {
-  id Int @id @default(autoincrement())
-  nome String
-  telefone String
+model usuario {
+  id               String           @id @default(uuid())
+  nome             String           @unique
+  email            String           @unique
+  senha            String
+  tipo             tipo_usuario
+  status           status_usuarios
+  data_criacao     DateTime
+  data_atualizacao DateTime
+  data_exclusao    DateTime?
+
+  funcionario      funcionario?
+  envia_formulario envio_formulario[]
 }
 
-model clientes {
-  id Int @id @default(autoincrement())
-  nome String
-  telefone String
+model funcionario {
+  id               String           @id @default(uuid())
+  usuarioId        String           @unique       // garante 1‑para‑1
+  usuario          usuario          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  cargo            String
+  status           status_usuarios
+  data_criacao     DateTime
+  data_atualizacao DateTime
+  data_exclusao    DateTime?
+}
+
+
+
+model cliente {
+  id               String @id @default(uuid())
+  nome             String
+  telefone         String
+  email            String?
+  cidade           String
+  status           status_usuarios
+  data_criacao     DateTime
+  data_atualizacao DateTime
+  data_exclusao    DateTime?
+  produtos         produto[]
+  
+  envio_formulario envio_formulario[]
+}
+
+model produto {
+  id               String @id @default(uuid())
+  nome             String
+  descricao        String
+  data_criacao     DateTime
+  data_atualizacao DateTime
+  data_exclusao    DateTime?
+  cliente_id       String
+  cliente         cliente  @relation(fields: [cliente_id], references: [id])
+}
+
+model pergunta {
+  id               String @id @default(uuid())
+  titulo           String
+  opcoes           Json
+  tipo_pergunta    String
+  data_criacao     DateTime
+  data_atualizacao DateTime
+  data_exclusao    DateTime?
+
+  formulario_id    String
+  formulario      formulario @relation(fields: [formulario_id], references: [id])
+}
+
+
+model envio_formulario {
+  id               String @id @default(uuid())
+  formulario       formulario @relation(fields: [id_formulario], references: [id])
+  cliente          cliente @relation(fields: [cliente_id], references: [id])
+  usuario          usuario @relation(fields: [usuario_id], references: [id])
+
+  id_formulario    String
+  usuario_id       String
+  cliente_id       String
+
+  data_envio        DateTime
+
+  status           status_formulario
 
 }
 
-model produtos {
-  id Int @id @default(autoincrement())
+model formulario {
+  id               String     @id @default(uuid())
+  titulo           String
+  descricao        String
+  ativo            Boolean
+  data_criacao     DateTime
+  data_atualizacao DateTime
+  data_exclusao    DateTime?
+  
+  feedbacks        feedback[]
+  envio_formulario envio_formulario[]
+  perguntas        pergunta[]
 }
 
-model compras {
- id Int @id @default(autoincrement())
+model feedback {
+  id               String     @id @default(uuid())
+  resposta         Json
+  data_criacao     DateTime
+  data_exclusao    DateTime?
+  formularioId     String
+  formulario       formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
 }
 
-model feedback{
-  id Int @id @default(autoincrement())
-}
+
