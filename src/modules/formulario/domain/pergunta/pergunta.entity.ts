@@ -8,7 +8,7 @@ class Pergunta extends Entity<IPergunta> implements IPergunta{
 private _texto: string;
 private _tipo: string;
 private _opcoes?: string[] | undefined;
-private _ordem: number;
+// private _ordem: number;
 
 get texto(): string {
   return this._texto;
@@ -51,19 +51,19 @@ private set opcoes(opcoes: string[] | undefined) {
   this._opcoes = opcoes;
 }
 
-get ordem(): number {
-  return this._ordem;
-}
+// get ordem(): number {
+//   return this._ordem;
+// }
 
-private set ordem(ordem: number) {
-  this._ordem = ordem;
-}
+// private set ordem(ordem: number) {
+//   this._ordem = ordem;
+// }
 
  constructor(pergunta: IPergunta) {
     super(pergunta.id)
     this.texto = pergunta.texto;
     this.tipo = pergunta.tipo;
-    this.ordem = pergunta.ordem;
+    // this.ordem = pergunta.ordem;
     this.opcoes = Pergunta.validarOpcoes(this.tipo, pergunta.opcoes);
   }
 private static validarOpcoes(tipo: string, opcoes?: string[]): string[] | undefined {
@@ -118,28 +118,28 @@ private static validarOpcoesMultiplaEscolha(opcoes?: string[]): string[] {
   return opcoes;
 }
 
-private static proximaOrdemLivre(ordensUsadas: number[] = []): number {
-  let ordem = 1;
-  while (ordensUsadas.includes(ordem)) {
-    ordem++;
-  }
-  return ordem;
-}
+// private static proximaOrdemLivre(ordensUsadas: number[] = []): number {
+//   let ordem = 1;
+//   while (ordensUsadas.includes(ordem)) {
+//     ordem++;
+//   }
+//   return ordem;
+// }
 
  public static criar(props: CriarPerguntaProps): Pergunta {
-  const { texto, tipo, ordensUsadas, opcoes } = props;
+  const { texto, tipo, opcoes } = props;
 
   const opcoesDefinidas = tipo === "texto" ? undefined : opcoes;
-  const novaOrdem = Pergunta.proximaOrdemLivre(ordensUsadas);
+  // const novaOrdem = Pergunta.proximaOrdemLivre(ordensUsadas);
   return new Pergunta({
     texto,
     tipo,
     opcoes: opcoesDefinidas,
-    ordem: novaOrdem
+    // ordem: novaOrdem
   });
 }
   public static recuperar(props: RecuperarPerguntaProps): Pergunta {
-    const { id, texto, tipo, ordem, opcoes } = props;
+    const { id, texto, tipo, opcoes } = props;
 
     if (!id) {
       throw new PerguntaNaoEncontradaException(id);
@@ -147,7 +147,7 @@ private static proximaOrdemLivre(ordensUsadas: number[] = []): number {
 
     const opcoesDefinidas = tipo === "multipla_escolha" || tipo === "nota" ? opcoes : undefined;
 
-    return new Pergunta({ id, texto, tipo, ordem, opcoes: opcoesDefinidas });
+    return new Pergunta({ id, texto, tipo, opcoes: opcoesDefinidas });
   }
 
   public static deletar() {

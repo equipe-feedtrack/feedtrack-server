@@ -4,7 +4,7 @@
   "description": "FeedTrack é um sistema de coleta e análise de feedbacks voltado para empresas que desejam melhorar a experiência do cliente. Ele automatiza o envio de questionários após a venda e coleta opiniões sobre atendimento, produto, entrega e outros pontos-chave. Os dados são armazenados, analisados e transformados em relatórios inteligentes que auxiliam gestores na tomada de decisões estratégicas. O sistema também permite identificar o cliente que realizou a compra, segmentar públicos e manter um canal ativo de comunicação para divulgação de novidades, eventos e ações de relacionamento. Além disso, faz uso do ambiente de execução node e linguagem de programação TypeScript.",
   "main": "index.js",
   "scripts": {
-    "dev:": "nodemon",
+    "dev": "nodemon",
     "dev:console": "node -r tsconfig-paths/register -r sucrase/register src/index.ts",
     "test": "vitest",
     "test:run": "vitest run",
@@ -45,8 +45,9 @@
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
+    "@types/axios": "^0.9.36",
     "@types/express": "^5.0.1",
-    "axios": "^1.9.0",
+    "axios": "^1.10.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "module-alias": "^2.2.3",

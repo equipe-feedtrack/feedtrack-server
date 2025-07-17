@@ -9,7 +9,6 @@ class PerguntaMap {
             texto: pergunta.texto,
             tipo: pergunta.tipo,
             opcoes: pergunta.opcoes,
-            ordem: pergunta.ordem
         }
     }
 

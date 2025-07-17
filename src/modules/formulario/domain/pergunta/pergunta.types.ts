@@ -3,12 +3,10 @@ interface IPergunta {
     texto: string;
     tipo: string;
     opcoes?: string[];
-    ordem: number;
+    // ordem: number;
   }
 
-  type CriarPerguntaProps = Omit<IPergunta, 'id' | 'ordem'> & {
-    ordensUsadas: number[];
-  };
+  type CriarPerguntaProps = Omit<IPergunta, 'id'> & { opcoes?: string[] } & {id?: string;};
 
  type RecuperarPerguntaProps = Omit<IPergunta, 'opcoes'> & { opcoes?: string[] } & {id: string;};
 

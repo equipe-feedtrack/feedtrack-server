@@ -11,7 +11,7 @@ import { Cliente } from '@modules/gestao_clientes/domain/cliente/cliente.entity'
 import { Pessoa } from '@shared/domain/pessoa.entity';
 
 
-//ENVIANDO POR EMAIL O FORMULARIO.
+// ENVIANDO POR EMAIL O FORMULARIO.
 // async function main() {
   
 //     const pessoa = new Pessoa({
@@ -63,55 +63,59 @@ import { Pessoa } from '@shared/domain/pessoa.entity';
 //   console.error("❌ Erro ao enviar o formulário:", err);
 // })
 
-//RELACIONADO AO MODULO PERGUNTA! (YAGO)
+// RELACIONADO AO MODULO PERGUNTA! (YAGO)
 // // Criando  e recuperando  perguntas.
-// try {
-//     const pergunta = Pergunta.criar( { texto: 'Como você avalia sua experiência geral?', tipo: 'nota', opcoes:["1","2","3"], ordem: 1 });
-//     console.log(pergunta);
 
-//      let propspergunta: RecuperarPerguntaProps = {
-//         id: '4ede92e2-5a0c-4b0c-85d7-c4eed09ee7a5',
-//         texto: 'fale de sua experiência',
-//         tipo: 'texto',
-//         ordem: 1 
-//     };
-//      let pergunta2 = Pergunta.recuperar(propspergunta);
-//     console.log(pergunta2);
+function test (){
+    try {
+    const pergunta = Pergunta.criar( { texto: 'Como você avalia sua experiência geral?', tipo: 'nota', opcoes:["1","2","3"]});
+    console.log(pergunta);
 
-//     //////////////////////////////////////////////////////
-//     //Persistinto e Recuperando em Arquivo - File System//
-//     //////////////////////////////////////////////////////
+     let propspergunta: RecuperarPerguntaProps = {
+        id: '4ede92e2-5a0c-4b0c-85d7-c4eed09ee7a5',
+        texto: 'fale de sua experiência',
+        tipo: 'texto',
+    };
+     let pergunta2 = Pergunta.recuperar(propspergunta);
+    console.log(pergunta2);
 
-//     let arrayperguntas = [];
-//     arrayperguntas.push(pergunta.toDTO());
-// 	arrayperguntas.push(pergunta2.toDTO());
+    //////////////////////////////////////////////////////
+    //Persistinto e Recuperando em Arquivo - File System//
+    //////////////////////////////////////////////////////
 
-//      writeFile('perguntas.json', JSON.stringify(arrayperguntas), function (error:any) {
-//         if (error) throw error;
-//         console.log('Arquivo Salvo com Sucesso!');
-//         readFile('perguntas.json', (error, dadoGravadoArquivo) => {
-//             if (error) throw error;
-//             console.log('Leitura de Arquivo!');
-//             let categoriasSalvas: [] = JSON.parse(dadoGravadoArquivo.toString());
-//             categoriasSalvas.forEach(categoriaJSON => {
-//                 console.log(categoriaJSON);
-//                 console.log(PerguntaMap.toDomain(categoriaJSON));
-//             })
-//         });
-//     });
+    let arrayperguntas = [];
+    arrayperguntas.push(pergunta.toDTO());
+	arrayperguntas.push(pergunta2.toDTO());
 
-// } catch (error:any) {
-//     if (error instanceof DomainException) {
-//         console.log('Execeção de Dominio');
-//         console.log(error.message);
-//     }
-//     else {
-//         console.log('Outras Exceções');
-//         console.log(error.message);
-//     }
-// }
+     writeFile('perguntas.json', JSON.stringify(arrayperguntas), function (error:any) {
+        if (error) throw error;
+        console.log('Arquivo Salvo com Sucesso!');
+        readFile('perguntas.json', (error, dadoGravadoArquivo) => {
+            if (error) throw error;
+            console.log('Leitura de Arquivo!');
+            let categoriasSalvas: [] = JSON.parse(dadoGravadoArquivo.toString());
+            categoriasSalvas.forEach(categoriaJSON => {
+                console.log(categoriaJSON);
+                console.log(PerguntaMap.toDomain(categoriaJSON));
+            })
+        });
+    });
 
-//Testando Feedback (AINDA NÃO MEXI, APENAS CONTEÚDO GENÉRICO DE FEEDBACK - YAGO)
+} catch (error:any) {
+    if (error instanceof DomainException) {
+        console.log('Execeção de Dominio');
+        console.log(error.message);
+    }
+    else {
+        console.log('Outras Exceções');
+        console.log(error.message);
+    }
+}
+}
+
+test();
+
+// Testando Feedback (AINDA NÃO MEXI, APENAS CONTEÚDO GENÉRICO DE FEEDBACK - YAGO)
 
 // const feedback = Feedback.criar({
 //   formulario_id: 'form123',
@@ -125,7 +129,7 @@ import { Pessoa } from '@shared/domain/pessoa.entity';
 
 
 
-//Cleilson.
+// Cleilson.
 
 // import express from 'express';
 // import { PrismaClient } from '@prisma/client';
