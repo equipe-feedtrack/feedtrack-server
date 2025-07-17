@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "https://663640124e09.ngrok-free.app/api/sendText";
+const url = "https://261bb16e347e.ngrok-free.app";
 const data = {
     session: "default",
     chatId: "557998615536@c.us",
