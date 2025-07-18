@@ -2,7 +2,7 @@ import { FormularioMap } from "@modules/formulario/mappers/formulario.map";
 import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 import { ClienteEssencial } from "@modules/gestao_clientes/domain/cliente/cliente.types";
 import { Entity } from "@shared/domain/entity";
-import { Pergunta } from "../pergunta/pergunta.entity";
+import { Pergunta } from "../pergunta/domain/pergunta.entity";
 import { FormularioTituloVazioException } from "./formulario.exception";
 import { CriarFormularioProps, IFormulario, RecuperarFormularioProps } from "./formulario.types";
 

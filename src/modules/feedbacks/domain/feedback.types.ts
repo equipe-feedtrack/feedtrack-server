@@ -1,20 +1,14 @@
-import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
-import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
 import { TipoPergunta } from "@shared/domain/data.types";
 
-/**
- * Representa um feedback completo (instância da entidade).
- * Deve conter todos os dados, inclusive datas e relacionamento com Formulário e Pergunta.
- */
 interface IFeedback {
   id?: string;
-  formulario: Formulario;
-  pergunta: Pergunta;
+  formularioId: string;
+  perguntaId: string;
   tipo: TipoPergunta;
   resposta_texto?: string;
   nota?: number;
-  data_resposta: Date;
   opcaoEscolhida?: string;
+  data_resposta?: Date;
 }
 
 /**

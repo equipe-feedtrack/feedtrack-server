@@ -3,12 +3,12 @@ import { Entity } from "@shared/domain/entity";
 import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaNaoEncontradaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
 import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
 
+
 class Pergunta extends Entity<IPergunta> implements IPergunta{
 
 private _texto: string;
 private _tipo: string;
 private _opcoes?: string[] | undefined;
-// private _ordem: number;
 
 get texto(): string {
   return this._texto;
@@ -50,14 +50,6 @@ public get opcoes(): string[] | undefined {
 private set opcoes(opcoes: string[] | undefined) { 
   this._opcoes = opcoes;
 }
-
-// get ordem(): number {
-//   return this._ordem;
-// }
-
-// private set ordem(ordem: number) {
-//   this._ordem = ordem;
-// }
 
  constructor(pergunta: IPergunta) {
     super(pergunta.id)
@@ -118,24 +110,14 @@ private static validarOpcoesMultiplaEscolha(opcoes?: string[]): string[] {
   return opcoes;
 }
 
-// private static proximaOrdemLivre(ordensUsadas: number[] = []): number {
-//   let ordem = 1;
-//   while (ordensUsadas.includes(ordem)) {
-//     ordem++;
-//   }
-//   return ordem;
-// }
-
  public static criar(props: CriarPerguntaProps): Pergunta {
   const { texto, tipo, opcoes } = props;
 
   const opcoesDefinidas = tipo === "texto" ? undefined : opcoes;
-  // const novaOrdem = Pergunta.proximaOrdemLivre(ordensUsadas);
   return new Pergunta({
     texto,
     tipo,
     opcoes: opcoesDefinidas,
-    // ordem: novaOrdem
   });
 }
   public static recuperar(props: RecuperarPerguntaProps): Pergunta {

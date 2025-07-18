@@ -1,4 +1,4 @@
-import { Pergunta } from "../pergunta/pergunta.entity";
+import { Pergunta } from "../pergunta/domain/pergunta.entity";
 import { ClienteEssencial } from "@modules/gestao_clientes/domain/cliente/cliente.types";
 
 interface IFormulario {

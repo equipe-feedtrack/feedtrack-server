@@ -1,4 +1,4 @@
-import { Feedback } from "@modules/feedbacks/domain/feedback/feedback.entity";
+import { Feedback } from "@modules/feedbacks/domain/feedback.entity";
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
 import { Funcionario } from "@modules/gestao_funcionario/domain/funcionario/funcionario.entity";
 import { Entity } from "@shared/domain/entity";

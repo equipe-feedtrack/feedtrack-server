@@ -1,7 +1,7 @@
 import { IDEntityUUIDInvalid } from "@shared/domain/domain.exception";
 import { describe, expect, it } from "vitest";
-import { Pergunta } from "./pergunta.entity";
-import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException } from "./pergunta.exception";
+import { Pergunta } from "./domain/pergunta.entity";
+import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException } from "./domain/pergunta.exception";
 import { RecuperarPerguntaProps } from "./pergunta.types";
 
 describe("Entidade Pergunta: Criar Pergunta", () => {
@@ -9,7 +9,6 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
     const pergunta = Pergunta.criar({
       texto: "Qual a sua nota?",
       tipo: "nota",
-      ordensUsadas: [],
       opcoes: undefined,
     });
 
@@ -20,13 +19,12 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
 
   it("deve criar uma pergunta do tipo texto corretamente", () => {
     const pergunta = Pergunta.criar({
-      texto: "O que você sugere de melhoria para o nosso produto?",
+      texto: "O que você achou do tênis corre 4?",
       tipo: "texto",
-      ordensUsadas: [],
       opcoes: undefined,
     });
 
-    expect(pergunta.texto).toBe("O que você sugere de melhoria para o nosso produto?");
+    expect(pergunta.texto).toBe("O que você achou do tênis corre 4?");
     expect(pergunta.tipo).toBe("texto");
     expect(pergunta.opcoes).toBeUndefined();
   });
@@ -35,7 +33,6 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
     const pergunta = Pergunta.criar({
       texto: "Qual o seu nível de satisfação?",
       tipo: "multipla_escolha",
-      ordensUsadas: [],
       opcoes: ["ruim", "bom", "excelente"],
     });
 
@@ -49,7 +46,6 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
       Pergunta.criar({
         texto: "",
         tipo: "texto",
-        ordensUsadas: [],
         opcoes: undefined,
       }),
     ).toThrow(PerguntaTextoVazioException);
@@ -60,7 +56,6 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
       Pergunta.criar({
         texto: "Texto",
         tipo: "escolha_unica",
-        ordensUsadas: [],
         opcoes: undefined,
       }),
     ).toThrow(TipoPerguntaInvalidoException);
@@ -71,7 +66,6 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
       Pergunta.criar({
         texto: "Escolha uma opção",
         tipo: "multipla_escolha",
-        ordensUsadas: [],
         opcoes: ["Sim"],
       }),
     ).toThrow(QuantidadeMinimaOpcoesException);
@@ -82,7 +76,6 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
       Pergunta.criar({
         texto: "Escolha uma opção",
         tipo: "multipla_escolha",
-        ordensUsadas: [],
         opcoes: ["Sim", "Sim"],
       }),
     ).toThrow(OpcaoDuplicadaException);
@@ -92,7 +85,6 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
     const pergunta = Pergunta.criar({
       texto: "Qual o seu nível de satisfação?",
       tipo: "nota",
-      ordensUsadas: [],
       opcoes: ["1", "2", "3"],
     });
 
@@ -101,15 +93,14 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
   });
 
   it("deve atribuir a próxima ordem disponível", () => {
-    const ordensUsadas = [1, 2, 3];
     const novaPergunta = Pergunta.criar({
       texto: "Qual sua idade?",
       tipo: "nota",
       opcoes: ['1', '2', '3'],
-      ordensUsadas,
+
     });
 
-    expect(novaPergunta.ordem).toBe(4);
+  
   });
 });
 
@@ -119,8 +110,7 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
     const perguntaValida: RecuperarPerguntaProps = {
       id: "89eebea5-2314-47bf-8510-e1ddf69503a9",
       texto: "Qual a sua nota?",
-      tipo: "nota",
-      ordem: 1,
+      tipo: "nota"
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
@@ -135,8 +125,7 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
     const perguntaInvalida: RecuperarPerguntaProps = {
       id: "1234",
       texto: "Qual a sua nota?",
-      tipo: "nota",
-      ordem: 1,
+      tipo: "nota"
     };
 
     expect(() => Pergunta.recuperar(perguntaInvalida)).toThrow(IDEntityUUIDInvalid);
@@ -146,8 +135,7 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
     const perguntaValida: RecuperarPerguntaProps = {
       id: "89eebea5-2314-47bf-8510-e1ddf69503a9",
       texto: "Descreva sua experiência com o produto.",
-      tipo: "texto",
-      ordem: 2,
+      tipo: "texto"
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
@@ -163,8 +151,7 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
       id: "89eebea5-2314-47bf-8510-e1ddf69503a9",
       texto: "Qual é a sua cor favorita?",
       tipo: "multipla_escolha",
-      opcoes: ["Azul", "Verde", "Vermelho"],
-      ordem: 1,
+      opcoes: ["Azul", "Verde", "Vermelho"]
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
@@ -181,7 +168,6 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
       texto: "Qual é a sua fruta favorita?",
       tipo: "multipla_escolha",
       opcoes: [], // opções vazias
-      ordem: 3,
     };
 
     expect(() => Pergunta.recuperar(perguntaInvalida)).toThrow(OpcoesObrigatoriasException);

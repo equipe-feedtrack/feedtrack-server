@@ -1,5 +1,4 @@
-import { Pergunta } from '@modules/formulario/domain/pergunta/pergunta.entity';
-import { RecuperarPerguntaProps } from '@modules/formulario/domain/pergunta/pergunta.types';
+import { Pergunta } from '@modules/formulario/domain/pergunta/domain/pergunta.entity';
 import { PerguntaMap } from '@modules/formulario/mappers/pergunta.map';
 import { DomainException } from '@shared/domain/domain.exception';
 import { readFile, writeFile } from 'fs';
@@ -9,6 +8,7 @@ import { EnvioFormularioService } from '@modules/formulario/domain/envioformular
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
 import { Cliente } from '@modules/gestao_clientes/domain/cliente/cliente.entity';
 import { Pessoa } from '@shared/domain/pessoa.entity';
+import { RecuperarPerguntaProps } from '@modules/formulario/domain/pergunta/domain/pergunta.types';
 
 
 // ENVIANDO POR EMAIL O FORMULARIO.

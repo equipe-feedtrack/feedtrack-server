@@ -1,55 +1,55 @@
 import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 import { beforeEach, describe, expect, it } from "vitest";
-import { Pergunta } from "../pergunta/pergunta.entity";
+import { Pergunta } from "../pergunta/domain/pergunta.entity";
 import { Formulario } from "./formulario.entity";
 import { FormularioTituloVazioException } from "./formulario.exception";
+import { ClienteEssencial } from "@modules/gestao_clientes/domain/cliente/cliente.types";
+import { Produto } from "@modules/produtos/domain/produtos/produto.entity";
+import { Pessoa } from "@shared/domain/pessoa.entity";
 
 describe("Entidade Formulario", () => {
   let perguntaNota: Pergunta;
   let perguntaTexto: Pergunta;
   let perguntaMultiplaEscolha: Pergunta;
   let cliente: Cliente;
-  // let funcionario: Funcionario;
+  let dados: ReturnType<Cliente["recuperarDadosEssenciais"]>;
 
   beforeEach(() => {
-     cliente =  Cliente.criarCliente({ 
-      pessoa: {
-      nome:"João",
-      email: "joao@email.com",
-      telefone: "12345678"
-      },
-      cidade: "Aracaju",
-      vendedorResponsavel: "Yago",
-      produtos: [{nome: "Tênis de corrida", descricao: "Tênis profissional para quem já tem experiência", valor: 320}]
+    cliente = Cliente.criarCliente({
+    pessoa: new Pessoa({nome: "João", email: "joao@email.com", telefone: "12345678"}),
+    cidade: "Aracaju",
+    vendedorResponsavel: "Yago",
+    produtos: [
+      new Produto({ nome: "Tênis de corrida", descricao: "Tênis profissional para quem já tem experiência", valor: 320 })
+    ]
     });
-    // funcionario = new Funcionario("func-1", "Maria Souza");
+    
+     dados = cliente.recuperarDadosEssenciais();
+    
     perguntaNota = Pergunta.criar({
       texto: "Qual a sua nota?",
       tipo: "nota",
-      ordensUsadas: [],
       opcoes: ["1", "2", "3", "4", "5"]
     });
 
     perguntaTexto = Pergunta.criar({
       texto: "Descreva sua experiência.",
-      tipo: "texto",
-      ordensUsadas: []
+      tipo: "texto"
     });
 
     perguntaMultiplaEscolha = Pergunta.criar({
       texto: "Qual seu canal favorito?",
       tipo: "multipla_escolha",
-      ordensUsadas: [],
       opcoes: ["Instagram", "WhatsApp", "Email"]
     });
   });
 
   it("deve criar um formulário com sucesso", () => {
-    const formulario = Formulario.criar({
+  const formulario = Formulario.criar({
   titulo: "Formulário de Avaliação",
   descricao: "Queremos saber sua opinião!",
   perguntas: [],
-  cliente: cliente
+  cliente: dados
 });
 
     expect(formulario.id).toBeDefined();
@@ -65,7 +65,7 @@ describe("Entidade Formulario", () => {
   titulo: " ",
   descricao: "Queremos saber sua opinião!",
   perguntas: [],
-  cliente: cliente
+  cliente: dados
 })).toThrowError(FormularioTituloVazioException);
   });
 
@@ -75,7 +75,7 @@ describe("Entidade Formulario", () => {
       titulo: "Formulário Recuperado",
       descricao: "Descrição do formulário",
       perguntas: [perguntaNota],
-      cliente: cliente,
+      cliente: dados,
       ativo: true,
       dataCriacao: new Date("2024-01-01"),
       dataAtualizacao: new Date("2024-01-02"),
@@ -91,7 +91,7 @@ describe("Entidade Formulario", () => {
   titulo: "Formulário de Adição",
   descricao: "Queremos saber sua opinião!",
   perguntas: [],
-  cliente: cliente
+  cliente: dados
 });
 
     formulario.adicionarPergunta(perguntaNota);
@@ -105,7 +105,7 @@ describe("Entidade Formulario", () => {
   titulo: "Formulário com remoção",
   descricao: "Queremos saber sua opinião!",
   perguntas: [],
-  cliente: cliente
+  cliente: dados
 });
     formulario.adicionarPergunta(perguntaNota);
 
@@ -119,7 +119,7 @@ describe("Entidade Formulario", () => {
     titulo: "Formulário de Atualização",
     descricao: "Queremos saber sua opinião!",
     perguntas: [],
-    cliente: cliente
+    cliente: dados
 });
 
     formulario.atualizarTitulo("Novo Título");
@@ -132,7 +132,7 @@ describe("Entidade Formulario", () => {
   titulo: "Formulário de Avaliação",
   descricao: "Queremos saber sua opinião!",
   perguntas: [],
-  cliente: cliente
+  cliente: dados
 });
 
     expect(() => formulario.atualizarTitulo("")).toThrowError(FormularioTituloVazioException);
@@ -143,7 +143,7 @@ describe("Entidade Formulario", () => {
   titulo: "Formulário de Avaliação",
   descricao: "Queremos saber sua opinião!",
   perguntas: [],
-  cliente: cliente
+  cliente: dados
 });
 
     formulario.atualizarDescricao("Nova descrição");
@@ -156,7 +156,7 @@ describe("Entidade Formulario", () => {
   titulo: "Formulário de Feedback",
   descricao: "Queremos saber sua opinião!",
   perguntas: [],
-  cliente: cliente
+  cliente: dados
 });
 
     formulario.desativar();
@@ -170,7 +170,7 @@ describe("Entidade Formulario", () => {
       titulo: "Formulário de Feedback",
       descricao: "Ajude-nos a melhorar.",
       perguntas: [perguntaNota, perguntaTexto, perguntaMultiplaEscolha],
-      cliente: cliente
+      cliente: dados
     });
 
     expect(formulario).toBeInstanceOf(Formulario);
@@ -183,7 +183,7 @@ describe("Entidade Formulario", () => {
       titulo: "Comentário Geral",
       descricao: "Deixe seu comentário.",
       perguntas: [perguntaTexto],
-      cliente: cliente
+      cliente: dados
     });
 
     expect(formulario.perguntas.length).toBe(1);
@@ -194,14 +194,12 @@ describe("Entidade Formulario", () => {
     const p1 = Pergunta.criar({
       texto: "Escolha sua cor preferida.",
       tipo: "multipla_escolha",
-      ordensUsadas: [],
       opcoes: ["Azul", "Vermelho", "Verde"]
     });
 
     const p2 = Pergunta.criar({
       texto: "Escolha seu animal favorito.",
       tipo: "multipla_escolha",
-      ordensUsadas: [],
       opcoes: ["Cachorro", "Gato", "Pássaro"]
     });
 
@@ -209,7 +207,7 @@ describe("Entidade Formulario", () => {
       titulo: "Preferências Pessoais",
       descricao: "Queremos saber mais sobre você.",
       perguntas: [p1, p2],
-      cliente: cliente
+      cliente: dados
     });
 
     expect(formulario.perguntas.length).toBe(2);
@@ -225,7 +223,7 @@ describe("Entidade Formulario", () => {
       titulo: "Avaliação",
       descricao: "Nos avalie.",
       perguntas: [perguntaNota],
-      cliente: cliente
+      cliente: dados
     });
 
     expect(formulario.dataCriacao.getTime()).toBeLessThanOrEqual(Date.now());
@@ -239,7 +237,7 @@ describe("Entidade Formulario", () => {
       titulo: "Inativo",
       descricao: "Formulário não disponível.",
       perguntas: [],
-      cliente: cliente,
+      cliente: dados,
       ativo: false
     });
 
