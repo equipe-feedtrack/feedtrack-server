@@ -1,7 +1,7 @@
 import { IDEntityUUIDInvalid } from "@shared/domain/domain.exception";
 import { describe, expect, it } from "vitest";
-import { Pergunta } from "./domain/pergunta.entity";
-import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException } from "./domain/pergunta.exception";
+import { Pergunta } from "./pergunta.entity";
+import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException } from "./pergunta.exception";
 import { RecuperarPerguntaProps } from "./pergunta.types";
 
 describe("Entidade Pergunta: Criar Pergunta", () => {
@@ -10,6 +10,7 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
       texto: "Qual a sua nota?",
       tipo: "nota",
       opcoes: undefined,
+      formularioId: "form-001"
     });
 
     expect(pergunta.texto).toBe("Qual a sua nota?");
@@ -22,6 +23,7 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
       texto: "O que você achou do tênis corre 4?",
       tipo: "texto",
       opcoes: undefined,
+      formularioId: "form-002"
     });
 
     expect(pergunta.texto).toBe("O que você achou do tênis corre 4?");
@@ -34,6 +36,7 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
       texto: "Qual o seu nível de satisfação?",
       tipo: "multipla_escolha",
       opcoes: ["ruim", "bom", "excelente"],
+      formularioId: "form-003"
     });
 
     expect(pergunta.texto).toBe("Qual o seu nível de satisfação?");
@@ -47,6 +50,7 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
         texto: "",
         tipo: "texto",
         opcoes: undefined,
+        formularioId: "form-004"
       }),
     ).toThrow(PerguntaTextoVazioException);
   });
@@ -57,6 +61,7 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
         texto: "Texto",
         tipo: "escolha_unica",
         opcoes: undefined,
+        formularioId: "form-005"
       }),
     ).toThrow(TipoPerguntaInvalidoException);
   });
@@ -67,6 +72,7 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
         texto: "Escolha uma opção",
         tipo: "multipla_escolha",
         opcoes: ["Sim"],
+        formularioId: "form-006"
       }),
     ).toThrow(QuantidadeMinimaOpcoesException);
   });
@@ -77,6 +83,7 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
         texto: "Escolha uma opção",
         tipo: "multipla_escolha",
         opcoes: ["Sim", "Sim"],
+        formularioId: "form-007"
       }),
     ).toThrow(OpcaoDuplicadaException);
   });
@@ -86,6 +93,7 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
       texto: "Qual o seu nível de satisfação?",
       tipo: "nota",
       opcoes: ["1", "2", "3"],
+      formularioId: "form-008"
     });
 
     expect(pergunta.tipo).toBe("nota");
@@ -97,7 +105,7 @@ describe("Entidade Pergunta: Criar Pergunta", () => {
       texto: "Qual sua idade?",
       tipo: "nota",
       opcoes: ['1', '2', '3'],
-
+      formularioId: "form-009"
     });
 
   
@@ -110,7 +118,8 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
     const perguntaValida: RecuperarPerguntaProps = {
       id: "89eebea5-2314-47bf-8510-e1ddf69503a9",
       texto: "Qual a sua nota?",
-      tipo: "nota"
+      tipo: "nota",
+       formularioId: "form-010"
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
@@ -125,7 +134,8 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
     const perguntaInvalida: RecuperarPerguntaProps = {
       id: "1234",
       texto: "Qual a sua nota?",
-      tipo: "nota"
+      tipo: "nota",
+      formularioId: "form-010.1"
     };
 
     expect(() => Pergunta.recuperar(perguntaInvalida)).toThrow(IDEntityUUIDInvalid);
@@ -135,7 +145,8 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
     const perguntaValida: RecuperarPerguntaProps = {
       id: "89eebea5-2314-47bf-8510-e1ddf69503a9",
       texto: "Descreva sua experiência com o produto.",
-      tipo: "texto"
+      tipo: "texto",
+      formularioId: "form-011"
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
@@ -151,7 +162,8 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
       id: "89eebea5-2314-47bf-8510-e1ddf69503a9",
       texto: "Qual é a sua cor favorita?",
       tipo: "multipla_escolha",
-      opcoes: ["Azul", "Verde", "Vermelho"]
+      opcoes: ["Azul", "Verde", "Vermelho"],
+       formularioId: "form-012"
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
@@ -168,6 +180,7 @@ describe("Entidade Pergunta: Recuperar Pergunta", () => {
       texto: "Qual é a sua fruta favorita?",
       tipo: "multipla_escolha",
       opcoes: [], // opções vazias
+       formularioId: "form-013"
     };
 
     expect(() => Pergunta.recuperar(perguntaInvalida)).toThrow(OpcoesObrigatoriasException);

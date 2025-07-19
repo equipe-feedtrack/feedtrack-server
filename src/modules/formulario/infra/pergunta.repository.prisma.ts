@@ -20,7 +20,7 @@ export class PerguntaRepositoryPrisma implements IPerguntaRepository<Pergunta> {
       dataCriacao: perguntaPrisma.data_criacao,
       dataAtualizacao: perguntaPrisma.data_atualizacao,
       dataExclusao: perguntaPrisma.data_exclusao ?? null,
-      formularioId: perguntaPrisma.formulario_id,
+      formularioId: perguntaPrisma.formularioId,
     });
   }
 
@@ -36,7 +36,7 @@ export class PerguntaRepositoryPrisma implements IPerguntaRepository<Pergunta> {
         dataCriacao: p.data_criacao,
         dataAtualizacao: p.data_atualizacao,
         dataExclusao: p.data_exclusao ?? null,
-        formularioId: p.formulario_id,
+        formularioId: p.formularioId,
       })
     );
   }
@@ -53,10 +53,10 @@ export class PerguntaRepositoryPrisma implements IPerguntaRepository<Pergunta> {
         texto: pergunta.texto,
         tipo: pergunta.tipo,
         opcoes: pergunta.opcoes ?? [],
-        data_criacao: pergunta.dataCriacao,
-        data_atualizacao: pergunta.dataAtualizacao,
+        formularioId: pergunta.formularioId,
+        data_criacao: pergunta.dataCriacao ?? new Date(),
+        data_atualizacao: pergunta.dataAtualizacao ?? new Date(),
         data_exclusao: pergunta.dataExclusao ?? null,
-        formulario_id: pergunta.formularioId,
       },
     });
 
@@ -65,10 +65,10 @@ export class PerguntaRepositoryPrisma implements IPerguntaRepository<Pergunta> {
       texto: perguntaCriada.texto,
       tipo: perguntaCriada.tipo,
       opcoes: perguntaCriada.opcoes as string[],
+      formularioId: perguntaCriada.formularioId,
       dataCriacao: perguntaCriada.data_criacao,
       dataAtualizacao: perguntaCriada.data_atualizacao,
       dataExclusao: perguntaCriada.data_exclusao ?? null,
-      formularioId: perguntaCriada.formulario_id,
     });
   }
 

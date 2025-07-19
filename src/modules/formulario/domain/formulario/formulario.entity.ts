@@ -1,6 +1,4 @@
-import { FormularioMap } from "@modules/formulario/mappers/formulario.map";
-import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
-import { ClienteEssencial } from "@modules/gestao_clientes/domain/cliente/cliente.types";
+import { CriarPerguntaDTO } from "@modules/formulario/application/criarFormularioDTO";
 import { Entity } from "@shared/domain/entity";
 import { Pergunta } from "../pergunta/domain/pergunta.entity";
 import { FormularioTituloVazioException } from "./formulario.exception";
@@ -10,11 +8,11 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
  
   private _titulo: string;
   private _descricao?: string | undefined;
-  private _perguntas: Pergunta[];
-  private _cliente: ClienteEssencial;
+  private _perguntas: CriarPerguntaDTO[];
   private _ativo: boolean;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
+  private _dataExclusao: Date | null;
 
     public get titulo(): string {
         return this._titulo;
@@ -28,20 +26,12 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     private set descricao(descricao: string | undefined) {
         this._descricao = descricao;
     }
-    public get perguntas(): Pergunta[] {
+    public get perguntas(): CriarPerguntaDTO[] {
         return this._perguntas;
     }
-    private set perguntas(perguntas: Pergunta[]) {
+    private set perguntas(perguntas: CriarPerguntaDTO[]) {
         this._perguntas = perguntas;
     }
-    public get cliente(): ClienteEssencial {
-    return this._cliente;
-    }
-
-    private set cliente(cliente: ClienteEssencial) {
-      this._cliente = cliente;
-    }
-    
     public get ativo(): boolean {
         return this._ativo;
     }
@@ -60,17 +50,22 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     private set dataAtualizacao(dataAtualizacao: Date) {
         this._dataAtualizacao = dataAtualizacao;
     }
+    public get dataExclusao(): Date | null {
+    return this._dataExclusao;
+    }
+    private set dataExclusao(value: Date | null) {
+      this._dataExclusao = value;
+    }
   
   public constructor(formulario: IFormulario) {
     super(formulario.id)
     this.titulo = formulario.titulo;
     this.descricao = formulario.descricao;
-    this.perguntas = formulario.perguntas ?? [];
-    this.cliente = formulario.cliente instanceof Cliente ? formulario.cliente.recuperarDadosEssenciais() : formulario.cliente;
+    this.perguntas = formulario.perguntas?.map(p => Pergunta.recuperar(p)) ?? [];
     this.ativo = formulario.ativo ?? true;
     this.dataCriacao = formulario.dataCriacao ?? new Date();
     this.dataAtualizacao = formulario.dataAtualizacao ?? new Date();
-
+    this.dataExclusao = formulario.dataExclusao ?? null;
     this.validateFormulario();
   }
 
@@ -87,8 +82,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     return new Formulario({
     titulo: formulario.titulo,
     descricao: formulario.descricao,
-    perguntas: formulario.perguntas,
-    cliente: formulario.cliente,
+    perguntas: formulario.perguntas ?? [],
     ativo: formulario.ativo,
     dataCriacao: formulario.dataCriacao,
     dataAtualizacao: formulario.dataAtualizacao
@@ -103,10 +97,6 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     ///////////
     //Métodos///
     ///////////
-
-    public toDTO(): IFormulario {
-        return FormularioMap.toDTO(this);
-    }
 
   // Métodos para manipular perguntas
   public adicionarPergunta(pergunta: Pergunta): void {

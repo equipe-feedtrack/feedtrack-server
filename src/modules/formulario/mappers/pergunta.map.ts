@@ -1,7 +1,5 @@
 import { Pergunta } from "../domain/pergunta/domain/pergunta.entity";
-import { IPergunta, RecuperarPerguntaProps } from "../domain/pergunta/domain/pergunta.types";
-
-;
+import { IPergunta } from "../domain/pergunta/domain/pergunta.types";
 
 class PerguntaMap {
     public static toDTO(pergunta: Pergunta): IPergunta {
@@ -9,20 +7,21 @@ class PerguntaMap {
             id: pergunta.id,
             texto: pergunta.texto,
             tipo: pergunta.tipo,
-            opcoes: pergunta.opcoes ?? [],
+            opcoes: Array.isArray(pergunta.opcoes) ? (pergunta.opcoes as string[]) : undefined,
+            formularioId: pergunta.formularioId
         };
     }
 
-    public static toDomain(prismaData: any): Pergunta {
+    public static toDomain(prismaData: IPergunta): Pergunta {
         return Pergunta.recuperar({
             id: prismaData.id,
-            texto: prismaData.titulo,
-            tipo: prismaData.tipo_pergunta,
-            opcoes: prismaData.opcoes,
-            formularioId: prismaData.formulario_id,
-            dataCriacao: prismaData.data_criacao,
-            dataAtualizacao: prismaData.data_atualizacao,
-            dataExclusao: prismaData.data_exclusao,
+            texto: prismaData.texto,
+            tipo: prismaData.tipo,
+            opcoes: prismaData.opcoes === null ? undefined : prismaData.opcoes,
+            formularioId: prismaData.formularioId, // importante para relacionamento
+            dataCriacao: prismaData.dataCriacao ?? new Date(), // fallback se vier undefined
+            dataAtualizacao: prismaData.dataAtualizacao ?? new Date(),
+            dataExclusao: prismaData.dataExclusao ?? null,
         });
     }
 }

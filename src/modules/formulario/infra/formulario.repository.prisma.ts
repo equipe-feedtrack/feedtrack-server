@@ -1,87 +1,112 @@
-import { IFormularioRepository } from "../domain/formulario/formulario.repository.interface";
-import { Formulario } from "../domain/formulario/formulario.entity";
 import { PrismaClient } from "@prisma/client";
+import { Formulario } from "../domain/formulario/formulario.entity";
 import { FormularioMap } from "../mappers/formulario.map";
-
-const prisma = new PrismaClient();
+import { IFormularioRepository } from "./formulario.repository.interface";
 
 export class FormularioRepositoryPrisma implements IFormularioRepository<Formulario> {
   constructor(private prisma: PrismaClient) {}
 
   async recuperarPorUuid(uuid: string): Promise<Formulario | null> {
-    const formularioPrisma = await this.prisma.formulario.findUnique({ where: { id: uuid } });
-    if (!formularioPrisma) return null;
+    const f = await this.prisma.formulario.findUnique({
+      where: { id: uuid },
+      include: { perguntas: true },
+    });
+    if (!f) return null;
+    const perguntasTratadas = f.perguntas.map(p => ({
+    ...p,
+    // Prisma pode retornar opcoes como null ou qualquer JSON
+    opcoes: p.opcoes === null ? undefined : Array.isArray(p.opcoes) ? p.opcoes.map(String) : undefined,
+    formularioId: p.formularioId, // converter nome para camelCase esperado no domínio
+    dataCriacao: p.data_criacao,
+    dataAtualizacao: p.data_atualizacao,
+    dataExclusao: p.data_exclusao,
+    }));
 
     return FormularioMap.toDomain({
-      id: formularioPrisma.id,
-      titulo: formularioPrisma.titulo,
-      dataCriacao: formularioPrisma.data_criacao,
-      dataAtualizacao: formularioPrisma.data_atualizacao,
-      dataExclusao: formularioPrisma.data_exclusao ?? null,
-      clienteId: formularioPrisma.cliente_id,
-      produtoId: formularioPrisma.produto_id,
-      funcionarioId: formularioPrisma.funcionario_id,
+      id: f.id,
+      titulo: f.texto,
+      descricao: f.descricao,
+      perguntas: perguntasTratadas,
+      ativo: f.ativo,
+      dataCriacao: f.data_criacao,
+      dataAtualizacao: f.data_atualizacao,
+      dataExclusao: f.data_exclusao ?? null,
     });
   }
 
   async recuperarTodos(): Promise<Formulario[]> {
-    const formularios = await this.prisma.formulario.findMany();
+  const formularios = await this.prisma.formulario.findMany({
+    include: { perguntas: true },
+  });
 
-    return formularios.map((f) =>
-      FormularioMap.toDomain({
-        id: f.id,
-        titulo: f.titulo,
-        dataCriacao: f.data_criacao,
-        dataAtualizacao: f.data_atualizacao,
-        dataExclusao: f.data_exclusao ?? null,
-        clienteId: f.cliente_id,
-        produtoId: f.produto_id,
-        funcionarioId: f.funcionario_id,
-      })
-    );
-  }
+  return formularios.map(f => {
+    // Normalizar perguntas
+    const perguntasTratadas = f.perguntas.map(p => ({
+      ...p,
+      opcoes: p.opcoes === null 
+        ? undefined 
+        : Array.isArray(p.opcoes) 
+          ? p.opcoes.map(String) 
+          : undefined,
+      formularioId: p.formularioId,
+      dataCriacao: p.data_criacao,
+      dataAtualizacao: p.data_atualizacao,
+      dataExclusao: p.data_exclusao,
+    }));
+
+    return FormularioMap.toDomain({
+      id: f.id,
+      titulo: f.texto,
+      descricao: f.descricao,
+      perguntas: perguntasTratadas,
+      ativo: f.ativo,
+      dataCriacao: f.data_criacao,
+      dataAtualizacao: f.data_atualizacao,
+      dataExclusao: f.data_exclusao ?? null,
+    });
+  });
+}
 
   async existe(uuid: string): Promise<boolean> {
     const count = await this.prisma.formulario.count({ where: { id: uuid } });
     return count > 0;
   }
 
-  async inserir(entity: Formulario): Promise<Formulario> {
-    const formularioCriado = await this.prisma.formulario.create({
+  async inserir(formulario: Formulario): Promise<Formulario> {
+    const fCriado = await this.prisma.formulario.create({
       data: {
-        id: entity.id,
-        titulo: entity.titulo,
-        data_criacao: entity.dataCriacao,
-        data_atualizacao: entity.dataAtualizacao,
-        data_exclusao: entity.dataExclusao ?? null,
-        cliente_id: entity.clienteId,
-        produto_id: entity.produtoId,
-        funcionario_id: entity.funcionarioId,
+        id: formulario.id,
+        texto: formulario.titulo,
+        descricao: formulario.descricao ?? '',
+        ativo: formulario.ativo,
+        data_criacao: formulario.dataCriacao,
+        data_atualizacao: formulario.dataAtualizacao,
+        data_exclusao: formulario.dataExclusao ?? null,
+        // perguntas devem ser inseridas separadamente
       },
     });
 
     return FormularioMap.toDomain({
-      id: formularioCriado.id,
-      titulo: formularioCriado.titulo,
-      dataCriacao: formularioCriado.data_criacao,
-      dataAtualizacao: formularioCriado.data_atualizacao,
-      dataExclusao: formularioCriado.data_exclusao ?? null,
-      clienteId: formularioCriado.cliente_id,
-      produtoId: formularioCriado.produto_id,
-      funcionarioId: formularioCriado.funcionario_id,
+      id: fCriado.id,
+      titulo: fCriado.texto,
+      descricao: fCriado.descricao,
+      perguntas: [], // perguntas vazias ao criar
+      ativo: fCriado.ativo,
+      dataCriacao: fCriado.data_criacao,
+      dataAtualizacao: fCriado.data_atualizacao,
+      dataExclusao: fCriado.data_exclusao ?? null,
     });
   }
 
-  async atualizar(uuid: string, entity: Partial<Formulario>): Promise<boolean> {
+  async atualizar(uuid: string, formulario: Partial<Formulario>): Promise<boolean> {
     const result = await this.prisma.formulario.updateMany({
       where: { id: uuid },
       data: {
-        titulo: entity.titulo,
+        texto: formulario.titulo,
+        descricao: formulario.descricao,
+        ativo: formulario.ativo,
         data_atualizacao: new Date(),
-        data_exclusao: entity.dataExclusao ?? undefined,
-        cliente_id: entity.clienteId,
-        produto_id: entity.produtoId,
-        funcionario_id: entity.funcionarioId,
+        data_exclusao: formulario.dataExclusao ?? undefined,
       },
     });
 
