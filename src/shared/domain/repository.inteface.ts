@@ -7,7 +7,7 @@ interface IQuery<T> {
 }
 
 interface ICommand<T> {
-    inserir(entity: T): Promise<T>;
+    inserir(entity: T): Promise<void>;
     atualizar(uuid: string, entity: Partial<T>): Promise<boolean>;
     deletar(uuid: string): Promise<boolean>;
 }

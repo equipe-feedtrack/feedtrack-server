@@ -1,94 +1,78 @@
-import { Pergunta } from "../domain/pergunta/domain/pergunta.entity";
-import { PerguntaMap } from "../mappers/pergunta.map";
-import { IPerguntaRepository } from "./pergunta.repository.interface";
 import { PrismaClient } from "@prisma/client";
+import { IPergunta } from "../domain/pergunta/domain/pergunta.types";
+import { IPerguntaRepository } from "./pergunta.repository.interface";
+import { PerguntaMap } from "../mappers/pergunta.map";
+import { Pergunta } from "../domain/pergunta/domain/pergunta.entity";
 
-const prisma = new PrismaClient();
+export class PerguntaRepositoryPrisma implements IPerguntaRepository<IPergunta> {
+  // Recebemos o prisma via injeção de dependência, o que é ótimo.
+  constructor(private readonly prisma: PrismaClient) {}
+  
+  async recuperarPorUuid(id: string): Promise<IPergunta | null> {
+    const perguntaPrisma = await this.prisma.pergunta.findUnique({
+      where: { id },
+    });
 
-export class PerguntaRepositoryPrisma implements IPerguntaRepository<Pergunta> {
-  constructor(private prisma: PrismaClient) {}
-
-  async recuperarPorUuid(uuid: string): Promise<Pergunta | null> {
-    const perguntaPrisma = await this.prisma.pergunta.findUnique({ where: { id: uuid } });
     if (!perguntaPrisma) return null;
 
-    return PerguntaMap.toDomain({
-      id: perguntaPrisma.id,
-      texto: perguntaPrisma.texto,
-      tipo: perguntaPrisma.tipo,
-      opcoes: perguntaPrisma.opcoes as string[],
-      dataCriacao: perguntaPrisma.data_criacao,
-      dataAtualizacao: perguntaPrisma.data_atualizacao,
-      dataExclusao: perguntaPrisma.data_exclusao ?? null,
-      formularioId: perguntaPrisma.formularioId,
+    // Apenas chamamos o Mapper. Ele faz todo o trabalho de tradução.
+    return PerguntaMap.toDomain(perguntaPrisma);
+  }
+  
+  async inserir(pergunta: Pergunta): Promise<void> {
+   const dadosParaPersistencia = PerguntaMap.toPersistence(pergunta);
+
+    await this.prisma.pergunta.upsert({
+      where: { id: pergunta.id },
+      // Para o 'update', omitimos 'opcoes' se for null para evitar erros.
+      update: {
+        texto: dadosParaPersistencia.texto,
+        tipo: dadosParaPersistencia.tipo,
+        opcoes: dadosParaPersistencia.opcoes ?? undefined, // Omitir se for null
+        data_atualizacao: dadosParaPersistencia.data_atualizacao,
+        data_exclusao: dadosParaPersistencia.data_exclusao,
+      },
+      // Para o 'create', garantimos que todos os campos obrigatórios estejam presentes e com os tipos corretos.
+      create: {
+        id: dadosParaPersistencia.id,
+        texto: dadosParaPersistencia.texto,
+        tipo: dadosParaPersistencia.tipo,
+        opcoes: dadosParaPersistencia.opcoes ?? null, // 'null' é um valor JSON válido na criação
+        data_criacao: dadosParaPersistencia.data_criacao ?? new Date(),
+        data_atualizacao: dadosParaPersistencia.data_atualizacao ?? new Date(),
+        data_exclusao: dadosParaPersistencia.data_exclusao,
+      },
     });
   }
 
-  async recuperarTodos(): Promise<Pergunta[]> {
-    const perguntasPrisma = await this.prisma.pergunta.findMany();
-
-    return perguntasPrisma.map((p) =>
-      PerguntaMap.toDomain({
-        id: p.id,
-        texto: p.texto,
-        tipo: p.tipo,
-        opcoes: p.opcoes as string[],
-        dataCriacao: p.data_criacao,
-        dataAtualizacao: p.data_atualizacao,
-        dataExclusao: p.data_exclusao ?? null,
-        formularioId: p.formularioId,
-      })
-    );
-  }
-
-  async existe(uuid: string): Promise<boolean> {
-    const count = await this.prisma.pergunta.count({ where: { id: uuid } });
-    return count > 0;
-  }
-
-  async inserir(pergunta: Pergunta): Promise<Pergunta> {
-    const perguntaCriada = await this.prisma.pergunta.create({
-      data: {
-        id: pergunta.id,
-        texto: pergunta.texto,
-        tipo: pergunta.tipo,
-        opcoes: pergunta.opcoes ?? [],
-        formularioId: pergunta.formularioId,
-        data_criacao: pergunta.dataCriacao ?? new Date(),
-        data_atualizacao: pergunta.dataAtualizacao ?? new Date(),
-        data_exclusao: pergunta.dataExclusao ?? null,
+  async buscarMuitosPorId(ids: string[]): Promise<Pergunta[]> {
+    const perguntasPrisma = await this.prisma.pergunta.findMany({
+      where: {
+        id: {
+          in: ids, // Usa o filtro 'in' para encontrar todos os IDs na lista
+        },
       },
     });
 
-    return PerguntaMap.toDomain({
-      id: perguntaCriada.id,
-      texto: perguntaCriada.texto,
-      tipo: perguntaCriada.tipo,
-      opcoes: perguntaCriada.opcoes as string[],
-      formularioId: perguntaCriada.formularioId,
-      dataCriacao: perguntaCriada.data_criacao,
-      dataAtualizacao: perguntaCriada.data_atualizacao,
-      dataExclusao: perguntaCriada.data_exclusao ?? null,
-    });
+    return perguntasPrisma.map(PerguntaMap.toDomain);
   }
 
-  async atualizar(uuid: string, pergunta: Partial<Pergunta>): Promise<boolean> {
-    const result = await this.prisma.pergunta.updateMany({
-      where: { id: uuid },
-      data: {
-        texto: pergunta.texto,
-        tipo: pergunta.tipo,
-        opcoes: pergunta.opcoes ?? [],
-        data_atualizacao: new Date(),
-        data_exclusao: pergunta.dataExclusao ?? undefined,
-      },
-    });
-
-    return result.count > 0;
+  recuperarTodos(): Promise<IPergunta[]> {
+    throw new Error("Method not implemented.");
   }
 
-  async deletar(uuid: string): Promise<boolean> {
-    const result = await this.prisma.pergunta.deleteMany({ where: { id: uuid } });
-    return result.count > 0;
+  existe(uuid: string): Promise<boolean> {
+    throw new Error("Method not implemented.");
   }
+
+  atualizar(uuid: string, entity: Partial<IPergunta>): Promise<boolean> {
+    throw new Error("Method not implemented.");
+  }
+  
+  deletar(uuid: string): Promise<boolean> {
+    throw new Error("Method not implemented.");
+  }
+
 }
+
+  

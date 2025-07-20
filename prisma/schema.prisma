@@ -93,8 +93,8 @@ model Pergunta {
   data_atualizacao DateTime
   data_exclusao    DateTime?
 
-  formularioId    String
-  formulario      Formulario @relation(fields: [formularioId], references: [id])
+  formularios     Formulario[]
+  @@map("perguntas")
 }
 
 
@@ -126,6 +126,7 @@ model Formulario {
   feedbacks        Feedback[]
   envio_formulario Envio_formulario[]
   perguntas        Pergunta[]
+  @@map("formularios")
 }
 
 model Feedback {

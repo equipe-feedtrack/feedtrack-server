@@ -1,4 +1,3 @@
-import { CriarPerguntaDTO } from "@modules/formulario/application/criarFormularioDTO";
 import { Entity } from "@shared/domain/entity";
 import { Pergunta } from "../pergunta/domain/pergunta.entity";
 import { FormularioTituloVazioException } from "./formulario.exception";
@@ -8,7 +7,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
  
   private _titulo: string;
   private _descricao?: string | undefined;
-  private _perguntas: CriarPerguntaDTO[];
+  private _perguntas: Pergunta[];
   private _ativo: boolean;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
@@ -26,10 +25,10 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     private set descricao(descricao: string | undefined) {
         this._descricao = descricao;
     }
-    public get perguntas(): CriarPerguntaDTO[] {
+    public get perguntas(): Pergunta[] {
         return this._perguntas;
     }
-    private set perguntas(perguntas: CriarPerguntaDTO[]) {
+    private set perguntas(perguntas: Pergunta[]) {
         this._perguntas = perguntas;
     }
     public get ativo(): boolean {
@@ -61,7 +60,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     super(formulario.id)
     this.titulo = formulario.titulo;
     this.descricao = formulario.descricao;
-    this.perguntas = formulario.perguntas?.map(p => Pergunta.recuperar(p)) ?? [];
+    this.perguntas = formulario.perguntas;
     this.ativo = formulario.ativo ?? true;
     this.dataCriacao = formulario.dataCriacao ?? new Date();
     this.dataAtualizacao = formulario.dataAtualizacao ?? new Date();
@@ -99,14 +98,17 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     ///////////
 
   // Métodos para manipular perguntas
-  public adicionarPergunta(pergunta: Pergunta): void {
-    // Se quiser, pode validar se pergunta já existe na lista
+   public adicionarPergunta(pergunta: Pergunta): void {
+    const jaExiste = this.perguntas.some(p => p.id === pergunta.id);
+    if (jaExiste) {
+      throw new Error("Esta pergunta já existe no formulário.");
+    }
     this.perguntas.push(pergunta);
     this.dataAtualizacao = new Date();
   }
 
-  public removerPergunta(idPergunta: string): void {
-    this.perguntas = this.perguntas.filter(p => p.id !== idPergunta);
+ public removerPergunta(perguntaId: string): void {
+    this.perguntas = this.perguntas.filter(p => p.id !== perguntaId);
     this.dataAtualizacao = new Date();
   }
 
