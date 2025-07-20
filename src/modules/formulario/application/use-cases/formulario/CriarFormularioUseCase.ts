@@ -1,8 +1,9 @@
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
 import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
-import { IFormularioRepository } from "@modules/formulario/infra/formulario.repository.interface";
-import { IPerguntaRepository } from "@modules/formulario/infra/pergunta.repository.interface";
+import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
+
 import { CriarFormularioDTO } from "../dto/formulario/CriarFormularioDTO";
+import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
 
 export class CriarFormularioUseCase {
   constructor(

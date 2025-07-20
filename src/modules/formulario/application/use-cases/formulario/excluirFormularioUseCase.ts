@@ -1,5 +1,5 @@
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
-import { IFormularioRepository } from "@modules/formulario/infra/formulario.repository.interface";
+import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
 import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
 
 export class ExcluirFormularioUseCase {

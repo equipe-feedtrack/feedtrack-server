@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { Pergunta } from "../domain/pergunta/domain/pergunta.entity";
-import { IPergunta } from "../domain/pergunta/domain/pergunta.types";
-import { PerguntaMap } from "../mappers/pergunta.map";
+import { Pergunta } from "../../domain/pergunta/domain/pergunta.entity";
+import { IPergunta } from "../../domain/pergunta/domain/pergunta.types";
+import { PerguntaMap } from "../../mappers/pergunta.map";
 import { IPerguntaRepository } from "./pergunta.repository.interface";
 
 export class PerguntaRepositoryPrisma implements IPerguntaRepository<IPergunta> {

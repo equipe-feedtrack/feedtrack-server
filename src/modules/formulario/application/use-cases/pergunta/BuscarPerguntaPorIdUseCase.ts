@@ -1,8 +1,9 @@
 import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
-import { IPerguntaRepository } from "@modules/formulario/infra/pergunta.repository.interface";
+
 import { PerguntaMap } from "@modules/formulario/mappers/pergunta.map";
 import { UseCaseException } from "@shared/application/use-case/use-case.exception";
 import { PerguntaResponseDTO } from "../dto/pergunta/PerguntaResponseDTO";
+import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
 
 
 export class BuscarPerguntaPorIdUseCase {

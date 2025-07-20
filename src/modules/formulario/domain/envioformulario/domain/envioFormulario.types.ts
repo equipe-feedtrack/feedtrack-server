@@ -1,15 +1,16 @@
-import { Formulario } from "../../formulario/formulario.entity";
+import { Status_formulario } from "@prisma/client";
 
-interface IEnvioFormularioProps {
-  id?: string;
-  data_envio: Date;
-  destinatario: string;
-  formulario: Formulario;
-  canal: "email" | "whatsapp" | string;
+interface EnvioProps {
+  id: string;
+  clienteId: string;
+  usuarioId: string;
+  formularioId: string;
+  feedbackId: string;
+  status: Status_formulario;
+  dataCriacao: Date;
+  dataEnvio?: Date | null;
+  tentativasEnvio: number;
+  ultimaMensagemErro?: string | null;
 }
 
-export interface CanalEnvioFormulario {
-  enviar(destinatario: string, titulo: string, perguntas: string[]): Promise<void>;
-}
-
-export{ IEnvioFormularioProps}
+export {EnvioProps}

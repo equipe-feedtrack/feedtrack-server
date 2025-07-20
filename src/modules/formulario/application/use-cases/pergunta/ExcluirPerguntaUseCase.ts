@@ -1,5 +1,5 @@
 import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
-import { IPerguntaRepository } from "@modules/formulario/infra/pergunta.repository.interface";
+import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
 import { UseCaseException } from "@shared/application/use-case/use-case.exception";
 
 export class ExcluirPerguntaUseCase {
