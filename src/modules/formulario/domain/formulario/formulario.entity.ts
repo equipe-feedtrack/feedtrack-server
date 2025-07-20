@@ -114,28 +114,59 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
 
   // Atualizar título ou descrição
   public atualizarTitulo(titulo: string): void {
-    if (!titulo || titulo.trim().length === 0) {
+    if (!titulo || titulo.trim().length < 3) {
       throw new FormularioTituloVazioException;
     }
     this.titulo = titulo;
     this.dataAtualizacao = new Date();
   }
 
-  public atualizarDescricao(descricao: string): void {
+  public atualizarDescricao(descricao: string | undefined): void {
     this.descricao = descricao;
     this.dataAtualizacao = new Date();
   }
 
-  // Ativar ou desativar formulário
+  public substituirPerguntas(novasPerguntas: Pergunta[]): void {
+    // 1. Regra de negócio (opcional): Garante que um formulário não pode ficar sem perguntas.
+    if (!novasPerguntas || novasPerguntas.length === 0) {
+      throw new Error("Um formulário deve ter pelo menos uma pergunta.");
+    }
+
+    // 2. Garante que as novas perguntas estejam vinculadas a este formulário.
+    // O Formulário "adota" as novas perguntas.
+    novasPerguntas.forEach(pergunta => {
+      // Usando o método que criamos na entidade Pergunta
+      pergunta.vincularFormulario(this.id); 
+    });
+
+    // 3. Substitui a lista antiga pela nova.
+    this.perguntas = novasPerguntas;
+
+    // 4. Atualiza a data de modificação.
+    this.dataAtualizacao = new Date();
+  }
+
+  // Ativar
   public ativar(): void {
     this.ativo = true;
     this.dataAtualizacao = new Date();
   }
-
+  //desativar formulário
   public desativar(): void {
+     if (!this.ativo) {
+      throw new Error("Este formulário já está inativo.");
+    }
+
     this.ativo = false;
     this.dataAtualizacao = new Date();
+    this.dataExclusao = new Date();
+
+     this.perguntas.forEach(pergunta => {
+      // Supondo que a entidade Pergunta também tenha um método inativar()
+      pergunta.inativar(); 
+     });
   }
+
 }
 
 export { Formulario };

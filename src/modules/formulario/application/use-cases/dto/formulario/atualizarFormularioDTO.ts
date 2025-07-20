@@ -9,7 +9,7 @@ export interface AtualizarFormularioDTO {
   /**
    * A nova descrição do formulário.
    */
-  descricao?: string;
+  descricao?: string | undefined;
 
   /**
    * O novo conjunto completo de perguntas. 

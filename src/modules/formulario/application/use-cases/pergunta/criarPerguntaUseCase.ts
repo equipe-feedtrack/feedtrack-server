@@ -1,10 +1,10 @@
 import { IFormulario } from "@modules/formulario/domain/formulario/formulario.types";
 import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
-import { CriarPerguntaProps, IPergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.types";
+import { IPergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.types";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario.repository.interface";
 import { IPerguntaRepository } from "@modules/formulario/infra/pergunta.repository.interface";
-import { CriarPerguntaDTO } from "../dto/pergunta/CriarPerguntaDTO";
 import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
+import { CriarPerguntaDTO } from "../dto/pergunta/CriarPerguntaDTO";
 
 export class CriarPerguntaUseCase {
   constructor(

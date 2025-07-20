@@ -25,8 +25,9 @@ enum Tipo_usuario {
 }
 
 enum Status_formulario {
+  PENDENTE
   ENVIADO
-  NAO_ENVIADO
+  FALHA
 }
 
 model Usuario {
@@ -99,18 +100,31 @@ model Pergunta {
 
 
 model Envio_formulario {
-  id               String @id @default(uuid())
-  formulario       Formulario @relation(fields: [id_formulario], references: [id])
-  cliente          Cliente @relation(fields: [cliente_id], references: [id])
-  usuario          Usuario @relation(fields: [usuario_id], references: [id])
+   
+  id                String    @id @default(uuid())
+  // Relações que você já tinha, agora padronizadas
+  formulario        Formulario @relation(fields: [formularioId], references: [id])
+  formularioId      String     @map("formulario_id")
 
-  id_formulario    String
-  usuario_id       String
-  cliente_id       String
+  cliente           Cliente    @relation(fields: [clienteId], references: [id])
+  clienteId         String     @map("cliente_id")
 
-  data_envio        DateTime
+  usuario           Usuario    @relation(fields: [usuarioId], references: [id])
+  usuarioId         String     @map("usuario_id")
 
-  status           Status_formulario
+  // Campo crucial que conecta ao subdomínio de feedback
+  feedbackId        String     @unique @map("feedback_id")
+
+  // Status padronizado usando o enum
+  status            Status_formulario @default(PENDENTE)
+  
+  // Campos de rastreamento do envio
+  dataCriacao       DateTime  @default(now()) @map("data_criacao")
+  dataEnvio         DateTime? @map("data_envio")
+  tentativasEnvio   Int       @default(0) @map("tentativas_envio")
+  ultimaMensagemErro String?   @map("ultima_mensagem_erro")
+
+  @@map("envios")
 
 }
 

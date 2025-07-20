@@ -4,6 +4,7 @@ interface IPergunta {
     tipo: string;
     ativo?: boolean;
     opcoes?: string[] | null;
+    formularioId?: string;
     dataCriacao: Date;
     dataAtualizacao: Date;
     dataExclusao: Date | null;

@@ -7,4 +7,4 @@ interface IPerguntaRepository<T> extends IRepository<T> {
      buscarMuitosPorId(ids: string[]): Promise<Pergunta[]>;
 }
 
-export { IPerguntaRepository }
+export { IPerguntaRepository };

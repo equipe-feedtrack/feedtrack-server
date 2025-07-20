@@ -1,9 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Formulario } from "../domain/formulario/formulario.entity";
-import { IFormularioRepository } from "./formulario.repository.interface";
-import { FormularioMap } from "../mappers/formulario.map";
-import { PerguntaMap } from "../mappers/pergunta.map";
 import { IFormulario } from "../domain/formulario/formulario.types";
+import { FormularioMap } from "../mappers/formulario.map";
+import { IFormularioRepository } from "./formulario.repository.interface";
 
 export class FormularioRepositoryPrisma implements IFormularioRepository<IFormulario> {
   constructor(private prisma: PrismaClient) {}

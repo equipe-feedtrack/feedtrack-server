@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { IPergunta } from "../domain/pergunta/domain/pergunta.types";
-import { IPerguntaRepository } from "./pergunta.repository.interface";
-import { PerguntaMap } from "../mappers/pergunta.map";
 import { Pergunta } from "../domain/pergunta/domain/pergunta.entity";
+import { IPergunta } from "../domain/pergunta/domain/pergunta.types";
+import { PerguntaMap } from "../mappers/pergunta.map";
+import { IPerguntaRepository } from "./pergunta.repository.interface";
 
 export class PerguntaRepositoryPrisma implements IPerguntaRepository<IPergunta> {
   // Recebemos o prisma via injeção de dependência, o que é ótimo.

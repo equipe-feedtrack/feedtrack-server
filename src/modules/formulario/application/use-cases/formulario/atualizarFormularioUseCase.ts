@@ -1,9 +1,8 @@
-import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
-import { AtualizarFormularioDTO } from "../dto/formulario/atualizarFormularioDTO";
-import { IFormularioRepository } from "@modules/formulario/infra/formulario.repository.interface";
-import { IFormulario } from "@modules/formulario/domain/formulario/formulario.types";
-import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
+import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
+import { IFormularioRepository } from "@modules/formulario/infra/formulario.repository.interface";
+import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
+import { AtualizarFormularioDTO } from "../dto/formulario/atualizarFormularioDTO";
 
 export class AtualizarFormularioUseCase {
   constructor(private readonly formularioRepository: IFormularioRepository<Formulario>) {}
@@ -17,8 +16,8 @@ export class AtualizarFormularioUseCase {
     }
 
     // 2. Chama os métodos de negócio da entidade para alterar o estado.
-    formulario.alterarTitulo(dto.titulo);
-    formulario.alterarDescricao(dto.descricao);
+    formulario.atualizarTitulo(dto.titulo);
+    formulario.atualizarDescricao(dto.descricao);
 
     // 3. Cria as novas instâncias de Pergunta que substituirão as antigas.
     const novasPerguntas = dto.perguntas.map(p =>

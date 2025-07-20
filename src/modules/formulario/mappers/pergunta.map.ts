@@ -1,7 +1,6 @@
 import { Pergunta as PerguntaPrisma, Prisma } from '@prisma/client';
-import { Pergunta } from '../domain/pergunta/domain/pergunta.entity';
-import { IPergunta } from '../domain/pergunta/domain/pergunta.types';
 import { PerguntaResponseDTO } from '../application/use-cases/dto/pergunta/PerguntaResponseDTO';
+import { Pergunta } from '../domain/pergunta/domain/pergunta.entity';
  // Usaremos a interface de Props da entidade
 
 export class PerguntaMap {
