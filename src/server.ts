@@ -1,9 +1,9 @@
 // const url = 'https://graph.facebook.com/v18.0/727356933783650/messages';
 
 import { IniciarEnvioFormularioUseCase } from "@modules/formulario/application/use-cases/envio/IniciarEnvioFormularioUseCase";
-import { EnvioRepositoryPrisma } from "@modules/infra/database/prisma/repositories/EnvioRepositoryPrisma";
-import { WhatsAppApiGateway } from "@modules/infra/gateways/WhatsAppApiGateway";
-import { FeedbackService } from "@modules/infra/presentation/FeedbackService";
+import { EnvioRepositoryPrisma } from "infra/database/prisma/repositories/EnvioRepositoryPrisma";
+import { WhatsAppApiGateway } from "infra/gateways/WhatsAppApiGateway";
+import { FeedbackService } from "infra/presentation/FeedbackService";
 import { PrismaClient } from "@prisma/client";
 
 // Em algum lugar na inicialização da sua aplicação...

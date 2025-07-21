@@ -2,7 +2,7 @@ interface IPergunta {
     id: string;
     texto: string;
     tipo: string;
-    ativo?: boolean;
+    ativo: boolean;
     opcoes?: string[] | null;
     formularioId?: string;
     dataCriacao: Date;
@@ -10,7 +10,7 @@ interface IPergunta {
     dataExclusao: Date | null;
   }
 
-  type CriarPerguntaProps = Omit<IPergunta, 'id'> & { opcoes?: string[] } & {id: string;};
+ type CriarPerguntaProps = Omit<IPergunta, 'id' | 'ativo' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>;
 
  type RecuperarPerguntaProps = Omit<IPergunta, 'opcoes'>  & { opcoes?: string[] } & {id: string;};
 

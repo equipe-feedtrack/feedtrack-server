@@ -1,6 +1,7 @@
 import { Pergunta as PerguntaPrisma, Prisma } from '@prisma/client';
 import { PerguntaResponseDTO } from '../application/use-cases/dto/pergunta/PerguntaResponseDTO';
 import { Pergunta } from '../domain/pergunta/domain/pergunta.entity';
+import { RecuperarPerguntaProps } from '../domain/pergunta/domain/pergunta.types';
  // Usaremos a interface de Props da entidade
 
 export class PerguntaMap {
@@ -27,20 +28,42 @@ export class PerguntaMap {
    * Converte dados crus do Prisma para uma entidade de domínio Pergunta.
    * Usado para "hidratar" a entidade após uma consulta ao banco.
    */
-  public static toDomain(raw: PerguntaPrisma): Pergunta {
-    // CORREÇÃO: Usamos o tipo 'PerguntaPrisma' (raw) e seus campos em snake_case.
-    return Pergunta.recuperar({
+   public static toDomain(raw: PerguntaPrisma): Pergunta {
+    const tipoPergunta = raw.tipo as 'nota' | 'texto' | 'multipla_escolha';
+    let opcoesTratadas: string[] | undefined | null;
+
+    if (tipoPergunta === 'nota') {
+      // Se for uma pergunta tipo 'nota':
+      // Se raw.opcoes for null/undefined/vazio do banco, aplique o padrão.
+      if (!raw.opcoes || (Array.isArray(raw.opcoes) && raw.opcoes.length === 0)) {
+        opcoesTratadas = ['1', '2', '3', '4', '5'];
+      } else {
+        // Se houver opções customizadas para 'nota', use-as (garantindo que são strings)
+        opcoesTratadas = Array.isArray(raw.opcoes) ? raw.opcoes.map(String) : undefined;
+      }
+    } else if (tipoPergunta === 'texto') {
+      // Perguntas tipo 'texto' nunca devem ter opções.
+      opcoesTratadas = undefined;
+    } else {
+      // Para 'multipla_escolha' e outros tipos, use o que veio do banco.
+      opcoesTratadas = Array.isArray(raw.opcoes) ? raw.opcoes.map(String) : undefined;
+    }
+
+    const propsParaEntidade: RecuperarPerguntaProps = {
       id: raw.id,
       texto: raw.texto,
-      tipo: raw.tipo as 'nota' | 'texto' | 'multipla_escolha',
-      // Tratamento seguro para o tipo JsonValue do Prisma
-      opcoes: Array.isArray(raw.opcoes) ? raw.opcoes.map(String) : undefined,
-      // CORREÇÃO: Passamos as datas diretamente, sem fallbacks perigosos.
+      tipo: tipoPergunta,
+      opcoes: opcoesTratadas, // Passa as opções já tratadas
+      formularioId: raw.formularioId ?? undefined,
       dataCriacao: raw.data_criacao,
       dataAtualizacao: raw.data_atualizacao,
       dataExclusao: raw.data_exclusao,
-    });
+    };
+
+    // A entidade Pergunta.recuperar apenas "hidrata" com os dados já preparados.
+    return Pergunta.recuperar(propsParaEntidade);
   }
+
   public static toPersistence(pergunta: Pergunta) {
     // Aqui fazemos a "tradução" de camelCase (domínio) para snake_case (banco).
     return {
@@ -48,6 +71,7 @@ export class PerguntaMap {
       texto: pergunta.texto,
       tipo: pergunta.tipo,
       opcoes: pergunta.opcoes ?? Prisma.JsonNull,
+      formulario_id: pergunta.formularioId ?? null,
       data_criacao: pergunta.dataCriacao,
       data_atualizacao: pergunta.dataAtualizacao,
       data_exclusao: pergunta.dataExclusao,

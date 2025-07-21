@@ -1,13 +1,13 @@
 import { Entity } from "@shared/domain/entity";
-import { randomUUID } from "crypto";
-import { OpcaoDuplicadaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
+import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaNaoEncontradaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
 import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
+import { randomUUID } from "crypto";
 
 
 class Pergunta extends Entity<IPergunta> implements IPergunta{
 
-private _texto: string;
-private _tipo: string;
+  private _texto: string;
+  private _tipo: string;
   private _ativo: boolean;
   private _opcoes?: string[] | undefined | null;
   private _formularioId: string | undefined;
@@ -87,6 +87,7 @@ private _tipo: string;
   public get dataExclusao(): Date | null {
     return this._dataExclusao;
   }
+
   private set dataExclusao(value: Date | null) {
     this._dataExclusao = value;
   }
@@ -95,13 +96,15 @@ private _tipo: string;
     super(pergunta.id)
     this.texto = pergunta.texto;
     this.tipo = pergunta.tipo;
-    this.dataCriacao = pergunta.dataCriacao;
-    this.dataAtualizacao = pergunta.dataAtualizacao;
-    this.dataExclusao = pergunta.dataExclusao ?? null
+    this.ativo = pergunta.ativo;
+    this._formularioId = pergunta.formularioId;
+    this.dataCriacao = pergunta.dataCriacao ?? new Date();
+    this.dataAtualizacao = pergunta.dataAtualizacao ?? new Date();
+    this.dataExclusao = pergunta.dataExclusao ?? null;
     this.opcoes = pergunta.opcoes;
   }
   
-  private static validar(tipo: string, opcoes?: string[]): String [] | undefined {
+  private static validar(tipo: string, opcoes?: string[] | undefined | null ): String [] | undefined | null{
         switch (tipo) {
       case 'texto':
         if (opcoes !== undefined) {
@@ -132,19 +135,36 @@ private _tipo: string;
     }
   }
 
-  public static criar(props: Omit<CriarPerguntaProps, 'id' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>, id?: string): Pergunta {
-      const perguntaProps: CriarPerguntaProps = {
-        ...props,
-        id: id || randomUUID(), // Gera um novo ID se não for fornecido
-        dataCriacao: new Date(),
-        dataAtualizacao: new Date(),
-        dataExclusao: null,
-      };
+  public static criar(props: CriarPerguntaProps, id?: string): Pergunta {
+    let opcoesPreparadas: string[] | null | undefined = props.opcoes;
 
-      this.validar(perguntaProps.tipo, perguntaProps.opcoes);; // Valida as regras de negócio
-      return new Pergunta(perguntaProps);
+    if (props.tipo === 'nota' && (!opcoesPreparadas || opcoesPreparadas.length === 0)) {
+        opcoesPreparadas = ['1', '2', '3', '4', '5'];
+    }
+    // Para tipo texto, garanta que opcoes seja undefined, não null ou array vazio
+    else if (props.tipo === 'texto' && (opcoesPreparadas === null || (Array.isArray(opcoesPreparadas) && opcoesPreparadas.length === 0))) {
+        opcoesPreparadas = undefined;
+    }
+    // Para outros casos onde null foi passado, mas a entidade prefere undefined para ausência
+    else if (opcoesPreparadas === null) {
+        opcoesPreparadas = undefined;
     }
 
+    const perguntaCompleta: IPergunta = {
+      id: id || randomUUID(),
+      texto: props.texto,
+      tipo: props.tipo,
+      opcoes: opcoesPreparadas,
+      formularioId: props.formularioId, 
+      ativo: true, // Nova pergunta geralmente é ativa
+      dataCriacao: new Date(),
+      dataAtualizacao: new Date(),
+      dataExclusao: null,
+    };
+    this.validar(perguntaCompleta.tipo, perguntaCompleta.opcoes);
+    return new Pergunta(perguntaCompleta); // Passa o objeto IPergunta completo
+  }
+  
   public static recuperar(props: RecuperarPerguntaProps): Pergunta {
      this.validar(props.tipo, props.opcoes);; // Também valida ao recuperar, para garantir consistência
     return new Pergunta(props);
@@ -169,9 +189,8 @@ private _tipo: string;
     if (!this.ativo) {
       throw new Error("Esta pergunta já está inativa.");
     }
-
     // 2. Altera as propriedades para refletir o estado de "excluído".
-    this.ativo = false;
+    this.ativo= false;
     this.dataExclusao = new Date();
     this.dataAtualizacao = new Date(); // A inativação é uma atualização
   }

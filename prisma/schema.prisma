@@ -94,8 +94,10 @@ model Pergunta {
   data_atualizacao DateTime
   data_exclusao    DateTime?
 
-  formularios     Formulario[]
-  @@map("perguntas")
+  formularioId     String? // Campo que armazenará o ID do Formulario (foreign key)
+  formulario       Formulario? @relation(fields: [formularioId], references: [id]) // Define a relação
+
+  @@map("perguntas") // Mapeia para a tabela 'perguntas'
 }
 
 
@@ -139,7 +141,8 @@ model Formulario {
   
   feedbacks        Feedback[]
   envio_formulario Envio_formulario[]
-  perguntas        Pergunta[]
+  perguntas        Pergunta[] 
+
   @@map("formularios")
 }
 
