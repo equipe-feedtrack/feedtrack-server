@@ -31,6 +31,7 @@ export class PerguntaRepositoryPrisma implements IPerguntaRepository<IPergunta> 
         opcoes: dadosParaPersistencia.opcoes ?? undefined, // Omitir se for null
         data_atualizacao: dadosParaPersistencia.data_atualizacao,
         data_exclusao: dadosParaPersistencia.data_exclusao,
+        ativo: dadosParaPersistencia.ativo, 
       },
       // Para o 'create', garantimos que todos os campos obrigatórios estejam presentes e com os tipos corretos.
       create: {
@@ -41,6 +42,7 @@ export class PerguntaRepositoryPrisma implements IPerguntaRepository<IPergunta> 
         data_criacao: dadosParaPersistencia.data_criacao ?? new Date(),
         data_atualizacao: dadosParaPersistencia.data_atualizacao ?? new Date(),
         data_exclusao: dadosParaPersistencia.data_exclusao,
+        ativo: dadosParaPersistencia.ativo, 
       },
     });
   }

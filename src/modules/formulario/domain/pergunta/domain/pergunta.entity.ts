@@ -10,7 +10,6 @@ class Pergunta extends Entity<IPergunta> implements IPergunta{
   private _tipo: string;
   private _ativo: boolean;
   private _opcoes?: string[] | undefined | null;
-  private _formularioId: string | undefined;
   private _dataCriacao: Date ;
   private _dataAtualizacao: Date ;
   private _dataExclusao: Date | null;
@@ -59,14 +58,6 @@ class Pergunta extends Entity<IPergunta> implements IPergunta{
   private set opcoes(opcoes: string[] | undefined | null) { 
       this._opcoes = opcoes;
     }
-  
-  public get formularioId(): string | undefined {
-    return this._formularioId;
-  }
-
-  private set formularioId(value: string | undefined) {
-    this._formularioId = value;
-  }
 
     public get dataCriacao(): Date {
       return this._dataCriacao;
@@ -97,7 +88,6 @@ class Pergunta extends Entity<IPergunta> implements IPergunta{
     this.texto = pergunta.texto;
     this.tipo = pergunta.tipo;
     this.ativo = pergunta.ativo;
-    this._formularioId = pergunta.formularioId;
     this.dataCriacao = pergunta.dataCriacao ?? new Date();
     this.dataAtualizacao = pergunta.dataAtualizacao ?? new Date();
     this.dataExclusao = pergunta.dataExclusao ?? null;
@@ -155,7 +145,6 @@ class Pergunta extends Entity<IPergunta> implements IPergunta{
       texto: props.texto,
       tipo: props.tipo,
       opcoes: opcoesPreparadas,
-      formularioId: props.formularioId, 
       ativo: true, // Nova pergunta geralmente é ativa
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
@@ -170,18 +159,10 @@ class Pergunta extends Entity<IPergunta> implements IPergunta{
     return new Pergunta(props);
   }
 
-  public vincularFormulario(formularioId: string): void {
-    // 1. Regra de negócio: Impede que uma pergunta já vinculada seja atribuída a outro formulário.
-    // Para reatribuir, seria necessário um método 'desvincular' primeiro.
-    if (this.formularioId && this.formularioId !== formularioId) {
-      throw new Error("Esta pergunta já está vinculada a outro formulário.");
-    }
-
-    // 2. Atribui o ID do formulário.
-    this.formularioId = formularioId;
-
-    // 3. A vinculação é uma alteração, então atualizamos a data.
-    this.dataAtualizacao = new Date();
+  public atualizarTexto(novoTexto: string): void {
+   this.texto = novoTexto; 
+   // Atualiza a data de modificação
+   this.dataAtualizacao = new Date();
   }
 
   public inativar(): void {

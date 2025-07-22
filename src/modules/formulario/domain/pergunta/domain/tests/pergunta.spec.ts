@@ -16,7 +16,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
       texto: 'Qual a sua nota para o atendimento?',
       tipo: 'nota',
       opcoes: undefined, // Testando opções undefined para tipo nota
-      formularioId: undefined,
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
@@ -24,7 +23,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
     expect(pergunta.texto).toBe('Qual a sua nota para o atendimento?');
     expect(pergunta.tipo).toBe('nota');
     expect(pergunta.opcoes).toEqual(['1', '2', '3', '4', '5']); // Opções padrão para 'nota'
-    expect(pergunta.formularioId).toBe(undefined); // Agora deve passar
     expect(pergunta.dataCriacao).toBeInstanceOf(Date);
     expect(pergunta.dataAtualizacao).toBeInstanceOf(Date);
     expect(pergunta.dataExclusao).toBeNull();
@@ -35,7 +33,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
       texto: 'Classifique de 1 a 3',
       tipo: 'nota',
       opcoes: ['1', '2', '3'], // Opções customizadas
-      formularioId: 'form-008',
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
@@ -48,7 +45,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
       texto: 'O que você achou do tênis Corre 4?',
       tipo: 'texto',
       opcoes: undefined,
-      formularioId: 'form-002',
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
@@ -61,8 +57,7 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
     const pergunta = Pergunta.criar({
       texto: 'Qual o seu nível de satisfação?',
       tipo: 'multipla_escolha',
-      opcoes: ['ruim', 'bom', 'excelente'],
-      formularioId: 'form-003',
+      opcoes: ['ruim', 'bom', 'excelente']
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
@@ -77,7 +72,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
         texto: '',
         tipo: 'texto',
         opcoes: undefined,
-        formularioId: 'form-004',
       }),
     ).toThrow(PerguntaTextoVazioException);
   });
@@ -88,7 +82,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
         texto: 'Texto',
         tipo: 'escolha_unica' as any, // Forçando tipo inválido para teste
         opcoes: undefined,
-        formularioId: 'form-005',
       }),
     ).toThrow(TipoPerguntaInvalidoException);
   });
@@ -99,7 +92,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
         texto: 'Escolha uma opção',
         tipo: 'multipla_escolha',
         opcoes: ['Sim'],
-        formularioId: 'form-006',
       }),
     ).toThrow(QuantidadeMinimaOpcoesException);
   });
@@ -110,7 +102,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
         texto: 'Escolha uma opção',
         tipo: 'multipla_escolha',
         opcoes: ['Sim', 'Não', 'Sim'],
-        formularioId: 'form-007',
       }),
     ).toThrow(OpcaoDuplicadaException);
   });
@@ -121,7 +112,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
         texto: 'Qual seu nome?',
         tipo: 'texto',
         opcoes: ['João', 'Maria'],
-        formularioId: 'form-009',
       }),
     ).toThrow(ValidacaoPerguntaException); // "Perguntas do tipo texto não devem ter opções."
   });
@@ -132,7 +122,6 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
         texto: 'Sua avaliação?',
         tipo: 'nota',
         opcoes: ['bom', 'ruim'],
-        formularioId: 'form-010',
       }),
     ).toThrow(ValidacaoPerguntaException); // "Opções de nota devem ser apenas números."
   });
@@ -146,7 +135,6 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       tipo: 'nota',
       opcoes: ['1', '2', '3', '4', '5'],
       ativo: true,
-      formularioId: 'form-010',
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,
@@ -167,7 +155,6 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       id: '1234', // ID inválido
       texto: 'Qual a sua nota?',
       tipo: 'nota',
-      formularioId: 'form-010.1',
       ativo: true,
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
@@ -183,7 +170,6 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       id: '89eebea5-2314-47bf-8510-e1ddf69503a9',
       texto: 'Descreva sua experiência com o produto.',
       tipo: 'texto',
-      formularioId: 'form-011',
       ativo: true,
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
@@ -206,7 +192,6 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       tipo: 'multipla_escolha',
       opcoes: ['Azul', 'Verde', 'Vermelho'],
       ativo: true,
-      formularioId: 'form-012',
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,
@@ -227,7 +212,6 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       texto: 'Qual é a sua fruta favorita?',
       tipo: 'multipla_escolha',
       opcoes: [], // opções vazias
-      formularioId: 'form-013',
       ativo: true,
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
@@ -243,7 +227,6 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       texto: 'Comentário',
       tipo: 'texto',
       opcoes: ['Opção 1'],
-      formularioId: 'form-014',
       ativo: true,
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
@@ -263,57 +246,10 @@ describe('Entidade Pergunta: Métodos de Comportamento', () => {
     vi.useRealTimers(); // Restaura os timers reais após cada teste
   });
 
-  it('deve vincular a um formulário se a pergunta não estiver vinculada', () => {
-    const pergunta = Pergunta.criar({
-      texto: 'Teste de vínculo',
-      tipo: 'texto',
-      formularioId: undefined, // Pergunta não vinculada
-    });
-    const oldUpdateDate = pergunta.dataAtualizacao;
-
-    vi.advanceTimersByTime(1); // Avança o tempo em 1ms para garantir que a nova data seja maior
-
-    pergunta.vincularFormulario('novo-formulario-id');
-
-    expect(pergunta.formularioId).toBe('novo-formulario-id');
-    expect(pergunta.dataAtualizacao.getTime()).toBeGreaterThan(oldUpdateDate.getTime());
-  });
-
-  it('não deve vincular a outro formulário se já estiver vinculada a um diferente', () => {
-    // 1. Cria uma pergunta que já está vinculada a um formulário existente
-    const pergunta = Pergunta.criar({
-      texto: 'Teste de vínculo existente',
-      tipo: 'texto',
-      formularioId: 'formulario-existente',
-    });
-
-    expect(() =>
-      pergunta.vincularFormulario('novo-formulario-id'),
-    ).toThrowError();
-
-  });
-
-  it('deve permitir vincular ao mesmo formulário sem lançar exceção', () => {
-    const formularioId = 'formulario-abc';
-    const pergunta = Pergunta.criar({
-      texto: 'Teste de mesmo vínculo',
-      tipo: 'texto',
-      formularioId: formularioId,
-    });
-    const oldUpdateDate = pergunta.dataAtualizacao;
-
-    vi.advanceTimersByTime(1); // Avança o tempo em 1ms
-
-    expect(() => pergunta.vincularFormulario(formularioId)).not.toThrow();
-    expect(pergunta.formularioId).toBe(formularioId);
-    expect(pergunta.dataAtualizacao.getTime()).toBeGreaterThan(oldUpdateDate.getTime());
-  });
-
   it('deve inativar a pergunta com sucesso', () => {
     const pergunta = Pergunta.criar({
       texto: 'Pergunta para inativar',
       tipo: 'texto',
-      formularioId: 'form-inativar',
 
     });
 
@@ -333,7 +269,6 @@ describe('Entidade Pergunta: Métodos de Comportamento', () => {
     const pergunta = Pergunta.criar({
       texto: 'Pergunta já inativa',
       tipo: 'texto',
-      formularioId: 'form-inativa',
     });
     pergunta.inativar(); // Inativa pela primeira vez
 

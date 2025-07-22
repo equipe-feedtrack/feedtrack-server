@@ -15,6 +15,7 @@ export class PerguntaMap {
       id: pergunta.id,
       texto: pergunta.texto,
       tipo: pergunta.tipo,
+      ativo: pergunta.ativo,
       // 3. Converte 'null' em 'undefined' para respeitar o DTO
       opcoes: pergunta.opcoes ?? undefined,
       // 4. Converte as datas para o formato string ISO 8601
@@ -54,7 +55,7 @@ export class PerguntaMap {
       texto: raw.texto,
       tipo: tipoPergunta,
       opcoes: opcoesTratadas, // Passa as opções já tratadas
-      formularioId: raw.formularioId ?? undefined,
+      ativo: raw.ativo,
       dataCriacao: raw.data_criacao,
       dataAtualizacao: raw.data_atualizacao,
       dataExclusao: raw.data_exclusao,
@@ -71,7 +72,7 @@ export class PerguntaMap {
       texto: pergunta.texto,
       tipo: pergunta.tipo,
       opcoes: pergunta.opcoes ?? Prisma.JsonNull,
-      formulario_id: pergunta.formularioId ?? null,
+      ativo: pergunta.ativo,
       data_criacao: pergunta.dataCriacao,
       data_atualizacao: pergunta.dataAtualizacao,
       data_exclusao: pergunta.dataExclusao,

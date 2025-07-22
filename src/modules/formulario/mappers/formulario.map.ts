@@ -26,6 +26,7 @@ export class FormularioMap {
         dataCriacao: p_prisma.data_criacao,
         dataAtualizacao: p_prisma.data_atualizacao,
         dataExclusao: p_prisma.data_exclusao,
+        ativo: p_prisma.ativo,
       })
     );
 

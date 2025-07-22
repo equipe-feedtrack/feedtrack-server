@@ -4,13 +4,12 @@ interface IPergunta {
     tipo: string;
     ativo: boolean;
     opcoes?: string[] | null;
-    formularioId?: string;
     dataCriacao: Date;
     dataAtualizacao: Date;
     dataExclusao: Date | null;
   }
 
- type CriarPerguntaProps = Omit<IPergunta, 'id' | 'ativo' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>;
+ type CriarPerguntaProps = Omit<IPergunta, 'id' | 'ativo' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao' | 'formularios'>;
 
  type RecuperarPerguntaProps = Omit<IPergunta, 'opcoes'>  & { opcoes?: string[] } & {id: string;};
 

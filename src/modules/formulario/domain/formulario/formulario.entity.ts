@@ -132,13 +132,6 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
       throw new Error("Um formulário deve ter pelo menos uma pergunta.");
     }
 
-    // 2. Garante que as novas perguntas estejam vinculadas a este formulário.
-    // O Formulário "adota" as novas perguntas.
-    novasPerguntas.forEach(pergunta => {
-      // Usando o método que criamos na entidade Pergunta
-      pergunta.vincularFormulario(this.id); 
-    });
-
     // 3. Substitui a lista antiga pela nova.
     this.perguntas = novasPerguntas;
 

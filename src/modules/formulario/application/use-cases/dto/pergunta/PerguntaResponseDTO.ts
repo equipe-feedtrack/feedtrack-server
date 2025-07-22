@@ -14,6 +14,8 @@ export interface PerguntaResponseDTO {
    */
   tipo: string;
 
+  ativo: boolean;
+
   /**
    * As opções da pergunta, se houver.
    */
