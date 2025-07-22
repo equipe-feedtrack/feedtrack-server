@@ -20,6 +20,8 @@ class Envio {
       ...props,
       status: 'PENDENTE',
       dataCriacao: new Date(),
+      dataEnvio: null,
+      ultimaMensagemErro: null,
       tentativasEnvio: 0,
     };
     return new Envio(envioProps);

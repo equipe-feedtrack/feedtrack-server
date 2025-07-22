@@ -1,4 +1,4 @@
-import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
+import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
 import { IRepository } from "@shared/domain/repository.inteface";
 
 

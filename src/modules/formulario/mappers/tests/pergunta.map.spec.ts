@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { Pergunta } from '../../domain/pergunta/domain/pergunta.entity';
+import { Pergunta } from '../../domain/pergunta/pergunta.entity';
 import { PerguntaMap } from '../pergunta.map';
 import { Prisma, Pergunta as PerguntaPrisma } from '@prisma/client'; // Renomeei Pergunta para PerguntaPrisma para evitar conflito
-import { QuantidadeMinimaOpcoesException } from '@modules/formulario/domain/pergunta/domain/pergunta.exception';
+import { QuantidadeMinimaOpcoesException } from '@modules/formulario/domain/pergunta/pergunta.exception';
 import { randomUUID } from 'crypto';
 
-describe('PerguntaMap (N-N Relation)', () => {
+describe('PerguntaMap', () => {
   // Cenário base para os testes da entidade
   const ids = randomUUID()
 

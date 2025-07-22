@@ -1,7 +1,7 @@
 import { Pergunta as PerguntaPrisma, Prisma } from '@prisma/client';
-import { PerguntaResponseDTO } from '../application/use-cases/dto/pergunta/PerguntaResponseDTO';
-import { Pergunta } from '../domain/pergunta/domain/pergunta.entity';
-import { RecuperarPerguntaProps } from '../domain/pergunta/domain/pergunta.types';
+import { PerguntaResponseDTO } from '../application/dto/pergunta/PerguntaResponseDTO';
+import { Pergunta } from '../domain/pergunta/pergunta.entity';
+import { RecuperarPerguntaProps } from '../domain/pergunta/pergunta.types';
  // Usaremos a interface de Props da entidade
 
 export class PerguntaMap {

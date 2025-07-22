@@ -1,27 +1,40 @@
-// const url = 'https://graph.facebook.com/v18.0/727356933783650/messages';
+import http from 'node:http';
+import express, { Application } from 'express';
+import morgan from 'morgan';
+import { apiv1Router } from './rest/api.v1';
 
-import { IniciarEnvioFormularioUseCase } from "@modules/formulario/application/use-cases/envio/IniciarEnvioFormularioUseCase";
-import { EnvioRepositoryPrisma } from "infra/database/prisma/repositories/EnvioRepositoryPrisma";
-import { WhatsAppApiGateway } from "infra/gateways/WhatsAppApiGateway";
-import { FeedbackService } from "infra/presentation/FeedbackService";
-import { PrismaClient } from "@prisma/client";
+const app: Application = express();
+
+const createHTTPServer = async (): Promise<http.Server>  => {
+    app.disabled('x-powered-by');
+    app.use(express.json());
+    app.use(morgan('tiny'));
+    app.use('/api/v1', apiv1Router);
+    const httpServer: http.Server = http.createServer(app);
+    return httpServer;
+};
+
+export { createHTTPServer }
+
+
+
 
 // Em algum lugar na inicialização da sua aplicação...
 
 // 1. Instancia as implementações da camada de INFRA
-const prisma = new PrismaClient();
-const envioRepository = new EnvioRepositoryPrisma(prisma);
-const clienteRepository = new ClienteRepositoryPrisma(prisma); // (Exemplo)
-const whatsAppGateway = new WhatsAppApiGateway();
-const feedbackService = new FeedbackService();
+// const prisma = new PrismaClient();
+// const envioRepository = new EnvioRepositoryPrisma(prisma);
+// const clienteRepository = new ClienteRepositoryPrisma(prisma); // (Exemplo)
+// const whatsAppGateway = new WhatsAppApiGateway();
+// const feedbackService = new FeedbackService();
 
-// 2. Instancia o CASO DE USO, passando as implementações concretas
-const iniciarEnvioUseCase = new IniciarEnvioFormularioUseCase(
-  envioRepository,
-  whatsAppGateway,
-  feedbackService,
-  clienteRepository
-);
+// // 2. Instancia o CASO DE USO, passando as implementações concretas
+// const iniciarEnvioUseCase = new IniciarEnvioFormularioUseCase(
+//   envioRepository,
+//   whatsAppGateway,
+//   feedbackService,
+//   clienteRepository
+// );
 
 // 3. Agora, o 'iniciarEnvioUseCase' está pronto para ser usado nos seus Controllers!
 

@@ -1,16 +1,35 @@
-import { Pergunta } from '@modules/formulario/domain/pergunta/domain/pergunta.entity';
-import { PerguntaMap } from '@modules/formulario/mappers/pergunta.map';
-import { DomainException } from '@shared/domain/domain.exception';
-import { readFile, writeFile } from 'fs';
+import dotenv from 'dotenv';
+import { createHTTPServer } from './presentation/http/server';
 
-import { EnviarFormularioUseCase } from '@modules/formulario/domain/envioformulario/application/enviar-formulario.use-case';
-import { EnvioFormularioService } from '@modules/formulario/domain/envioformulario/service/envioFormulario.service';
-import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
-import { Cliente } from '@modules/gestao_clientes/domain/cliente/cliente.entity';
-import { Pessoa } from '@shared/domain/pessoa.entity';
-import { RecuperarPerguntaProps } from '@modules/formulario/domain/pergunta/domain/pergunta.types';
+async function bootstrap() {
+
+    //Carrega variáveis de ambiente do arquivo .env
+	dotenv.config();
+
+    const api_name = process.env.API_NAME;
+    const host_name = process.env.HOST_NAME;
+    const port = process.env.PORT;
+
+    console.log(`[${api_name}] 🚀 Inicializando a API....`);
+
+    const httpServer = await createHTTPServer();
+
+    httpServer.listen({ port: port }, async () => {
+        console.log(`[${api_name}] ✅ Servidor HTTP pronto e ouvindo em http://${host_name}:${port}`);
+    });
+
+}
+
+bootstrap()
+    .catch((error) => {
+        console.error(error);
+    });
 
 
+
+
+
+    
 // ENVIANDO POR EMAIL O FORMULARIO.
 // async function main() {
   
@@ -66,54 +85,54 @@ import { RecuperarPerguntaProps } from '@modules/formulario/domain/pergunta/doma
 // RELACIONADO AO MODULO PERGUNTA! (YAGO)
 // // Criando  e recuperando  perguntas.
 
-function test (){
-    try {
-    const pergunta = Pergunta.criar( { texto: 'Como você avalia sua experiência geral?', tipo: 'nota', opcoes:["1","2","3"]});
-    console.log(pergunta);
+// function test (){
+//     try {
+//     const pergunta = Pergunta.criar( { texto: 'Como você avalia sua experiência geral?', tipo: 'nota', opcoes:["1","2","3"]});
+//     console.log(pergunta);
 
-     let propspergunta: RecuperarPerguntaProps = {
-        id: '4ede92e2-5a0c-4b0c-85d7-c4eed09ee7a5',
-        texto: 'fale de sua experiência',
-        tipo: 'texto',
-    };
-     let pergunta2 = Pergunta.recuperar(propspergunta);
-    console.log(pergunta2);
+//      let propspergunta: RecuperarPerguntaProps = {
+//         id: '4ede92e2-5a0c-4b0c-85d7-c4eed09ee7a5',
+//         texto: 'fale de sua experiência',
+//         tipo: 'texto',
+//     };
+//      let pergunta2 = Pergunta.recuperar(propspergunta);
+//     console.log(pergunta2);
 
-    //////////////////////////////////////////////////////
-    //Persistinto e Recuperando em Arquivo - File System//
-    //////////////////////////////////////////////////////
+//     //////////////////////////////////////////////////////
+//     //Persistinto e Recuperando em Arquivo - File System//
+//     //////////////////////////////////////////////////////
 
-    let arrayperguntas = [];
-    arrayperguntas.push(pergunta.toDTO());
-	arrayperguntas.push(pergunta2.toDTO());
+//     let arrayperguntas = [];
+//     arrayperguntas.push(pergunta.toDTO());
+// 	arrayperguntas.push(pergunta2.toDTO());
 
-     writeFile('perguntas.json', JSON.stringify(arrayperguntas), function (error:any) {
-        if (error) throw error;
-        console.log('Arquivo Salvo com Sucesso!');
-        readFile('perguntas.json', (error, dadoGravadoArquivo) => {
-            if (error) throw error;
-            console.log('Leitura de Arquivo!');
-            let categoriasSalvas: [] = JSON.parse(dadoGravadoArquivo.toString());
-            categoriasSalvas.forEach(categoriaJSON => {
-                console.log(categoriaJSON);
-                console.log(PerguntaMap.toDomain(categoriaJSON));
-            })
-        });
-    });
+//      writeFile('perguntas.json', JSON.stringify(arrayperguntas), function (error:any) {
+//         if (error) throw error;
+//         console.log('Arquivo Salvo com Sucesso!');
+//         readFile('perguntas.json', (error, dadoGravadoArquivo) => {
+//             if (error) throw error;
+//             console.log('Leitura de Arquivo!');
+//             let categoriasSalvas: [] = JSON.parse(dadoGravadoArquivo.toString());
+//             categoriasSalvas.forEach(categoriaJSON => {
+//                 console.log(categoriaJSON);
+//                 console.log(PerguntaMap.toDomain(categoriaJSON));
+//             })
+//         });
+//     });
 
-} catch (error:any) {
-    if (error instanceof DomainException) {
-        console.log('Execeção de Dominio');
-        console.log(error.message);
-    }
-    else {
-        console.log('Outras Exceções');
-        console.log(error.message);
-    }
-}
-}
+// } catch (error:any) {
+//     if (error instanceof DomainException) {
+//         console.log('Execeção de Dominio');
+//         console.log(error.message);
+//     }
+//     else {
+//         console.log('Outras Exceções');
+//         console.log(error.message);
+//     }
+// }
+// }
 
-test();
+// test();
 
 // Testando Feedback (AINDA NÃO MEXI, APENAS CONTEÚDO GENÉRICO DE FEEDBACK - YAGO)
 

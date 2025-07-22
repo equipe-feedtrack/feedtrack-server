@@ -1,7 +1,7 @@
 import { Entity } from "@shared/domain/entity";
-import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaNaoEncontradaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
-import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
 import { randomUUID } from "crypto";
+import { OpcaoDuplicadaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
+import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
 
 
 class Pergunta extends Entity<IPergunta> implements IPergunta{

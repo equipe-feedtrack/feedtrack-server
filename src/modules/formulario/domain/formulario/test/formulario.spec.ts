@@ -1,11 +1,7 @@
-import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 import { beforeEach, describe, expect, it } from "vitest";
-import { Pergunta } from "../pergunta/domain/pergunta.entity";
-import { Formulario } from "./formulario.entity";
-import { FormularioTituloVazioException } from "./formulario.exception";
-import { ClienteEssencial } from "@modules/gestao_clientes/domain/cliente/cliente.types";
-import { Produto } from "@modules/produtos/domain/produtos/produto.entity";
-import { Pessoa } from "@shared/domain/pessoa.entity";
+import { Pergunta } from "../../pergunta/pergunta.entity";
+import { Formulario } from "../formulario.entity";
+import { FormularioTituloVazioException } from "../formulario.exception";
 
 describe("Entidade Formulario", () => {
   let perguntaNota: Pergunta;

@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { beforeEach, describe, expect, it, afterAll } from 'vitest';
 import { PerguntaRepositoryPrisma } from '../pergunta/pergunta.repository.prisma';
-import { Pergunta } from '@modules/formulario/domain/pergunta/domain/pergunta.entity';
+import { Pergunta } from '@modules/formulario/domain/pergunta/pergunta.entity';
 
 const prisma = new PrismaClient();
 const repository = new PerguntaRepositoryPrisma(prisma);
 
-describe('PerguntaRepositoryPrisma (Integration Tests - N-N Relation)', () => {
+describe('PerguntaRepositoryPrisma (Integration Tests com o banco)', () => {
   beforeEach(async () => {
     // Limpa apenas as perguntas antes de cada teste.
     // Formulários são gerenciados separadamente ou no FormularioRepositoryTests.

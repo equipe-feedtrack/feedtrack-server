@@ -1,9 +1,9 @@
 import { IFormulario } from "@modules/formulario/domain/formulario/formulario.types";
-import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
-import { IPergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.types";
+import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
+import { IPergunta } from "@modules/formulario/domain/pergunta/pergunta.types";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
 import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
-import { CriarPerguntaDTO } from "../dto/pergunta/CriarPerguntaDTO";
+import { CriarPerguntaDTO } from "../../dto/pergunta/CriarPerguntaDTO";
 import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
 
 export class CriarPerguntaUseCase {

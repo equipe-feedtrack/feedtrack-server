@@ -1,6 +1,6 @@
 import { Envio_formulario as EnvioPrisma } from '@prisma/client';
-import { EnvioResponseDTO } from "../application/use-cases/dto/envio/iniciarEnvioDTO.js";
-import { Envio } from "../domain/envioformulario/domain/envio.entity.ts.js";
+import { EnvioResponseDTO } from "../application/dto/envio/iniciarEnvioDTO.js";
+import { Envio } from "../domain/envioformulario/envio.entity.ts.js";
 
 export class EnvioMap {
   public static toDomain(raw: EnvioPrisma): Envio {

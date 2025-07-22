@@ -1,8 +1,8 @@
 
-import { Envio } from "@modules/formulario/domain/envioformulario/domain/envio.entity.ts";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
 import { IClienteRepository, IEnvioRepository, IFeedbackService, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { UseCaseException } from "@shared/application/use-case/use-case.exception";
-import { IniciarEnvioDTO } from "../dto/envio/iniciarEnvioDTO";
+import { IniciarEnvioDTO } from "../../dto/envio/iniciarEnvioDTO";
 
 export class IniciarEnvioFormularioUseCase {
   constructor(

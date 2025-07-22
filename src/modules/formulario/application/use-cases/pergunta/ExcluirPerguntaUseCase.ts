@@ -1,4 +1,4 @@
-import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
+import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
 import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
 import { UseCaseException } from "@shared/application/use-case/use-case.exception";
 

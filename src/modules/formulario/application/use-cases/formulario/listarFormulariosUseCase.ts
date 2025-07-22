@@ -1,7 +1,7 @@
 import { IFormulario } from "@modules/formulario/domain/formulario/formulario.types";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
 import { FormularioMap } from "@modules/formulario/mappers/formulario.map";
-import { ListarFormulariosResponseDTO } from "../dto/formulario/ListarFormulariosResponseDTO";
+import { ListarFormulariosResponseDTO } from "../../dto/formulario/ListarFormulariosResponseDTO";
 
 interface ListarFormulariosRequest {
   apenasAtivos?: boolean;

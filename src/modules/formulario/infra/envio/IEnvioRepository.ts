@@ -1,4 +1,4 @@
-import { Envio } from "@modules/formulario/domain/envioformulario/domain/envio.entity.ts";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
 import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
 
 

@@ -1,8 +1,8 @@
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
-import { Pergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.entity";
+import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
 import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
-import { AtualizarFormularioDTO } from "../dto/formulario/atualizarFormularioDTO";
+import { AtualizarFormularioDTO } from "../../dto/formulario/atualizarFormularioDTO";
 
 export class AtualizarFormularioUseCase {
   constructor(private readonly formularioRepository: IFormularioRepository<Formulario>) {}

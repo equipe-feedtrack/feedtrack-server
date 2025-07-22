@@ -1,4 +1,4 @@
-import { Pergunta } from "../pergunta/domain/pergunta.entity";
+import { Pergunta } from "../pergunta/pergunta.entity";
 
 interface IFormulario {
   id?: string;

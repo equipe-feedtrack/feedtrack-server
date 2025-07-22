@@ -1,6 +1,6 @@
-import { IPergunta } from "@modules/formulario/domain/pergunta/domain/pergunta.types";
+import { IPergunta } from "@modules/formulario/domain/pergunta/pergunta.types";
 import { UseCaseException } from "@shared/application/use-case/use-case.exception";
-import { AtualizarPerguntaDTO } from "../dto/pergunta/AtualizarPerguntaDTO";
+import { AtualizarPerguntaDTO } from "../../dto/pergunta/AtualizarPerguntaDTO";
 import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
 
 export class AtualizarPerguntaUseCase {

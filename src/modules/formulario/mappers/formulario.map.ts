@@ -2,10 +2,10 @@ import {
   Formulario as FormularioPrisma,
   Pergunta as PerguntaPrisma,
 } from '@prisma/client';
-import { FormularioResponseDTO } from '../application/use-cases/dto/formulario/FormularioResponseDTO';
-import { ListarFormulariosResponseDTO } from '../application/use-cases/dto/formulario/ListarFormulariosResponseDTO';
+import { FormularioResponseDTO } from '../application/dto/formulario/FormularioResponseDTO';
+import { ListarFormulariosResponseDTO } from '../application/dto/formulario/ListarFormulariosResponseDTO';
 import { Formulario } from '../domain/formulario/formulario.entity';
-import { Pergunta } from '../domain/pergunta/domain/pergunta.entity';
+import { Pergunta } from '../domain/pergunta/pergunta.entity';
 import { PerguntaMap } from './pergunta.map';
 
 

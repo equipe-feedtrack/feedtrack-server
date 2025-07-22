@@ -1,5 +1,5 @@
 import { Entity } from "@shared/domain/entity";
-import { Pergunta } from "../pergunta/domain/pergunta.entity";
+import { Pergunta } from "../pergunta/pergunta.entity";
 import { FormularioTituloVazioException } from "./formulario.exception";
 import { CriarFormularioProps, IFormulario, RecuperarFormularioProps } from "./formulario.types";
 

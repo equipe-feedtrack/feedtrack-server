@@ -1,5 +1,5 @@
 import { IDEntityUUIDInvalid } from '@shared/domain/domain.exception'; // Assumindo que seu IDEntityUUIDInvalid está aqui
-import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'; // Adicionado vi para controle de tempo
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'; // Adicionado vi para controle de tempo
 import { Pergunta } from '../pergunta.entity';
 import {
   OpcaoDuplicadaException,
