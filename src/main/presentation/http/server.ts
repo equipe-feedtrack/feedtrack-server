@@ -2,6 +2,7 @@ import http from 'node:http';
 import express, { Application } from 'express';
 import morgan from 'morgan';
 import { apiv1Router } from './rest/api.v1';
+import whatsappRoutes from './routes/whatsapp.routes';
 
 const app: Application = express();
 
@@ -10,6 +11,7 @@ const createHTTPServer = async (): Promise<http.Server>  => {
     app.use(express.json());
     app.use(morgan('tiny'));
     app.use('/api/v1', apiv1Router);
+    app.use(whatsappRoutes); // Registra as rotas
     const httpServer: http.Server = http.createServer(app);
     return httpServer;
 };

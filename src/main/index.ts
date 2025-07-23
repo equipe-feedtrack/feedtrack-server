@@ -6,9 +6,9 @@ async function bootstrap() {
     //Carrega variáveis de ambiente do arquivo .env
 	dotenv.config();
 
-    const api_name = process.env.API_NAME;
-    const host_name = process.env.HOST_NAME;
-    const port = process.env.PORT;
+    const api_name = process.env.API_NAME || 'FeedTrack API';
+    const host_name = process.env.HOST_NAME || 'localhost';
+    const port = Number(process.env.PORT) || 3000;
 
     console.log(`[${api_name}] 🚀 Inicializando a API....`);
 
