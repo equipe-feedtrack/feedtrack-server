@@ -9,7 +9,9 @@
     "test": "vitest",
     "test:integration:repo": "cross-env DATABASE_URL=\"file:./test.db\" vitest run --dir src/modules/formulario/infra",
     "db:test:push": "cross-env DATABASE_URL=\"file:./test.db\" npx prisma db push --accept-data-loss --schema src/main/infra/database/orm/prisma/schema.prisma",
-    "test:all": "npm run db:test:push && npm run test:unit:domain && npm run test:unit:mappers && npm run test:integration:repo"
+    "test:all": "npm run db:test:push && npm run test:unit:domain && npm run test:unit:mappers && npm run test:integration:repo",
+    "migrate": "npx prisma migrate dev --schema src/main/infra/database/orm/prisma/schema.prisma",
+    "reset": "npx prisma migrate reset --schema src/main/infra/database/orm/prisma/schema.prisma"
   },
   "_moduleAliases": {
     "@modules": "dist/modules",
