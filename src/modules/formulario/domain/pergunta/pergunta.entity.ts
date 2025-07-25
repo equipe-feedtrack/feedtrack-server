@@ -1,121 +1,181 @@
 import { Entity } from "@shared/domain/entity";
-import { OpcaoDuplicadaException, OpcoesObrigatoriasException, PerguntaDuplicadaException, PerguntaNaoEncontradaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
+import { randomUUID } from "crypto";
+import { OpcaoDuplicadaException, PerguntaTextoVazioException, QuantidadeMinimaOpcoesException, TipoPerguntaInvalidoException, ValidacaoPerguntaException } from "./pergunta.exception";
 import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
+
 
 class Pergunta extends Entity<IPergunta> implements IPergunta{
 
-private _texto: string;
-private _tipo: string;
-private _opcoes?: string[] | undefined;
-private _ordem: number;
-
-
-get texto(): string {
-  return this._texto;
-}
-
-private set texto(texto: string) {
-  if (!texto || texto.trim() === "") {
-    throw new PerguntaTextoVazioException();
+  private _texto: string;
+  private _tipo: string;
+  private _ativo: boolean;
+  private _opcoes?: string[] | undefined | null;
+  private _dataCriacao: Date ;
+  private _dataAtualizacao: Date ;
+  private _dataExclusao: Date | null;
+  
+  get texto(): string {
+    return this._texto;
+  }
+  
+  private set texto(texto: string) {
+    if (!texto || texto.trim() === "") {
+      throw new PerguntaTextoVazioException();
+    }
+    
+    this._texto = texto;
+  }
+  
+  get tipo(): string {
+    return this._tipo;
+  }
+  
+  private set tipo(tipo) {
+    const tiposValidos  =  ['nota', 'texto', 'multipla_escolha'];
+    if (!tiposValidos .includes(tipo)) {
+      throw new TipoPerguntaInvalidoException(tipo);
+    }
+    
+    this._tipo = tipo;
+    // Limpar opções se o tipo mudar para algo que não seja múltipla escolha
+    if (tipo !== 'multipla_escolha') {
+      this._opcoes = undefined;
+    }
+  }
+  
+  public get ativo(): boolean {
+    return this._ativo;
   }
 
-  // if (texto === texto) {
-  //     throw new PerguntaDuplicadaException();
-  // }
-
-  this._texto = texto;
-}
-
-get tipo(): string {
-  return this._tipo;
-}
-
- private set tipo(tipo) {
-   const tiposValidos  =  ['nota', 'texto', 'multipla_escolha'];
-  if (!tiposValidos .includes(tipo)) {
-    throw new TipoPerguntaInvalidoException(tipo);
+  private set ativo(value: boolean) {
+    this._ativo = value;
   }
-  if ((tipo === "multipla_escolha" || tipo === "texto") && tipo.length === 0) {
-    throw new OpcoesObrigatoriasException();
+  
+  public get opcoes(): string[] | undefined | null {
+      return this._opcoes;
+    }
+    
+  private set opcoes(opcoes: string[] | undefined | null) { 
+      this._opcoes = opcoes;
+    }
+
+    public get dataCriacao(): Date {
+      return this._dataCriacao;
+    }
+
+    private set dataCriacao(value: Date ) {
+      this._dataCriacao = value;
+    }
+
+    public get dataAtualizacao(): Date {
+    return this._dataAtualizacao;
   }
-  this._tipo = tipo;
-  // Limpar opções se o tipo mudar para algo que não seja múltipla escolha
-  if (tipo !== 'multipla_escolha') {
-    this._opcoes = undefined;
+
+  private set dataAtualizacao(value: Date ) {
+    this._dataAtualizacao = value;
   }
-}
 
-public get opcoes(): string[] | undefined {
-  return this._opcoes;
-}
-
-private set opcoes(opcoes: string[] | undefined) { 
-  this._opcoes = opcoes;
-}
-
-get ordem(): number {
-  return this._ordem;
-}
-
-private set ordem(value: number) {
-  if (value === undefined || value === null || value < 1) {
-    throw new Error('A ordem da pergunta deve ser maior ou igual a 1.');
+  public get dataExclusao(): Date | null {
+    return this._dataExclusao;
   }
-  this._ordem = value;
-}
 
-constructor(pergunta: IPergunta) {
+  private set dataExclusao(value: Date | null) {
+    this._dataExclusao = value;
+  }
+
+  private constructor(pergunta: IPergunta) {
     super(pergunta.id)
     this.texto = pergunta.texto;
     this.tipo = pergunta.tipo;
+    this.ativo = pergunta.ativo;
+    this.dataCriacao = pergunta.dataCriacao ?? new Date();
+    this.dataAtualizacao = pergunta.dataAtualizacao ?? new Date();
+    this.dataExclusao = pergunta.dataExclusao ?? null;
     this.opcoes = pergunta.opcoes;
-    this.ordem = pergunta.ordem;
-    Pergunta.validarOpcoes(this.tipo, this.opcoes);
   }
+  
+  private static validar(tipo: string, opcoes?: string[] | undefined | null ): String [] | undefined | null{
+        switch (tipo) {
+      case 'texto':
+        if (opcoes !== undefined) {
+          throw new ValidacaoPerguntaException('Perguntas do tipo texto não devem ter opções.');
+        }
+        return undefined;
 
-  private static validarOpcoes(tipo: string, opcoes: string[] | undefined): void {
+      case 'nota':
+        const opcoesDeNota = opcoes ?? ['1', '2', '3', '4', '5'];
+        if (opcoesDeNota.some(o => isNaN(Number(o)))) {
+          throw new ValidacaoPerguntaException('Opções de nota devem ser apenas números.');
+        }
+        return opcoesDeNota;
 
-    if ((tipo === "multipla_escolha" && opcoes != undefined)) {
-      if (opcoes.length === 0) {
-        throw new OpcoesObrigatoriasException();
-      };
+      case 'multipla_escolha':
+        if (!opcoes || opcoes.length < 2) {
+          throw new QuantidadeMinimaOpcoesException(2);
+        }
+        const duplicadas = opcoes.filter((item, i) => opcoes.indexOf(item) !== i);
+        if (duplicadas.length > 0) {
+          throw new OpcaoDuplicadaException(duplicadas[0]);
+        }
+        return opcoes;
 
-      if (tipo === "multipla_escolha" && opcoes.length < 2) {
-        throw new QuantidadeMinimaOpcoesException(2);
-      };
-
-      const duplicadas = opcoes.filter((item, i, arr) => arr.indexOf(item) !== i);
-      if (duplicadas.length > 0) {
-        throw new OpcaoDuplicadaException(duplicadas[0]);
-      };
-
+      default:
+        // Caso um tipo de pergunta desconhecido seja passado
+        throw new TipoPerguntaInvalidoException(tipo);
     }
-    
-    if (tipo === "nota" && opcoes != undefined && opcoes.length > 0) {
-      throw new ValidacaoPerguntaException([
-        "Perguntas do tipo 'nota' não devem ter opções."
-      ]);
+  }
+
+  public static criar(props: CriarPerguntaProps, id?: string): Pergunta {
+    let opcoesPreparadas: string[] | null | undefined = props.opcoes;
+
+    if (props.tipo === 'nota' && (!opcoesPreparadas || opcoesPreparadas.length === 0)) {
+        opcoesPreparadas = ['1', '2', '3', '4', '5'];
+    }
+    // Para tipo texto, garanta que opcoes seja undefined, não null ou array vazio
+    else if (props.tipo === 'texto' && (opcoesPreparadas === null || (Array.isArray(opcoesPreparadas) && opcoesPreparadas.length === 0))) {
+        opcoesPreparadas = undefined;
+    }
+    // Para outros casos onde null foi passado, mas a entidade prefere undefined para ausência
+    else if (opcoesPreparadas === null) {
+        opcoesPreparadas = undefined;
     }
 
-  }
-
-  public static criar(props: CriarPerguntaProps): Pergunta{
-    const { texto, tipo, opcoes, ordem } = props;
-      return new Pergunta ({texto,
-        tipo,
-        opcoes,
-        ordem});
-  }
-
-  public static recuperar(props: RecuperarPerguntaProps): Pergunta {
-    
-    if(!props.id) {
-      throw new PerguntaNaoEncontradaException(props.id);
+    const perguntaCompleta: IPergunta = {
+      id: id || randomUUID(),
+      texto: props.texto,
+      tipo: props.tipo,
+      opcoes: opcoesPreparadas,
+      ativo: true, // Nova pergunta geralmente é ativa
+      dataCriacao: new Date(),
+      dataAtualizacao: new Date(),
+      dataExclusao: null,
     };
+    this.validar(perguntaCompleta.tipo, perguntaCompleta.opcoes);
+    return new Pergunta(perguntaCompleta); // Passa o objeto IPergunta completo
+  }
+  
+  public static recuperar(props: RecuperarPerguntaProps): Pergunta {
+     this.validar(props.tipo, props.opcoes);; // Também valida ao recuperar, para garantir consistência
+    return new Pergunta(props);
+  }
 
-    return new Pergunta (props);
+  public atualizarTexto(novoTexto: string): void {
+   this.texto = novoTexto; 
+   // Atualiza a data de modificação
+   this.dataAtualizacao = new Date();
+  }
+
+  public inativar(): void {
+    // 1. Regra de negócio: Impede que uma pergunta já inativa seja inativada novamente.
+    if (!this.ativo) {
+      throw new Error("Esta pergunta já está inativa.");
+    }
+    // 2. Altera as propriedades para refletir o estado de "excluído".
+    this.ativo= false;
+    this.dataExclusao = new Date();
+    this.dataAtualizacao = new Date(); // A inativação é uma atualização
   }
 
 }
-
-export {Pergunta}
+   
+export { Pergunta };

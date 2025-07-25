@@ -1,10 +1,16 @@
-interface IEnvioFormulario {
-    id: number;
-    formularioId: number;
-    clienteId: number;
-    canal: 'whatsapp' | 'email';
-    statusEnvio: 'pendente' | 'enviado' | 'respondido';
-    dataEnvio: Date;
+import { Status_formulario } from "@prisma/client";
+
+interface EnvioProps {
+  id: string;
+  clienteId: string;
+  usuarioId: string;
+  formularioId: string;
+  feedbackId: string;
+  status: Status_formulario;
+  dataCriacao: Date;
+  dataEnvio?: Date | null;
+  tentativasEnvio: number;
+  ultimaMensagemErro?: string | null;
 }
 
-export {IEnvioFormulario}
+export {EnvioProps}
