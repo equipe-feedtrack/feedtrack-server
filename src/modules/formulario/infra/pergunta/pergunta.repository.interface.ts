@@ -1,5 +1,5 @@
 import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
-import { IRepository } from "@shared/domain/repository.inteface";
+import { IRepository } from "@shared/infra/repository.inteface";
 
 
 interface IPerguntaRepository<T> extends IRepository<T> {

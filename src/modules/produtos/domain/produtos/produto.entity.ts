@@ -12,8 +12,8 @@ class Produto extends Entity<IProduto> implements IProduto {
     private _nome: string;
     private _descricao: string;
     private _valor: number;
-    private _dataCriacao?: Date | undefined;
-    private _dataAtualizacao?: Date | undefined;
+    private _dataCriacao: Date;
+    private _dataAtualizacao: Date;
     private _dataExclusao?: Date | null | undefined;
     private _status?: StatusProduto | undefined;
 
@@ -85,19 +85,19 @@ class Produto extends Entity<IProduto> implements IProduto {
 
 
 
-    public get dataCriacao(): Date | undefined {
+    public get dataCriacao(): Date  {
         return this._dataCriacao;
     }
 
-    private set dataCriacao(value: Date | undefined) {
+    private set dataCriacao(value: Date) {
         this._dataCriacao = value;
     }
 
-    public get dataAtualizacao(): Date | undefined {
+    public get dataAtualizacao(): Date  {
         return this._dataAtualizacao;
     }
 
-    private set dataAtualizacao(value: Date | undefined) {
+    private set dataAtualizacao(value: Date) {
         this._dataAtualizacao = value;
     }
 

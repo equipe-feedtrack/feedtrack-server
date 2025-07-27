@@ -1,6 +1,6 @@
 interface IDatasControle {
-    dataCriacao?: Date;
-    dataAtualizacao?: Date;
+    dataCriacao: Date;
+    dataAtualizacao: Date;
     dataExclusao?: Date | null;
 }
 

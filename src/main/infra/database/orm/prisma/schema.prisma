@@ -30,6 +30,20 @@ enum Status_formulario {
   FALHA
 }
 
+enum Tipo_Campanha {
+  POS_COMPRA
+  AUTOMATICO
+  PROMOCIONAL
+  SATISFACAO
+}
+
+enum Segmento_Alvo {
+  TODOS_CLIENTES
+  CLIENTES_REGULARES
+  NOVOS_CLIENTES
+  CLIENTES_PREMIUM
+}
+
 model Usuario {
   id               String           @id @default(uuid())
   nome             String           @unique
@@ -66,6 +80,7 @@ model Cliente {
   email            String?
   cidade           String
   status           Status_usuarios
+  vendedor_responsavel String
   data_criacao     DateTime
   data_atualizacao DateTime
   data_exclusao    DateTime?
@@ -101,6 +116,44 @@ model Pergunta {
   @@map("perguntas")
 }
 
+model Formulario {
+  id               String     @id @default(uuid())
+  texto            String
+  descricao        String
+  ativo            Boolean
+  data_criacao     DateTime
+  data_atualizacao DateTime
+  data_exclusao    DateTime?
+  
+  feedbacks        Feedback[]
+  envio_formulario Envio_formulario[]
+  perguntas        Pergunta[]
+  campanhas        Campanha[] 
+
+  @@map("formularios")
+}
+
+model Campanha {
+  id               String        @id @default(uuid())
+  titulo           String
+  descricao        String?
+  tipo_campanha    Tipo_Campanha @map("tipoCampanha") // Mapeia para snake_case no DB
+  segmento_alvo    Segmento_Alvo @map("segmentoAlvo") // Mapeia para snake_case no DB
+  data_inicio      DateTime      @map("dataInicio")
+  data_fim         DateTime?     @map("dataFim")
+  template_mensagem String       @map("templateMensagem")
+  ativo            Boolean       @default(true)
+  data_criacao     DateTime      @map("dataCriacao")
+  data_atualizacao DateTime      @map("dataAtualizacao")
+  data_exclusao    DateTime?     @map("dataExclusao")
+  formularioId     String        @map("formularioId") // Chave estrangeira para o Formulário
+
+
+  formulario       Formulario    @relation(fields: [formularioId], references: [id])
+
+  @@map("campanhas") // Nome da tabela no banco
+}
+
 
 model Envio_formulario {
    
@@ -131,21 +184,6 @@ model Envio_formulario {
 
 }
 
-model Formulario {
-  id               String     @id @default(uuid())
-  texto           String
-  descricao        String
-  ativo            Boolean
-  data_criacao     DateTime
-  data_atualizacao DateTime
-  data_exclusao    DateTime?
-  
-  feedbacks        Feedback[]
-  envio_formulario Envio_formulario[]
-  perguntas        Pergunta[] 
-
-  @@map("formularios")
-}
 
 model Feedback {
   id               String     @id @default(uuid())

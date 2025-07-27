@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { Pergunta } from '../../domain/pergunta/pergunta.entity';
 import { PerguntaMap } from '../pergunta.map';
 import { Prisma, Pergunta as PerguntaPrisma } from '@prisma/client'; // Renomeei Pergunta para PerguntaPrisma para evitar conflito
 import { QuantidadeMinimaOpcoesException } from '@modules/formulario/domain/pergunta/pergunta.exception';
 import { randomUUID } from 'crypto';
+import { Pergunta } from '@modules/formulario/domain/pergunta/pergunta.entity';
 
 describe('PerguntaMap', () => {
   // Cenário base para os testes da entidade

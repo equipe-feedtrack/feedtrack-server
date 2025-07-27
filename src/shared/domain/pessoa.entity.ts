@@ -1,10 +1,6 @@
-export type PessoaProps = {
-    nome: string;
-    email?: string;
-    telefone?: string;
-};
+import { PessoaProps } from "./pessoa.types";
 
- class Pessoa implements PessoaProps {
+class Pessoa implements PessoaProps {
     private _nome: string;
     private _email?: string;
     private _telefone?: string;
@@ -64,6 +60,10 @@ export type PessoaProps = {
         email: this._email,
         telefone: this._telefone
         };
+    }
+
+    public static recuperar(props: PessoaProps): Pessoa {
+        return new Pessoa(props);
     }
 }
 

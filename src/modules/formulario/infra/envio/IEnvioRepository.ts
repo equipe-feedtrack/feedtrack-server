@@ -6,6 +6,7 @@ import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity"
 export interface IEnvioRepository {
   salvar(envio: Envio): Promise<void>;
   buscarPorId(id: string): Promise<Envio | null>;
+  atualizar(envio: Envio): Promise<void>;
 }
 
 // src/application/gateways/IWhatsAppGateway.ts

@@ -2,11 +2,12 @@ import {
   Formulario as FormularioPrisma,
   Pergunta as PerguntaPrisma,
 } from '@prisma/client';
-import { FormularioResponseDTO } from '../application/dto/formulario/FormularioResponseDTO';
-import { ListarFormulariosResponseDTO } from '../application/dto/formulario/ListarFormulariosResponseDTO';
-import { Formulario } from '../domain/formulario/formulario.entity';
-import { Pergunta } from '../domain/pergunta/pergunta.entity';
+
 import { PerguntaMap } from './pergunta.map';
+import { Pergunta } from '@modules/formulario/domain/pergunta/pergunta.entity';
+import { Formulario } from '@modules/formulario/domain/formulario/formulario.entity';
+import { ListarFormulariosResponseDTO } from '@modules/formulario/application/dto/formulario/ListarFormulariosResponseDTO';
+import { FormularioResponseDTO } from '@modules/formulario/application/dto/formulario/FormularioResponseDTO';
 
 
 type FormularioComPerguntas = FormularioPrisma & { perguntas: PerguntaPrisma[] };

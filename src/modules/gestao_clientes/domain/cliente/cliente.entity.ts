@@ -1,32 +1,40 @@
-import { ClienteMap } from "@modules/gestao_clientes/mappers/cliente.map";
+import { ClienteMap } from "@modules/gestao_clientes/infra/mappers/cliente.map";
 import { Produto } from "@modules/produtos/domain/produtos/produto.entity";
 import { Entity } from "@shared/domain/entity";
 import { Pessoa } from "@shared/domain/pessoa.entity";
 import { ClienteExceptions } from "./cliente.exception";
 import { ClienteEssencial, CriarClienteProps, ICliente, RecuperarClienteProps, StatusCliente } from "./cliente.types";
+import { randomUUID } from "crypto";
 
 class Cliente extends Entity<ICliente> {
 
   // -------- ATRIBUTOS DA CLASSE CLIENTE -------
   private _pessoa: Pessoa; // Agora consegue puxar da classe genérica Pessoa
   private _cidade: string;
-  private _status?: StatusCliente | undefined;
-  private _dataCriacao?: Date | undefined;
-  private _dataAtualizacao?: Date | undefined;
-  private _dataExclusao?: Date | null | undefined;
+  private _status?: StatusCliente;
+  private _dataCriacao: Date;
+  private _dataAtualizacao: Date ;
+  private _dataExclusao?: Date | null ;
   private _vendedorResponsavel: string //Funcionario; // Acredito que o código vai ficar assim com o tipo Funcionário! só tem que fazer os ajustes, não precisa cliente herdar de usuario, quem herda é funcionário é administrador porque Cliente é um domínio, ele tem que está associado a outra classe de dminio chamada de Funcinario (Yago).
   private _produtos: Array<Produto>;
-
-
+  
+  
   // ---------- CONSTANTES -------------------------------
-
+  
   public static readonly QTD_MINIMA_PRODUTOS = 1;
-
-
+  
+  
   // ---------- GETTERS e SETTERS COM VALIDAÇÃO ----------
-
-    public get pessoa(): Pessoa {
+  
+  public get pessoa(): Pessoa {
     return this._pessoa;
+  }
+
+  public set pessoa(value: Pessoa) {
+    if (!this._pessoa.telefone || this._pessoa.telefone.trim() === '') {
+      throw new ClienteExceptions.TelefoneClienteObrigatório();
+    }
+    this._pessoa = value;
   }
 
   public get cidade(): string | undefined {
@@ -37,19 +45,19 @@ class Cliente extends Entity<ICliente> {
     this._cidade = value?.trim() ?? '';
   }
 
-  public get dataCriacao(): Date | undefined {
+  public get dataCriacao(): Date {
     return this._dataCriacao;
   }
 
-  private set dataCriacao(value: Date | undefined) {
+  private set dataCriacao(value: Date) {
     this._dataCriacao = value;
   }
 
-  public get dataAtualizacao(): Date | undefined {
+  public get dataAtualizacao(): Date  {
     return this._dataAtualizacao;
   }
 
-  private set dataAtualizacao(value: Date | undefined) {
+  private set dataAtualizacao(value: Date ) {
     this._dataAtualizacao = value;
   }
 
@@ -107,21 +115,28 @@ class Cliente extends Entity<ICliente> {
   }
 
   // ---------- CRIA NOVO CLIENTE ----------
-    public static criarCliente(props: CriarClienteProps): Cliente {
-        return new Cliente(props);
+   public static criarCliente(props: CriarClienteProps): Cliente {
+        const clienteCompleto: ICliente = { 
+           id: randomUUID(),
+            pessoa: props.pessoa,
+            cidade: props.cidade,
+            vendedorResponsavel: props.vendedorResponsavel,
+            status: props.status ?? StatusCliente.ATIVO, // Status padrão
+            produtos: props.produtos, // Produtos vêm de props, serão mapeados no construtor
+            dataCriacao: new Date(), // <-- ADICIONADO: Data de criação gerada
+            dataAtualizacao: new Date(), // <-- ADICIONADO: Data de atualização gerada
+            dataExclusao: null, // <-- ADICIONADO: Data de exclusão como null por padrão
+        };
+        // O construtor de Cliente vai mapear os produtos usando Produto.criarProduto
+        return new Cliente(clienteCompleto);
     }
 
     // ---------- RECUPERAR CLIENTE ----------
-
       public static recuperar(props: RecuperarClienteProps): Cliente {
         return new Cliente(props);
     }
 
   // ---------- MÉTODOS ----------
-    public toDTO(): ICliente {
-        return ClienteMap.toDTO(this);
-    }
-
     public estaDeletado(): boolean {
         return this.dataExclusao !== null ? true : false;
     }
@@ -130,28 +145,12 @@ class Cliente extends Entity<ICliente> {
     return {
       nome: this.pessoa.nome,
       email: this.pessoa.email,
-      telefone: this.pessoa.telefone,
+      telefone: this.pessoa.telefone ?? '',
       produtos: this.produtos,
       vendedorResponsavel: this.vendedorResponsavel
     };
   }
  
-  // ---------- EXIBE OS DADOS DO CLIENTE ---------- // NÃO PRECISA PORQUE JÁ RECUPERA OS DADOS ACIMA
-// public lerContato(): Cliente {
-//   const dados = {
-//     ID: this.id ?? "Não informado",
-//     Nome: this.nome ?? "Removido",
-//     Telefone: this.telefone ?? "Removido",
-//     Email: this.email ?? "Removido",
-//     Cidade: this.cidade ?? "Removido",
-//     Cadastrado: this.dataCriacao ? this.dataCriacao.toLocaleString() : "Data não disponível"
-//   };
-
-//   return Object.entries(dados)
-//     .map(([chave, valor]) => `${chave}: ${valor}`)
-//     .join("\n")
-//     .trim();
-// }
 }
 
 export { Cliente };
