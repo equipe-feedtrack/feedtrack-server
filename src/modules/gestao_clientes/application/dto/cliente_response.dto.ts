@@ -1,4 +1,4 @@
-import { StatusCliente } from "@modules/gestao_clientes/domain/cliente/cliente.types";
+import { StatusCliente } from "@modules/gestao_clientes/domain/cliente.types";
 
 interface PessoaResponseDTO {
     nome: string;

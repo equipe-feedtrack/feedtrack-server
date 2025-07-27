@@ -44,6 +44,25 @@ enum Segmento_Alvo {
   CLIENTES_PREMIUM
 }
 
+enum Tipo_Acao {
+  CRIAR_USUARIO
+  ATUALIZAR_USUARIO
+  CRIAR_CLIENTE
+  ATUALIZAR_CLIENTE
+  DESATIVAR_CAMPANHA
+  INICIAR_ENVIO_CAMPANHA
+  // ... adicione todas as ações necessárias
+}
+
+enum Entidade_Alvo_Tipo { 
+  USUARIO
+  CLIENTE
+  CAMPANHA
+  FORMULARIO
+  PRODUTO
+  ENVIO_FORMULARIO
+}
+
 model Usuario {
   id               String           @id @default(uuid())
   nome             String           @unique
@@ -57,21 +76,38 @@ model Usuario {
 
   funcionario      Funcionario?
   envia_formulario Envio_formulario[]
+  logs_atividade   LogAtividade[]
 }
 
 model Funcionario {
-  id               String           @id @default(uuid())
-  usuarioId        String           @unique       // garante 1‑para‑1
-  usuario          Usuario          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
+  id               String         @id @default(uuid())
+  usuarioId        String         @unique // Garante 1-para-1 com Usuario
+  usuario          Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade) // Relação
   cargo            String
-  status           Status_usuarios
-  data_criacao     DateTime
-  data_atualizacao DateTime
-  data_exclusao    DateTime?
+  data_admissao    DateTime       @map("dataAdmissao") // Mapeia para camelCase no TS
+  status           Status_usuarios @default(ATIVO) // Reutiliza status de usuário
+  data_criacao     DateTime       @map("dataCriacao")
+  data_atualizacao DateTime       @map("dataAtualizacao")
+  data_exclusao    DateTime?      @map("dataExclusao")
+
+  @@map("funcionarios") // Nome da tabela
 }
 
 
+model LogAtividade {
+  id                 String           @id @default(uuid())
+  usuarioId          String           @map("usuarioId") // FK para Usuario
+  usuario            Usuario          @relation(fields: [usuarioId], references: [id])
+  nome_usuario       String           @map("nomeUsuario") // Denormalizado para facilitar consulta
+  tipo_usuario       Tipo_usuario     @map("tipoUsuario") // Enum, reutiliza Tipo_usuario de Usuario
+  acao               Tipo_Acao
+  entidade_alvo_id   String?          @map("entidadeAlvoId")
+  entidade_alvo_tipo Entidade_Alvo_Tipo? @map("entidadeAlvoTipo")
+  detalhes           String?          
+  data_ocorrencia    DateTime         @map("dataOcorrencia") @default(now())
+
+  @@map("logs_atividade")
+}
 
 model Cliente {
   id               String @id @default(uuid())
@@ -93,11 +129,13 @@ model Produto {
   id               String @id @default(uuid())
   nome             String
   descricao        String
+  valor            Int
+  ativo            Boolean       @default(true)
   data_criacao     DateTime
   data_atualizacao DateTime
   data_exclusao    DateTime?
-  cliente_id       String
-  cliente         Cliente  @relation(fields: [cliente_id], references: [id])
+  cliente_id       String?
+  cliente         Cliente?  @relation(fields: [cliente_id], references: [id])
 }
 
 model Pergunta {
@@ -154,7 +192,6 @@ model Campanha {
   @@map("campanhas") // Nome da tabela no banco
 }
 
-
 model Envio_formulario {
    
   id                String    @id @default(uuid())
@@ -184,7 +221,6 @@ model Envio_formulario {
 
 }
 
-
 model Feedback {
   id               String     @id @default(uuid())
   resposta         Json
@@ -193,5 +229,3 @@ model Feedback {
   formularioId     String
   formulario       Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
 }
-
-

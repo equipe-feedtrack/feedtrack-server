@@ -1,6 +1,6 @@
 import { SegmentoAlvo } from "@modules/campanha/domain/campanha.types";
-import { Cliente } from "../domain/cliente/cliente.entity";
-import { ICliente } from "../domain/cliente/cliente.types";
+import { Cliente } from "../domain/cliente.entity";
+import { ICliente } from "../domain/cliente.types";
 
 export interface IClienteRepository {
   /**

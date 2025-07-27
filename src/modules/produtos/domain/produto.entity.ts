@@ -1,7 +1,7 @@
-import { ProdutoMap } from "@modules/produtos/mappers/produto.map";
 import { Entity } from "@shared/domain/entity";
 import { ProdutoExceptions } from "./produto.exception";
-import { CriarProdutoProps, IProduto, RecuperarProdutoProps, StatusProduto } from "./produto.types";
+import { CriarProdutoProps, IProduto, RecuperarProdutoProps } from "./produto.types";
+import { randomUUID } from "crypto";
 
 class Produto extends Entity<IProduto> implements IProduto {
 
@@ -15,7 +15,8 @@ class Produto extends Entity<IProduto> implements IProduto {
     private _dataCriacao: Date;
     private _dataAtualizacao: Date;
     private _dataExclusao?: Date | null | undefined;
-    private _status?: StatusProduto | undefined;
+    private _ativo: boolean;
+    private _cliente_id?: string | null;
 
     //////////////
     //Constantes//
@@ -83,8 +84,6 @@ class Produto extends Entity<IProduto> implements IProduto {
         this._valor = valor;
     }
 
-
-
     public get dataCriacao(): Date  {
         return this._dataCriacao;
     }
@@ -109,12 +108,20 @@ class Produto extends Entity<IProduto> implements IProduto {
         this._dataExclusao = value;
     }
 
-    public get status(): StatusProduto | undefined {
-        return this._status;
+    public get ativo(): boolean  {
+        return this._ativo;
     }
 
-    private set status(value: StatusProduto | undefined) {
-        this._status = value;
+    private set ativo(value: boolean ) {
+        this._ativo = value;
+    }
+
+     public get cliente_id(): string | undefined | null {
+        return this._cliente_id;
+    }
+
+    public set cliente_id(value: string | undefined | null) {
+        this._cliente_id = value;
     }
 
     //////////////
@@ -122,7 +129,6 @@ class Produto extends Entity<IProduto> implements IProduto {
     //////////////
 
     constructor(produto: IProduto) {
-
         super(produto.id);
         this.nome = produto.nome;
         this.descricao = produto.descricao;
@@ -130,7 +136,8 @@ class Produto extends Entity<IProduto> implements IProduto {
         this.dataCriacao = produto.dataCriacao;
         this.dataAtualizacao = produto.dataAtualizacao;
         this.dataExclusao = produto.dataExclusao;
-        this.status = produto.status;
+        this.ativo = produto.ativo;
+        this.cliente_id = produto.cliente_id;
     }
 
     /////////////////////////
@@ -138,8 +145,20 @@ class Produto extends Entity<IProduto> implements IProduto {
     /////////////////////////
 
     public static criarProduto(props: CriarProdutoProps): Produto {
-        return new Produto(props);
+        const produtoCompleto: IProduto = { // <-- Construímos um IProduto COMPLETO aqui
+        id: randomUUID(), // <-- Geramos o ID aqui
+        nome: props.nome,
+        descricao: props.descricao,
+        valor: props.valor,
+        ativo: true,
+        dataCriacao: new Date(), // <-- Geramos a data de criação
+        dataAtualizacao: new Date(), // <-- Geramos a data de atualização
+        dataExclusao: null, // <-- Default para null
+        cliente_id: props.cliente_id, 
+        };
+        return new Produto(produtoCompleto); // Passa o IProduto completo para o construtor
     }
+
 
 
     public static recuperar(props: RecuperarProdutoProps): Produto {
@@ -149,10 +168,6 @@ class Produto extends Entity<IProduto> implements IProduto {
     ///////////
     //Métodos//
     ///////////
-
-    public toDTO(): IProduto {
-        return ProdutoMap.toDTO(this);
-    }
 
     public estaDeletado(): boolean {
         return this.dataExclusao !== null ? true : false;

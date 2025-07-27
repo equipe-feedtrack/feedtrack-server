@@ -1,5 +1,5 @@
 import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
-import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
+import { Cliente } from "@modules/gestao_clientes/domain/cliente.entity";
 
 
 // src/application/repositories/IEnvioRepository.ts

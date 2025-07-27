@@ -40,10 +40,10 @@ class TelefoneClienteInvalido extends ClienteException {
   }
 }
 
-class TelefoneClienteObrigatório extends ClienteException {
+class TelefoneObrigatorioParaClienteException extends ClienteException {
   constructor(message: string = '⚠️ O telefone do cliente é Obrigatório.') {
     super(message);
-    this.name = 'TelefoneClienteObrigatório';
+    this.name = 'TelefoneObrigatorioParaCliente';
     this.message = message;
   }
 }
@@ -110,7 +110,7 @@ const ClienteExceptions = {
   NomeClienteTamanhoMaximoInvalido,
   EmailClienteInvalido,
   TelefoneClienteInvalido,
-  TelefoneClienteObrigatório,
+  TelefoneObrigatorioParaClienteException,
   QtdMinimaProdutosClienteInvalida,
   ClienteNaoEncontrado,
   ClienteJaExistente,

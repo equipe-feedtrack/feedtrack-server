@@ -4,7 +4,7 @@ import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.t
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
 import { IClienteRepository, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
-import { ICliente } from "@modules/gestao_clientes/domain/cliente/cliente.types";
+import { ICliente } from "@modules/gestao_clientes/domain/cliente.types";
 import { CriarCampanhaInputDTO, CriarCampanhaOutputDTO } from "../dto/criar_campanha_dto";
 import { randomUUID } from "crypto";
 import { FormularioNaoEncontrado } from "@shared/application/application.exception";

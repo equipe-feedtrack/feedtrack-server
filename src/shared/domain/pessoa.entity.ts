@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { PessoaProps } from "./pessoa.types";
 
 class Pessoa implements PessoaProps {
@@ -10,48 +11,31 @@ class Pessoa implements PessoaProps {
      }
 
     private set nome(nome: string) {
-         this._nome = nome;
+        this._nome = nome;
      }
     public get email(): string | undefined {
          return this._email;
      }
-    private set email(email: string) {
+    private set email(email: string | undefined) {
          this._email = email;
      }
     public get telefone(): string | undefined {
          return this._telefone;
      }
     private set telefone(telefone: string | undefined) {
-         this._telefone = telefone;
+         this._telefone =telefone;
      }
    
     constructor(props: PessoaProps) {
         const { nome, email, telefone } = props;
-
-        // Validação do nome
-        if (!nome || nome.trim() === '') {
-        throw new Error("Nome é obrigatório.");
-        }
-        this.nome = nome.trim();
-
-            // Validação do e-mail
-        if (email !== undefined && email !== null) {
-        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!regexEmail.test(email)) {
-            throw new Error("Email inválido.");
-            }
-                this.email = email;
-            } else {
-                this.email = "";
-            }
-        // Validação do telefone
-         if (telefone !== undefined && telefone !== null) {
-        const regexTelefone = /^[\d\s()+-]{8,24}$/;
-            if (!regexTelefone.test(telefone)) {
-            throw new Error("Telefone inválido.");
-            }
+        this.nome = nome;
         this.telefone = telefone;
-        }
+        this.email = email
+    }
+
+     public static criar(props: Omit<PessoaProps, 'id'>): Pessoa {
+    const id = randomUUID(); // Gera um ID único para a nova Pessoa
+    return new Pessoa({ ...props, id });
     }
 
     public dados() {

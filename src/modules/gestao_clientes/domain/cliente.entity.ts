@@ -1,10 +1,9 @@
-import { ClienteMap } from "@modules/gestao_clientes/infra/mappers/cliente.map";
-import { Produto } from "@modules/produtos/domain/produtos/produto.entity";
 import { Entity } from "@shared/domain/entity";
 import { Pessoa } from "@shared/domain/pessoa.entity";
 import { ClienteExceptions } from "./cliente.exception";
-import { ClienteEssencial, CriarClienteProps, ICliente, RecuperarClienteProps, StatusCliente } from "./cliente.types";
 import { randomUUID } from "crypto";
+import { Produto } from "@modules/produtos/domain/produto.entity";
+import { ClienteEssencial, CriarClienteProps, ICliente, RecuperarClienteProps, StatusCliente } from "./cliente.types";
 
 class Cliente extends Entity<ICliente> {
 
@@ -31,8 +30,13 @@ class Cliente extends Entity<ICliente> {
   }
 
   public set pessoa(value: Pessoa) {
-    if (!this._pessoa.telefone || this._pessoa.telefone.trim() === '') {
-      throw new ClienteExceptions.TelefoneClienteObrigatório();
+    
+    if (!this.pessoa.nome || this.pessoa.nome.trim() === '') {
+        throw new Error("Nome é obrigatório para criar uma Pessoa.");
+    } 
+    
+    if (!this._pessoa.telefone || typeof this._pessoa.telefone !== 'string' || this._pessoa.telefone.trim() === '') {
+      throw new ClienteExceptions.TelefoneObrigatorioParaClienteException();
     }
     this._pessoa = value;
   }

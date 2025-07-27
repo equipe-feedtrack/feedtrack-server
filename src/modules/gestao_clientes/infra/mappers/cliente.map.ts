@@ -1,9 +1,7 @@
-// src/modules/gestao_clientes/infra/mappers/cliente.map.ts
-
 import { ClienteResponseDTO } from "@modules/gestao_clientes/application/dto/cliente_response.dto";
-import { Cliente } from "@modules/gestao_clientes/domain/cliente/cliente.entity";
-import { ICliente, StatusCliente } from "@modules/gestao_clientes/domain/cliente/cliente.types";
-import { ProdutoMap } from "@modules/produtos/mappers/produto.map"; // Mapper de Produto
+import { Cliente } from "@modules/gestao_clientes/domain/cliente.entity";
+import { ICliente, StatusCliente } from "@modules/gestao_clientes/domain/cliente.types";
+import { ProdutoMap } from "@modules/produtos/infra/mappers/produto.map"; // Mapper de Produto
 import { Cliente as ClientePrisma, Prisma, Status_usuarios } from "@prisma/client"; // Importe Cliente do Prisma e Status_usuarios
 import { PessoaMap } from "@shared/infra/mappers/pessoa.map";
 
@@ -14,7 +12,7 @@ export class ClienteMap {
      * Converte um objeto de dados brutos do Prisma (ClientePrisma) para a entidade de domínio Cliente.
      * Usado ao recuperar dados do banco.
      */
-    public static toDomain(raw: ClientePrisma & { produtos: Array<any> }): Cliente { // raw inclui produtos para N-N
+    public static toDomain(raw: ClientePrisma & { produtos?: Array<any> }): Cliente { // raw inclui produtos para N-N
         // Converte o status do DB (enum String) para o enum de domínio
         const statusDomain = raw.status as StatusCliente;
 
@@ -26,7 +24,7 @@ export class ClienteMap {
             cidade: raw.cidade ?? undefined,
             vendedorResponsavel: raw.vendedor_responsavel, // Ajustar nome de coluna se for snake_case no DB
             status: statusDomain,
-            produtos: raw.produtos.map(ProdutoMap.toDomain), // Usa ProdutoMap.toDomain para cada produto
+            produtos: (raw.produtos ?? []).map(ProdutoMap.toDomain), // Usa ProdutoMap.toDomain para cada produto
             dataCriacao: raw.data_criacao,
             dataAtualizacao: raw.data_atualizacao,
             dataExclusao: raw.data_exclusao ?? null,

@@ -1,9 +1,5 @@
-import { IDatasControle, KeysDatasControle } from "../../../../shared/domain/data.types";
+import { IDatasControle } from "@shared/domain/data.types";
 
-enum StatusProduto {
-    ATIVO = "ATIVO",
-    INATIVO = "INATIVO",
-}
 
 //Todos os atributos/propriedades que um produto deve ter no sistema
 //Auxilia na criação de invariantes e modelos ricos
@@ -12,7 +8,8 @@ interface IProduto extends IDatasControle {
     nome: string;
     descricao: string;
     valor: number;
-    status?: StatusProduto
+    ativo: boolean;
+    cliente_id?: string | null;
 }
 
 //Atributos que são necessários para criar um produto 
@@ -22,13 +19,10 @@ type CriarProdutoProps = Omit<IProduto, 'id' | 'ativo' | 'dataCriacao' | 'dataAt
 
 //Atributos que são necessários para recuperar um produto
 //Tipo representa um dos estados do ciclo de vida da entidade
-type RecuperarProdutoProps = IProduto & {
-    id: NonNullable<IProduto['id']>
-};
+type RecuperarProdutoProps = IProduto;
 
 export {
     IProduto,
     CriarProdutoProps,
-    RecuperarProdutoProps,
-    StatusProduto
+    RecuperarProdutoProps
 }
