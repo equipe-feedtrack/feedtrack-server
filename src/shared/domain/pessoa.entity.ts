@@ -49,6 +49,19 @@ class Pessoa implements PessoaProps {
     public static recuperar(props: PessoaProps): Pessoa {
         return new Pessoa(props);
     }
+
+    public atualizarNome(novoNome: string): void {
+    this.nome = novoNome; // Reutiliza o setter
+    }
+
+    public atualizarEmail(novoEmail: string | undefined): void {
+    this.email = novoEmail; // Reutiliza o setter
+    }
+
+    public atualizarTelefone(novoTelefone: string | undefined): void {
+    this.telefone = novoTelefone; // Reutiliza o setter
+    }
+    
 }
 
 export { Pessoa }

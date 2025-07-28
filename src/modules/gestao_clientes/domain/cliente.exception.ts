@@ -103,6 +103,20 @@ class DataCadastroInvalida extends ClienteException {
     this.message = message;
   }
 }
+ class ClienteJaInativo extends ClienteException {
+    constructor(id: string) {
+      super(`Cliente com ID ${id} já está inativo.`);
+      this.name = 'ClienteJaInativo';
+    }
+  }
+
+ class ClienteJaAtivo extends ClienteException {
+    constructor(id: string) {
+      super(`Cliente com ID ${id} já está ativo.`);
+      this.name = 'ClienteJaAtivo';
+    }
+  }
+
 
 const ClienteExceptions = {
   ClienteException,
@@ -117,7 +131,9 @@ const ClienteExceptions = {
   IdClienteInvalido,
   EnderecoClienteInvalido,
   ConsentimentoLGPDInvalido,
-  DataCadastroInvalida
+  DataCadastroInvalida,
+  ClienteJaInativo,
+  ClienteJaAtivo
 };
 
 export {

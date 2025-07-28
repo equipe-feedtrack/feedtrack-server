@@ -159,8 +159,6 @@ class Produto extends Entity<IProduto> implements IProduto {
         return new Produto(produtoCompleto); // Passa o IProduto completo para o construtor
     }
 
-
-
     public static recuperar(props: RecuperarProdutoProps): Produto {
         return new Produto(props);
     }
@@ -168,6 +166,34 @@ class Produto extends Entity<IProduto> implements IProduto {
     ///////////
     //Métodos//
     ///////////
+
+    public atualizarNome(novoNome: string): void {
+        this.nome = novoNome; // Reutiliza o setter com validação
+        this.dataAtualizacao = new Date();
+    }
+
+    public atualizarDescricao(novaDescricao: string): void {
+        this.descricao = novaDescricao; // Reutiliza o setter com validação
+        this.dataAtualizacao = new Date();
+    }
+
+     public atualizarValor(novoValor: number): void {
+        this.valor = novoValor; // Reutiliza o setter com validação
+        this.dataAtualizacao = new Date();
+    }
+
+     public ativar(): void {
+        if (this.ativo) throw new Error("Produto já está ativo.");
+        this.ativo = true;
+        this.dataAtualizacao = new Date();
+    }
+
+    public inativar(): void {
+        if (!this.ativo) throw new Error("Produto já está inativo.");
+        this.ativo = false;
+        this.dataExclusao = new Date(); // Exclusão lógica
+        this.dataAtualizacao = new Date();
+    }
 
     public estaDeletado(): boolean {
         return this.dataExclusao !== null ? true : false;

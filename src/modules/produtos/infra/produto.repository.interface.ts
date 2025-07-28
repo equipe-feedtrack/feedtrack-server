@@ -13,13 +13,15 @@ export interface IProdutoRepository {
    * @param id O ID do Produto a ser recuperado.
    * @returns A entidade Produto (IProduto), ou null se não encontrada.
    */
-  recuperarPorUuid(id: string): Promise<IProduto | null>;
+  recuperarPorUuid(id: string): Promise<Produto | null>;
 
   /**
    * Atualiza um Produto existente no mecanismo de persistência.
    * @param produto A entidade Produto com os dados a serem atualizados.
    */
   atualizar(produto: Produto): Promise<void>;
+
+  listar(filtros?: any): Promise<Produto[]>;
 
   // Você pode adicionar outros métodos comuns de repositório aqui:
   // listar?(filtros?: any): Promise<IProduto[]>;

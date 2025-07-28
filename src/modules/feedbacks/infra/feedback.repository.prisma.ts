@@ -1,68 +1,41 @@
-import { PrismaClient, Feedback as PrismaFeedback } from "@prisma/client";
-import { Feedback } from "../domain/feedback.entity";
-import { FeedbackRepository } from "./feedback.repository";
-import { TipoPergunta } from "@shared/domain/data.types";
+import { PrismaClient } from '@prisma/client';
+import { Feedback } from '../domain/feedback.entity';
+import { FeedbackMap } from './mappers/feedback.map';
+import { IFeedback } from '../domain/feedback.types';
+import { PrismaRepository } from '@shared/infra/prisma.repository';
+import { IFeedbackRepository } from './feedback.repository';
 
-export class FeedbackRepositoryPrisma implements FeedbackRepository {
+export class FeedbackRepositoryPrisma extends PrismaRepository implements IFeedbackRepository {
+  constructor(prisma: PrismaClient) {
+    super(prisma);
+  }
 
-  constructor(private readonly prisma: PrismaClient) {}
-  async salvar(feedback: Feedback): Promise<void> {
-    await this.prisma.feedback.create({
-      data: {
-        id: feedback.id,
-        formularioId: feedback.formularioId,
-        resposta: {
-          perguntaId: feedback.perguntaId,
-          tipo: feedback.tipo,
-          resposta_texto: feedback.resposta_texto,
-          nota: feedback.nota,
-          opcaoEscolhida: feedback.opcaoEscolhida,
-          data_resposta: feedback.data_resposta,
-        },
-        data_criacao: feedback.data_resposta,
-      },
+  async inserir(feedback: Feedback): Promise<void> {
+    const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
+    await this._datasource.feedback.create({
+      data: dadosParaPersistencia,
     });
   }
 
-  async buscarPorId(id: string): Promise<Feedback | null> {
-    const data = await this.prisma.feedback.findUnique({
+  async recuperarPorUuid(id: string): Promise<Feedback | null> {
+    const feedbackPrisma = await this._datasource.feedback.findUnique({
       where: { id },
     });
-
-    if (!data) return null;
-
-    const resposta = data.resposta as any;
-
-    return new Feedback({
-      id: data.id,
-      formularioId: data.formularioId,
-      perguntaId: resposta.perguntaId,
-      tipo: resposta.tipo as TipoPergunta,
-      resposta_texto: resposta.resposta_texto,
-      nota: resposta.nota,
-      opcaoEscolhida: resposta.opcaoEscolhida,
-      data_resposta: resposta.data_resposta || data.data_criacao,
-    });
+    if (!feedbackPrisma) return null;
+    return FeedbackMap.toDomain(feedbackPrisma);
   }
 
-  async buscarPorFormulario(formularioId: string): Promise<Feedback[]> {
-    const rows = await this.prisma.feedback.findMany({
-      where: { formularioId },
+  async buscarPorEnvioId(envioId: string): Promise<IFeedback | null> {
+    const envioFormulario = await this._datasource.envio_formulario.findUnique({
+        where: { feedbackId: envioId },
+        // Não precisamos incluir o Feedback aqui, apenas o ID do Feedback.
+        // Se a FK de Feedback está em Envio_formulario (feedbackId String @unique),
+        // então o feedbackId de Envio_formulario É o ID do Feedback.
     });
 
-    return rows.map((row) => {
-      const resposta = row.resposta as any;
+    if (!envioFormulario) return null;
 
-      return new Feedback({
-        id: row.id,
-        formularioId: row.formularioId,
-        perguntaId: resposta.perguntaId,
-        tipo: resposta.tipo as TipoPergunta,
-        resposta_texto: resposta.resposta_texto,
-        nota: resposta.nota,
-        opcaoEscolhida: resposta.opcaoEscolhida,
-        data_resposta: resposta.data_resposta || row.data_criacao,
-      });
-    });
+    // Recupera o Feedback pelo ID encontrado no Envio_formulario
+    return this.recuperarPorUuid(envioFormulario.feedbackId); 
   }
 }

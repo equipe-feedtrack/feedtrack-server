@@ -1,8 +1,9 @@
 
 import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
-import { IClienteRepository, IEnvioRepository, IFeedbackService, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
+import { IEnvioRepository, IFeedbackService, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { UseCaseException } from "@shared/application/use-case/use-case.exception";
 import { IniciarEnvioDTO } from "../../dto/envio/iniciarEnvioDTO";
+import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
 
 export class IniciarEnvioFormularioUseCase {
   constructor(
@@ -14,7 +15,7 @@ export class IniciarEnvioFormularioUseCase {
 
   async execute(dto: IniciarEnvioDTO): Promise<string> {
     // 1. Busca o cliente para obter o número de telefone (destinatário)
-    const cliente = await this.clienteRepository.buscarPorId(dto.clienteId);
+    const cliente = await this.clienteRepository.recuperarPorUuid(dto.clienteId);
     if (!cliente || !cliente.pessoa.telefone) { // Supondo que a entidade Cliente tenha um campo 'telefone'
         throw new UseCaseException('Cliente ou número de telefone não encontrado.');
     }

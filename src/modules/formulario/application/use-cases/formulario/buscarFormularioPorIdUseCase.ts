@@ -1,8 +1,8 @@
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
-import { FormularioMap } from "@modules/formulario/mappers/formulario.map";
 import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
 import { FormularioResponseDTO } from "../../dto/formulario/FormularioResponseDTO";
+import { FormularioMap } from "@modules/formulario/infra/mappers/formulario.map";
 
 export class BuscarFormularioPorIdUseCase {
   constructor(private readonly formularioRepository: IFormularioRepository<Formulario>) {}

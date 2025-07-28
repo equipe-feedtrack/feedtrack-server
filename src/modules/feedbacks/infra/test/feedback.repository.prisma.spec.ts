@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { Feedback } from "@modules/feedbacks/domain/feedback.entity";
 import { PrismaClient } from "@prisma/client";
-import { FeedbackRepositoryPrisma } from "./feedback.repository.prisma";
-import { Feedback } from "../domain/feedback.entity";
 import { TipoPergunta } from "@shared/domain/data.types";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { FeedbackRepositoryPrisma } from "../feedback.repository.prisma";
 
 vi.mock("@prisma/client", () => {
   return {

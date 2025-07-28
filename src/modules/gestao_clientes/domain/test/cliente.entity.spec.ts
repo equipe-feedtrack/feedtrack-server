@@ -151,10 +151,10 @@ describe('Entidade Cliente', () => {
   // --- Testes para Métodos de Comportamento ---
   it('deve verificar se o cliente está deletado corretamente', () => {
     const clienteAtivo = Cliente.criarCliente(baseProps);
-    expect(clienteAtivo.estaDeletado()).toBe(false);
+    expect(clienteAtivo.inativar()).toBe(false);
 
     const clienteDeletado = Cliente.recuperar({ ...baseProps, id: randomUUID(), status: StatusCliente.INATIVO, dataExclusao: new Date(), pessoa: Pessoa.criar(mockPessoaData), dataCriacao: new Date(), dataAtualizacao: new Date(), produtos: [produto1] });
-    expect(clienteDeletado.estaDeletado()).toBe(true);
+    expect(clienteDeletado.inativar()).toBe(true);
   });
 
   it('deve recuperar os dados essenciais do cliente', () => {

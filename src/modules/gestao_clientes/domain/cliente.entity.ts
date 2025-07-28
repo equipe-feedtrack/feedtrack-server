@@ -141,8 +141,46 @@ class Cliente extends Entity<ICliente> {
     }
 
   // ---------- MÉTODOS ----------
-    public estaDeletado(): boolean {
-        return this.dataExclusao !== null ? true : false;
+
+      public atualizarCidade(novaCidade: string | undefined): void {
+        this.cidade = novaCidade; // Reutiliza o setter
+        this.dataAtualizacao = new Date();
+    }
+
+    public atualizarVendedorResponsavel(novoVendedor: string): void {
+    this.vendedorResponsavel = novoVendedor; // Reutiliza o setter
+    this.dataAtualizacao = new Date();
+    } 
+
+    public atualizarStatus(novoStatus: StatusCliente): void {
+        if (this.status === novoStatus) return;
+        this.status = novoStatus; // Reutiliza o setter
+        this.dataAtualizacao = new Date();
+    }
+
+    public inativar(): void {
+        // Regra de negócio: Um cliente já inativo não pode ser inativado novamente.
+        if (this.status === StatusCliente.INATIVO) {
+            throw new ClienteExceptions.ClienteJaInativo(this.id);
+        }      
+
+        // Altera o status para INATIVO
+        this.status = StatusCliente.INATIVO; // Isso chamará o setter 'status' que lida com dataExclusao
+        
+        // Assegura que dataExclusao e dataAtualizacao são atualizadas (se o setter de status não o fizer)
+        if (!this.dataExclusao) { // Só seta se ainda não tiver sido setado pelo setter de status
+            this.dataExclusao = new Date();
+        }
+        this.dataAtualizacao = new Date(); 
+    }
+
+    public reativar(): void {
+        if (this.status === StatusCliente.ATIVO) {
+            throw new ClienteExceptions.ClienteJaAtivo(this.id);
+        }
+        this.status = StatusCliente.ATIVO; // Isso chamará o setter 'status'
+        this.dataExclusao = null; // Remove a data de exclusão
+        this.dataAtualizacao = new Date();
     }
 
     public recuperarDadosEssenciais(): ClienteEssencial { //Passa apenas as informações essenciais!

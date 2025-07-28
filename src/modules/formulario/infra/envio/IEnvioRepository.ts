@@ -19,8 +19,3 @@ export interface IFeedbackService {
   iniciarColeta(formularioId: string, clienteId: string): Promise<string>; // Retorna o feedbackId
 }
 
-// src/application/repositories/IClienteRepository.ts (Exemplo de dependência extra)
-// Supondo que você tenha um Cliente com um número de telefone
-export interface IClienteRepository {
-    buscarPorId(id: string): Promise< Cliente| null>;
-}

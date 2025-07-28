@@ -1,10 +1,9 @@
 import { SegmentoAlvo } from '@modules/campanha/domain/campanha.types'; // O enum SegmentoAlvo
-import { ClienteMap } from './mappers/cliente.map';
-import { Cliente } from '../domain/cliente.entity';
+import { Cliente as ClientePrisma, PrismaClient } from '@prisma/client';
 import { PrismaRepository } from '@shared/infra/prisma.repository';
-import { ICliente } from '../domain/cliente.types';
+import { Cliente } from '../domain/cliente.entity';
 import { IClienteRepository } from './cliente.repository.interface';
-import { PrismaClient, Cliente as ClientePrisma } from '@prisma/client';
+import { ClienteMap } from './mappers/cliente.map';
 
 export class ClienteRepositoryPrisma extends PrismaRepository implements IClienteRepository {
   constructor(prismaClient: PrismaClient) { 
@@ -45,7 +44,7 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
   /**
    * Recupera um Cliente pelo seu ID único.
    */
-  async recuperarPorUuid(id: string): Promise<ICliente | null> {
+  async recuperarPorUuid(id: string): Promise<Cliente | null> {
     // Incluir 'produtos' é crucial para reconstruir a entidade Cliente completamente.
     // O relacionamento 'produtos' é 1-N para Cliente->Produto, então o Cliente é o "pai".
     const clientePrisma = await this._datasource.cliente.findUnique({
@@ -148,6 +147,20 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
       where: { id },
     });
     return count > 0;
+  }
+
+  async listar(filtros?: any): Promise<Cliente[]> {
+    const whereClause: any = {};
+    if (filtros?.status) {
+      whereClause.status = filtros.status;
+    }
+    // Adicione mais lógica de filtro aqui (ex: nome, cidade)
+
+    const clientesPrisma: ClientePrisma[] = await this._datasource.cliente.findMany({
+      where: whereClause,
+      include: { produtos: true }, // Incluir produtos para o DTO
+    });
+    return clientesPrisma.map(ClienteMap.toDomain);
   }
 
   // Você pode adicionar outros métodos da interface IClienteRepository aqui (listar, existe, deletar).

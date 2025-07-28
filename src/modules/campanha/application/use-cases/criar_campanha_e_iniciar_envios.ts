@@ -2,12 +2,13 @@ import { Campanha } from "@modules/campanha/domain/campanha.entity";
 import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.repository.interface";
 import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
-import { IClienteRepository, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
+import { IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
 import { ICliente } from "@modules/gestao_clientes/domain/cliente.types";
 import { CriarCampanhaInputDTO, CriarCampanhaOutputDTO } from "../dto/criar_campanha_dto";
 import { randomUUID } from "crypto";
 import { FormularioNaoEncontrado } from "@shared/application/application.exception";
+import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
 
 export class CriarCampanhaEIniciarEnviosUseCase { // Nome do Use Case ajustado
   constructor(
@@ -61,7 +62,7 @@ export class CriarCampanhaEIniciarEnviosUseCase { // Nome do Use Case ajustado
       // 4c. Tentar enviar a mensagem via WhatsApp
       try {
         const mensagemConteudo = this.personalizarMensagem(campanha.templateMensagem, cliente, formulario); // Personaliza a mensagem
-        await this.whatsappGateway.enviar(cliente.telefone, mensagemConteudo); // Assumindo que Cliente tem 'telefone'
+        await this.whatsappGateway.enviar(cliente.pessoa.telefone, mensagemConteudo); // Assumindo que Cliente tem 'telefone'
         
         // 4d. Marcar Envio como SUCESSO
         envio.marcarComoEnviado();

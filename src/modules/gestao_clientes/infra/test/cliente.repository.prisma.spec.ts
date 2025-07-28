@@ -16,7 +16,7 @@ import { ICliente, StatusCliente } from '@modules/gestao_clientes/domain/cliente
 const prisma = new PrismaClient();
 const repository = new ClienteRepositoryPrisma(prisma);
 
-describe('ClienteRepositoryPrisma (Integration Tests)', () => {
+describe('ClienteRepositoryPrisma (Integration Tests)', async () => {
   // IDs mockados
   const PRODUTO_ID_1 = randomUUID();
   const PRODUTO_ID_2 = randomUUID();

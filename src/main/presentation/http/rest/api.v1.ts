@@ -1,26 +1,30 @@
-import Express, { Router } from "express";
+import produtoRouter from "@modules/produtos/presentation/produto.routes";
+import  { Router } from "express";
 
-const apiv1Router: Router = Express.Router();
+const feedtrackRouter: Router = Router();
 
-apiv1Router.use(
+feedtrackRouter.use(
     '/pergunta',
     function (request, response, next) {
         response.json({'entidade':'Pergunta'});
     }
 );
 
-apiv1Router.use(
+feedtrackRouter.use(
     '/formulario',
     function (request, response, next) {
         response.json({'entidade':'Formulario'});
     }
 );
 
-apiv1Router.use(
+feedtrackRouter.use(
     '/envioFormulario',
     function (request, response, next) {
         response.json({'entidade':'Envio'});
     }
 );
 
-export{ apiv1Router }
+feedtrackRouter.use('/produtos', produtoRouter);
+
+
+export  { feedtrackRouter }

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { Feedback } from "./feedback.entity";
+
 import { TipoPergunta } from "@shared/domain/data.types";
+import { Feedback } from "../feedback.entity";
 
 describe("Feedback Entity", () => {
   const baseProps = {

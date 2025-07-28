@@ -35,7 +35,7 @@ export class ProdutoRepositoryPrisma extends PrismaRepository implements IProdut
   /**
    * Recupera um Produto pelo seu ID único.
    */
-  async recuperarPorUuid(id: string): Promise<IProduto | null> {
+  async recuperarPorUuid(id: string): Promise<Produto | null> {
     const produtoPrisma = await this._datasource.produto.findUnique({ 
       where: { id },
     });
@@ -63,6 +63,26 @@ export class ProdutoRepositoryPrisma extends PrismaRepository implements IProdut
         cliente_id: dadosParaPersistencia.cliente_id, // Pode ser null
       },
     });
+  }
+  
+  async listar(filtros?: any): Promise<Produto[]> {
+    const whereClause: any = {};
+
+    if (filtros?.status) {
+      whereClause.status = filtros.status; // Filtra por status
+    }
+    if (filtros?.ativo !== undefined) {
+      whereClause.ativo = filtros.ativo; // Filtra por ativo
+    }
+    if (filtros?.cliente_id) {
+      whereClause.cliente_id = filtros.cliente_id; // Filtra por cliente
+    }
+    // Adicione mais lógica de filtro aqui
+
+    const produtosPrisma = await this._datasource.produto.findMany({
+      where: whereClause,
+    });
+    return produtosPrisma.map(ProdutoMap.toDomain);
   }
 
   // ... (outros métodos da interface IProdutoRepository) ...

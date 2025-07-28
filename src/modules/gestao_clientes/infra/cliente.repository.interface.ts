@@ -1,6 +1,5 @@
 import { SegmentoAlvo } from "@modules/campanha/domain/campanha.types";
 import { Cliente } from "../domain/cliente.entity";
-import { ICliente } from "../domain/cliente.types";
 
 export interface IClienteRepository {
   /**
@@ -14,7 +13,7 @@ export interface IClienteRepository {
    * @param id O ID do Cliente a ser recuperado.
    * @returns A entidade Cliente (ICliente), ou null se não encontrada.
    */
-  recuperarPorUuid(id: string): Promise<ICliente | null>;
+  recuperarPorUuid(id: string): Promise<Cliente | null>;
 
   /**
    * Atualiza um Cliente existente no mecanismo de persistência.
@@ -29,7 +28,7 @@ export interface IClienteRepository {
    * @param segmento O segmento alvo (ex: TODOS_CLIENTES, NOVOS_CLIENTES).
    * @returns Uma Promise que resolve para uma lista de entidades Cliente (ICliente[]).
    */
-  buscarPorSegmento(segmento: SegmentoAlvo): Promise<ICliente[]>;
+  buscarPorSegmento(segmento: SegmentoAlvo): Promise<Cliente[]>;
 
   // --- Métodos Adicionais que você pode precisar (opcionais, mas comuns) ---
   /**
@@ -37,14 +36,14 @@ export interface IClienteRepository {
    * @param id O ID do Cliente a ser verificado.
    * @returns Verdadeiro se existir, falso caso contrário.
    */
-  existe?(id: string): Promise<boolean>;
+  existe(id: string): Promise<boolean>;
 
   /**
    * Lista Clientes com base em filtros.
    * @param filtros Um objeto com critérios de filtro.
    * @returns Uma lista de entidades Cliente (ICliente[]).
    */
-  listar?(filtros?: any): Promise<ICliente[]>;
+  listar(filtros?: any): Promise<Cliente[]>;
 
   /**
    * Exclui (logicamente ou fisicamente) um Cliente pelo seu ID.

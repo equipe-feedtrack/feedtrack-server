@@ -111,7 +111,6 @@ describe('ClienteMap', () => {
       data_atualizacao: mockClienteDomainSemOpcionaisData.dataAtualizacao,
       data_exclusao: null,
       produtos: [{ // Mock de produto em formato Prisma para toDomain
-        id: mockProdutoData.id,
         nome: mockProdutoData.nome,
         descricao: mockProdutoData.descricao,
         valor: mockProdutoData.valor,
