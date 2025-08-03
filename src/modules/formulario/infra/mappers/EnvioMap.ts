@@ -1,49 +1,78 @@
-import { EnvioFormulario as EnvioPrisma } from '@prisma/client';
-import { Envio } from '@modules/formulario/domain/envioformulario/envio.entity.ts.js';
 import { EnvioResponseDTO } from '@modules/formulario/application/dto/envio/iniciarEnvioDTO';
+import { Envio } from '@modules/formulario/domain/envioformulario/envio.entity.ts';
+import { EnvioProps } from '@modules/formulario/domain/envioformulario/envioFormulario.types';
+import {
+  EnvioFormulario as EnvioPrisma,
+  StatusFormulario as StatusFormularioPrisma,
+  Prisma,
+} from '@prisma/client';
+
 
 
 export class EnvioMap {
+
+  /**
+   * Converte o dado bruto do Prisma para a Entidade de Domínio Envio.
+   */
   public static toDomain(raw: EnvioPrisma): Envio {
-    // @ts-ignore // O construtor é privado, mas o Mapper tem permissão para usá-lo
-    return new Envio({
+    const envioProps: EnvioProps = {
       id: raw.id,
+      status: raw.status,
+      feedbackId: raw.feedbackId,
       clienteId: raw.clienteId,
-      usuarioId: raw.usuarioId,
       formularioId: raw.formularioId,
-      status: raw.status as 'PENDENTE' | 'ENVIADO' | 'FALHA',
+      usuarioId: raw.usuarioId,
       dataCriacao: raw.dataCriacao,
       dataEnvio: raw.dataEnvio,
       tentativasEnvio: raw.tentativasEnvio,
       ultimaMensagemErro: raw.ultimaMensagemErro,
-    });
+    };
+
+    return Envio.recuperar(envioProps);
   }
 
-  public static toPersistence(envio: Envio) {
+  /**
+   * Converte a Entidade de Domínio para o formato que o Prisma espera para persistência.
+   */
+  public static toPersistence(envio: Envio): Prisma.EnvioFormularioCreateInput {
     return {
-      id: envio.props.id,
-      clienteId: envio.props.clienteId,
-      usuarioId: envio.props.usuarioId,
-      formularioId: envio.props.formularioId,
-      feedbackId: envio.props.feedbackId,
-      status: envio.props.status,
-      dataCriacao: envio.props.dataCriacao,
-      dataEnvio: envio.props.dataEnvio,
-      tentativasEnvio: envio.props.tentativasEnvio,
-      ultimaMensagemErro: envio.props.ultimaMensagemErro,
+      id: envio.id,
+      status: envio.status,
+      dataCriacao: envio.dataCriacao,
+      dataEnvio: envio.dataEnvio,
+      tentativasEnvio: envio.tentativasEnvio,
+      ultimaMensagemErro: envio.ultimaMensagemErro,
+      // Conecta as relações com as outras entidades
+      cliente: {
+        connect: { id: envio.clienteId },
+      },
+      formulario: {
+        connect: { id: envio.formularioId },
+      },
+      usuario: {
+        connect: { id: envio.usuarioId },
+      },
+      feedback: {
+        connect: { id: envio.feedbackId },
+      },
     };
   }
-    
-  public static toDTO(envio: Envio): EnvioResponseDTO {
-      return {
-          id: envio.id,
-          status: envio.status,
-          feedbackId: envio.feedbackId,
-          clienteId: envio.clienteId,
-          formularioId: envio.props.formularioId,
-          dataCriacao: envio.props.dataCriacao.toISOString(),
-          dataEnvio: envio.props.dataEnvio ? envio.props.dataEnvio.toISOString() : null,
-          erro: envio.props.ultimaMensagemErro,
-      }
+
+  /**
+   * Converte a entidade Envio para um DTO de resposta da API.
+   */
+  public static toResponseDTO(envio: Envio): EnvioResponseDTO {
+    return {
+      id: envio.id,
+      status: envio.status,
+      feedbackId: envio.feedbackId,
+      clienteId: envio.clienteId,
+      formularioId: envio.formularioId,
+      usuarioId: envio.usuarioId,
+      dataCriacao: envio.dataCriacao.toISOString(),
+      dataEnvio: envio.dataEnvio ? envio.dataEnvio.toISOString() : null,
+      tentativasEnvio: envio.tentativasEnvio,
+      ultimaMensagemErro: envio.ultimaMensagemErro,
+    };
   }
 }

@@ -26,6 +26,7 @@ export interface ICampanha {
   dataCriacao: Date;
   dataAtualizacao: Date;
   dataExclusao: Date | null; // Para exclusão lógica
+  
 }
 
 export type CriarCampanhaProps = Omit<ICampanha, 'id' | 'ativo' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>;

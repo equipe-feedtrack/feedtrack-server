@@ -136,7 +136,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
         this.dataAtualizacao = new Date();
     }
 
-    public atualizarPeriodo(dataInicio: Date, dataFim?: Date): void {
+    public atualizarPeriodo(dataInicio: Date, dataFim: Date | null): void {
         this.dataInicio = dataInicio;
         this.dataFim = dataFim ?? null;
         this.validarInvariantes(); // Revalida após mudança de datas

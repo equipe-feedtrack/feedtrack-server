@@ -13,7 +13,7 @@ export interface ICampanhaRepository {
    * @param id O ID da Campanha a ser recuperada.
    * @returns A entidade Campanha, ou null se não encontrada.
    */
-  recuperarPorUuid(id: string): Promise<ICampanha | null>;
+  recuperarPorUuid(id: string): Promise<Campanha | null>;
 
   // --- Métodos Adicionais que você pode precisar ---
   /**
@@ -21,14 +21,14 @@ export interface ICampanhaRepository {
    * @param filtros Um objeto com critérios de filtro (ex: { ativo: true, tipo: TipoCampanha.PROMOCIONAL }).
    * @returns Uma lista de entidades Campanha.
    */
-  listar?(filtros?: any): Promise<ICampanha[]>;
+  listar(filtros?: any): Promise<Campanha[]>;
 
   /**
    * Verifica se uma Campanha com um dado ID existe.
    * @param id O ID da Campanha a ser verificada.
    * @returns Verdadeiro se existir, falso caso contrário.
    */
-  existe?(id: string): Promise<boolean>;
+  existe(id: string): Promise<boolean>;
 
   /**
    * Atualiza parcialmente uma Campanha existente.
@@ -37,7 +37,7 @@ export interface ICampanhaRepository {
    * @param entity Parte da entidade com os dados a serem atualizados.
    * @returns Verdadeiro se a atualização for bem-sucedida, falso caso contrário.
    */
-  atualizar(entity: Partial<ICampanha>): Promise<void>;
+  atualizar(entity: Campanha): Promise<void>;
 
   /**
    * Exclui (logicamente ou fisicamente) uma Campanha.
@@ -45,4 +45,7 @@ export interface ICampanhaRepository {
    * @returns Verdadeiro se a exclusão for bem-sucedida, falso caso contrário.
    */
   deletar(id: string): Promise<void>;
+
+
+  
 }

@@ -1,13 +1,11 @@
-
-import { Campanha } from "@modules/campanha/domain/campanha.entity";
-import { TipoCampanha, SegmentoAlvo } from "@modules/campanha/domain/campanha.types";
-import { CampanhaMap } from "@modules/campanha/infra/mappers/campanha.map";
+import { IUseCase } from "@shared/application/use-case/usecase.interface";
 import { CriarCampanhaInputDTO } from "../dto/criarCampanhaInputDTO";
 import { CampanhaResponseDTO } from "../dto/CampanhaResponseDTO";
-import { IUseCase } from "@shared/application/use-case/usecase.interface";
 import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.repository.interface";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
+import { Campanha } from "@modules/campanha/domain/campanha.entity";
+import { CampanhaMap } from "@modules/campanha/infra/mappers/campanha.map";
 
 export class CriarCampanhaUseCase implements IUseCase<CriarCampanhaInputDTO, CampanhaResponseDTO> {
   private readonly _campanhaRepository: ICampanhaRepository;
@@ -15,7 +13,7 @@ export class CriarCampanhaUseCase implements IUseCase<CriarCampanhaInputDTO, Cam
 
   constructor(
     campanhaRepository: ICampanhaRepository,
-    formularioRepository: IFormularioRepository<Formulario>,
+    formularioRepository: IFormularioRepository<Formulario>
   ) {
     this._campanhaRepository = campanhaRepository;
     this._formularioRepository = formularioRepository;
