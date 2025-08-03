@@ -1,12 +1,12 @@
 import { randomUUID } from 'crypto';
 import { EnvioProps } from './envioFormulario.types';
-import { Status_formulario } from '@prisma/client';
+import { StatusFormulario } from '@prisma/client';
 
 class Envio {
   public readonly props: EnvioProps;
 
   public get id(): string { return this.props.id; }
-  public get status(): Status_formulario { return this.props.status; }
+  public get status(): StatusFormulario { return this.props.status; }
   public get feedbackId(): string { return this.props.feedbackId; }
   public get clienteId(): string { return this.props.clienteId; }
   public get formularioId(): string { return this.props.formularioId; } // <-- Getters existentes

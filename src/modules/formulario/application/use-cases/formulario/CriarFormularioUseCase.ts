@@ -1,32 +1,42 @@
-import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
-import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
+import { IUseCase } from "@shared/application/use-case/usecase.interface";
+import { FormularioResponseDTO } from "../../dto/formulario/FormularioResponseDTO";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
-
-import { CriarFormularioDTO } from "../../dto/formulario/CriarFormularioDTO";
 import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
+import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
+import { FormularioMap } from "@modules/formulario/infra/mappers/formulario.map";
+import { CriarFormularioInputDTO } from "../../dto/formulario/CriarFormularioDTO";
 
-export class CriarFormularioUseCase {
+export class CriarFormularioUseCase implements IUseCase<CriarFormularioInputDTO, FormularioResponseDTO> {
+  private readonly _formularioRepository: IFormularioRepository<Formulario>;
+  private readonly _perguntaRepository: IPerguntaRepository;
+
   constructor(
-    private readonly formularioRepository: IFormularioRepository<Formulario>,
-    private readonly perguntaRepository: IPerguntaRepository<Pergunta>, // Precisa de buscar as perguntas
-  ) {}
+    formularioRepository: IFormularioRepository<Formulario>,
+    perguntaRepository: IPerguntaRepository
+  ) {
+    this._formularioRepository = formularioRepository;
+    this._perguntaRepository = perguntaRepository;
+  }
 
-  async execute(dto: CriarFormularioDTO): Promise<string> {
-    // 1. Busca as entidades de Pergunta com base nos IDs recebidos
-    const perguntas = await this.perguntaRepository.buscarMuitosPorId(dto.perguntasIds);
-    if (perguntas.length !== dto.perguntasIds.length) {
-      throw new Error("Uma ou mais perguntas não foram encontradas.");
+  async execute(input: CriarFormularioInputDTO): Promise<FormularioResponseDTO> {
+    // 1. Validação e Recuperação das Perguntas
+    const perguntasRecuperadas = await this._perguntaRepository.buscarMuitosPorId(input.idsPerguntas);
+    if (perguntasRecuperadas.length !== input.idsPerguntas.length) {
+      throw new Error("Uma ou mais IDs de perguntas fornecidas são inválidas.");
     }
-    
-    // 2. Cria a entidade Formulário com as perguntas encontradas
+
+    // 2. Criação da Entidade de Domínio
     const formulario = Formulario.criar({
-      titulo: dto.titulo,
-      descricao: dto.descricao,
-      perguntas: perguntas,
+      titulo: input.titulo,
+      descricao: input.descricao,
+      ativo: input.ativo,
+      perguntas: perguntasRecuperadas,
     });
 
-    // 3. Salva o formulário, e o repositório se encarrega de conectar as perguntas
-    await this.formularioRepository.inserir(formulario);
-    return formulario.id;
+    // 3. Persistência no Banco de Dados
+    await this._formularioRepository.inserir(formulario);
+
+    // 4. Retorno do DTO de Saída
+    return FormularioMap.toResponseDTO(formulario);
   }
 }

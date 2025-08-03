@@ -9,11 +9,11 @@ class Cliente extends Entity<ICliente> {
 
   // -------- ATRIBUTOS DA CLASSE CLIENTE -------
   private _pessoa: Pessoa; // Agora consegue puxar da classe genérica Pessoa
-  private _cidade: string;
-  private _status?: StatusCliente;
+  private _cidade: string | null;
+  private _status: StatusCliente;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date ;
-  private _dataExclusao?: Date | null ;
+  private _dataExclusao: Date | null ;
   private _vendedorResponsavel: string //Funcionario; // Acredito que o código vai ficar assim com o tipo Funcionário! só tem que fazer os ajustes, não precisa cliente herdar de usuario, quem herda é funcionário é administrador porque Cliente é um domínio, ele tem que está associado a outra classe de dminio chamada de Funcinario (Yago).
   private _produtos: Array<Produto>;
   
@@ -29,23 +29,15 @@ class Cliente extends Entity<ICliente> {
     return this._pessoa;
   }
 
-  public set pessoa(value: Pessoa) {
-    
-    if (!this.pessoa.nome || this.pessoa.nome.trim() === '') {
-        throw new Error("Nome é obrigatório para criar uma Pessoa.");
-    } 
-    
-    if (!this._pessoa.telefone || typeof this._pessoa.telefone !== 'string' || this._pessoa.telefone.trim() === '') {
-      throw new ClienteExceptions.TelefoneObrigatorioParaClienteException();
-    }
+  private set pessoa(value: Pessoa) {
     this._pessoa = value;
   }
 
-  public get cidade(): string | undefined {
+  public get cidade(): string | null  {
     return this._cidade;
   }
 
-  private set cidade(value: string | undefined) {
+  private set cidade(value: string | null ) {
     this._cidade = value?.trim() ?? '';
   }
 
@@ -65,42 +57,40 @@ class Cliente extends Entity<ICliente> {
     this._dataAtualizacao = value;
   }
 
-  public get dataExclusao(): Date | null | undefined {
+  public get dataExclusao(): Date | null  {
     return this._dataExclusao;
   }
 
-  private set dataExclusao(value: Date | null | undefined) {
+  private set dataExclusao(value: Date | null ) {
     this._dataExclusao = value;
   }
 
-  public get status(): StatusCliente | undefined {
+  public get status(): StatusCliente  {
     return this._status;
   }
 
-  private set status(value: StatusCliente | undefined) {
+  private set status(value: StatusCliente ) {
     this._status = value;
+    if (value === StatusCliente.INATIVO) {
+      this.dataExclusao = new Date();
+    }
   }
 
   public get vendedorResponsavel(): string {
     return this._vendedorResponsavel;
   }
 
-  private set vendedorResponsavel(value: string) {
-    if (!value || value.trim() === '') {
+  private set vendedorResponsavel(vendedorResponsavel: string) {
+    if (!vendedorResponsavel || vendedorResponsavel.trim() === '') {
       throw new Error("Vendedor responsável é obrigatório.");
     }
-    this._vendedorResponsavel = value.trim();
+    this._vendedorResponsavel = vendedorResponsavel.trim();
   }
   public get produtos(): Array<Produto> {
-    return this._produtos;
-  }
+  return [...this._produtos];
+}
 
   private set produtos(produtos: Array<Produto>) {
-    const qtdProdutos = produtos.length;
-
-    if (qtdProdutos < Cliente.QTD_MINIMA_PRODUTOS) {
-      throw new ClienteExceptions.QtdMinimaProdutosClienteInvalida();
-    }
     this._produtos = produtos;
   }
 
@@ -115,18 +105,36 @@ class Cliente extends Entity<ICliente> {
     this.dataAtualizacao = cliente.dataAtualizacao;
     this.dataExclusao = cliente.dataExclusao;
     this.vendedorResponsavel = cliente.vendedorResponsavel;
-    this.produtos = (cliente.produtos ?? []).map(produto => Produto.criarProduto(produto));
+    this._produtos = cliente.produtos; 
+    this.validarInvariantes();
+  }
+
+  private validarInvariantes(): void {
+   // --- VALIDAÇÃO CRÍTICA DO TELEFONE AGORA AQUI ---
+   if (!this.pessoa.nome || this.pessoa.nome.trim() === '') {
+        throw new Error("Nome é obrigatório para criar um Cliente.");
+    }  
+   
+   if (!this.pessoa.telefone || ( this.pessoa.telefone !== 'string' && this.pessoa.telefone === '')) {
+     throw new ClienteExceptions.TelefoneObrigatorioParaClienteException();
+   } 
+   const qtdProdutos = this.produtos.length;
+   if (qtdProdutos < Cliente.QTD_MINIMA_PRODUTOS) {
+      throw new ClienteExceptions.QtdMinimaProdutosClienteInvalida();
+    }
+
+
   }
 
   // ---------- CRIA NOVO CLIENTE ----------
    public static criarCliente(props: CriarClienteProps): Cliente {
         const clienteCompleto: ICliente = { 
-           id: randomUUID(),
+            id: randomUUID(),
             pessoa: props.pessoa,
             cidade: props.cidade,
             vendedorResponsavel: props.vendedorResponsavel,
-            status: props.status ?? StatusCliente.ATIVO, // Status padrão
-            produtos: props.produtos, // Produtos vêm de props, serão mapeados no construtor
+            produtos: props.produtos.map(p => p instanceof Produto ? p : Produto.recuperar(p)),
+            status: StatusCliente.ATIVO,
             dataCriacao: new Date(), // <-- ADICIONADO: Data de criação gerada
             dataAtualizacao: new Date(), // <-- ADICIONADO: Data de atualização gerada
             dataExclusao: null, // <-- ADICIONADO: Data de exclusão como null por padrão
@@ -142,7 +150,7 @@ class Cliente extends Entity<ICliente> {
 
   // ---------- MÉTODOS ----------
 
-      public atualizarCidade(novaCidade: string | undefined): void {
+      public atualizarCidade(novaCidade: string ): void {
         this.cidade = novaCidade; // Reutiliza o setter
         this.dataAtualizacao = new Date();
     }
@@ -158,19 +166,30 @@ class Cliente extends Entity<ICliente> {
         this.dataAtualizacao = new Date();
     }
 
+    public adicionarProduto(produto: Produto): void {
+    if (!this._produtos.some(p => p.id === produto.id)) {
+      this._produtos.push(produto);
+      this._dataAtualizacao = new Date();
+    }
+  }
+
+  public removerProduto(produtoId: string): void {
+    const totalProdutos = this._produtos.length;
+    this._produtos = this._produtos.filter(p => p.id !== produtoId);
+
+    // Se um produto foi realmente removido, atualiza a data.
+    if (this._produtos.length < totalProdutos) {
+      this._dataAtualizacao = new Date();
+    }
+  }
+
     public inativar(): void {
         // Regra de negócio: Um cliente já inativo não pode ser inativado novamente.
         if (this.status === StatusCliente.INATIVO) {
             throw new ClienteExceptions.ClienteJaInativo(this.id);
         }      
-
         // Altera o status para INATIVO
         this.status = StatusCliente.INATIVO; // Isso chamará o setter 'status' que lida com dataExclusao
-        
-        // Assegura que dataExclusao e dataAtualizacao são atualizadas (se o setter de status não o fizer)
-        if (!this.dataExclusao) { // Só seta se ainda não tiver sido setado pelo setter de status
-            this.dataExclusao = new Date();
-        }
         this.dataAtualizacao = new Date(); 
     }
 
@@ -183,10 +202,14 @@ class Cliente extends Entity<ICliente> {
         this.dataAtualizacao = new Date();
     }
 
+    public estaDeletado(): boolean {
+    return !!this.dataExclusao;
+  }
+
     public recuperarDadosEssenciais(): ClienteEssencial { //Passa apenas as informações essenciais!
     return {
       nome: this.pessoa.nome,
-      email: this.pessoa.email,
+      email: this.pessoa.email ?? '',
       telefone: this.pessoa.telefone ?? '',
       produtos: this.produtos,
       vendedorResponsavel: this.vendedorResponsavel

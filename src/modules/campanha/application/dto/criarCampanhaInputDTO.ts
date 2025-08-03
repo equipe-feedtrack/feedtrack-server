@@ -6,13 +6,7 @@ export interface CriarCampanhaInputDTO {
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
   dataInicio: Date;
-  dataFim?: Date | null;
+  dataFim: Date | null;
   templateMensagem: string;
-  formularioId: string; // ID do formulário a ser associado
-}
-
-export interface CriarCampanhaOutputDTO {
-  campanhaId: string;
-  titulo: string;
-  clientesAssociadosCount: number; // Quantidade de clientes que se enquadram no segmento
+  formularioId: string;
 }

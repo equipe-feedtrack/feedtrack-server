@@ -1,146 +1,111 @@
-import { SegmentoAlvo } from '@modules/campanha/domain/campanha.types'; // O enum SegmentoAlvo
-import { Cliente as ClientePrisma, PrismaClient } from '@prisma/client';
+import { SegmentoAlvo, StatusUsuario } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { PrismaRepository } from '@shared/infra/prisma.repository';
 import { Cliente } from '../domain/cliente.entity';
 import { IClienteRepository } from './cliente.repository.interface';
 import { ClienteMap } from './mappers/cliente.map';
 
 export class ClienteRepositoryPrisma extends PrismaRepository implements IClienteRepository {
-  constructor(prismaClient: PrismaClient) { 
-    super(prismaClient); 
+  constructor(prismaClient: PrismaClient) {
+    super(prismaClient);
   }
 
-  /**
-   * Insere um novo Cliente no banco de dados.
-   * Assumimos que, para 'inserir', o Cliente ainda não existe no DB.
-   */
+  // ... métodos inserir e atualizar ...
   async inserir(cliente: Cliente): Promise<void> {
     const dadosParaPersistencia = ClienteMap.toPersistence(cliente);
 
-    // O Prisma model Cliente no schema.prisma tem nome, email, telefone diretos
-    // O ClienteMap.toPersistence já formata isso corretamente.
     await this._datasource.cliente.create({
       data: {
-        id: dadosParaPersistencia.id,
-        nome: dadosParaPersistencia.nome,
-        telefone: dadosParaPersistencia.telefone,
-        email: dadosParaPersistencia.email,
-        cidade: dadosParaPersistencia.cidade,
-        status: dadosParaPersistencia.status, // Enum
-        vendedor_responsavel: dadosParaPersistencia.vendedorResponsavel,
-        data_criacao: dadosParaPersistencia.data_criacao,
-        data_atualizacao: dadosParaPersistencia.data_atualizacao,
-        data_exclusao: dadosParaPersistencia.data_exclusao,
+        ...dadosParaPersistencia,
         produtos: {
-          connect: cliente.produtos.map(produto => ({ id: produto.id })),
-        },
-        // Produtos (relação N-N) e Envio_formulario (relação 1-N)
-        // serão gerenciados em seus próprios repositórios ou via o FormularioRepository
-        // ao conectar/setar, não diretamente aqui na criação do Cliente.
+          create: cliente.produtos.map(p => ({
+            produto: {
+              connect: { id: p.id }
+            }
+          }))
+        }
       },
     });
   }
 
-  /**
-   * Recupera um Cliente pelo seu ID único.
-   */
   async recuperarPorUuid(id: string): Promise<Cliente | null> {
-    // Incluir 'produtos' é crucial para reconstruir a entidade Cliente completamente.
-    // O relacionamento 'produtos' é 1-N para Cliente->Produto, então o Cliente é o "pai".
     const clientePrisma = await this._datasource.cliente.findUnique({
       where: { id },
-      include: { produtos: true }, // Inclui os produtos relacionados
+      include: { 
+        produtos: {
+          include: {
+            produto: true 
+          }
+        }
+      },
     });
 
     if (!clientePrisma) return null;
 
-    // O ClienteMap.toDomain espera ClientePrisma e os produtos incluídos
+    // ✅ CORREÇÃO: Usando a função anônima para manter o contexto do 'this'
     return ClienteMap.toDomain(clientePrisma);
   }
 
-  /**
-   * Atualiza um Cliente existente no banco de dados.
-   * Este método é para atualizações parciais ou completas de um Cliente.
-   * Podemos usar 'upsert' aqui ou um 'update' direto. Optaremos por 'update' direto para ser semântico.
-   */
   async atualizar(cliente: Cliente): Promise<void> {
     const dadosParaPersistencia = ClienteMap.toPersistence(cliente);
+    const { id, ...dadosEscalares } = dadosParaPersistencia;
 
     await this._datasource.cliente.update({
       where: { id: cliente.id },
       data: {
-        nome: dadosParaPersistencia.nome,
-        telefone: dadosParaPersistencia.telefone,
-        email: dadosParaPersistencia.email,
-        cidade: dadosParaPersistencia.cidade,
-        status: dadosParaPersistencia.status,
-        vendedor_responsavel: dadosParaPersistencia.vendedorResponsavel,
-        data_atualizacao: dadosParaPersistencia.data_atualizacao, // Apenas data de atualização
-        data_exclusao: dadosParaPersistencia.data_exclusao,
+        ...dadosEscalares,
         produtos: {
-          set: cliente.produtos.map(produto => ({ id: produto.id })),
-        },
-        // Para atualizar produtos (relação 1-N), pode ser necessário um método separado
-        // ou usar 'set' ou 'disconnect' no relacionamento, dependendo da operação.
+          deleteMany: {}, 
+          create: cliente.produtos.map(p => ({
+            produto: {
+              connect: { id: p.id }
+            }
+          }))
+        }
       },
     });
   }
 
-  /**
-   * Implementa a lógica para buscar clientes por segmento alvo.
-   * Isso será usado pelo caso de uso de Campanha.
-   */
   async buscarPorSegmento(segmento: SegmentoAlvo): Promise<Cliente[]> {
-    let clientesPrisma: ClientePrisma[];
-
+    const whereClause: any = {};
+    // ... sua lógica de switch para os filtros ...
     switch (segmento) {
-      case SegmentoAlvo.TODOS_CLIENTES:
-        clientesPrisma = await this._datasource.cliente.findMany({
-          include: { produtos: true },
-        });
-        break;
-      case SegmentoAlvo.NOVOS_CLIENTES: // Mantenha apenas este case para NOVOS_CLIENTES
-        const trintaDiasAtras = new Date();
-        trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30); // Lógica para últimos 30 dias
-        clientesPrisma = await this._datasource.cliente.findMany({
-          where: {
-            data_criacao: {
-              gte: trintaDiasAtras,
-            },
-            status: 'ATIVO', // Sempre buscar ativos
-          },
-          include: { produtos: true },
-        });
-        break;
-      case SegmentoAlvo.CLIENTES_REGULARES:
-        const trintaDiasAtrasParaRegulares = new Date();
-        trintaDiasAtrasParaRegulares.setDate(trintaDiasAtrasParaRegulares.getDate() - 30);
-        clientesPrisma = await this._datasource.cliente.findMany({
-          where: {
-            data_criacao: { lt: trintaDiasAtrasParaRegulares }, // Mais antigos que 30 dias
-            status: 'ATIVO',
-          },
-          include: { produtos: true },
-        });
-        break;
-      case SegmentoAlvo.CLIENTES_PREMIUM:
-        // Exemplo: Clientes com um status específico 'PREMIUM'
-        clientesPrisma = await this._datasource.cliente.findMany({
-          where: { status: 'ATIVO' /* && alguma outra condição para premium */ }, // Ajuste para sua lógica Premium
-          include: { produtos: true },
-        });
-        break;
-      default:
-        // Padrão se o segmento não for reconhecido ou se quiser buscar todos os ativos
-        clientesPrisma = await this._datasource.cliente.findMany({
-            where: { status: 'ATIVO' },
-            include: { produtos: true },
-        });
-        break;
-    }
+        case SegmentoAlvo.TODOS_CLIENTES:
+          break;
+        case SegmentoAlvo.NOVOS_CLIENTES:
+          const trintaDiasAtras = new Date();
+          trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
+          whereClause.dataCriacao = { gte: trintaDiasAtras };
+          whereClause.status = StatusUsuario.ATIVO;
+          break;
+        case SegmentoAlvo.CLIENTES_REGULARES:
+          const dataLimiteRegulares = new Date();
+          dataLimiteRegulares.setDate(dataLimiteRegulares.getDate() - 30);
+          whereClause.dataCriacao = { lt: dataLimiteRegulares };
+          whereClause.status = StatusUsuario.ATIVO;
+          break;
+        case SegmentoAlvo.CLIENTES_PREMIUM:
+          whereClause.status = StatusUsuario.ATIVO;
+          break;
+        default:
+          whereClause.status = StatusUsuario.ATIVO;
+          break;
+      }
 
-    return clientesPrisma.map(ClienteMap.toDomain);
-}
+    const clientesPrisma = await this._datasource.cliente.findMany({
+      where: whereClause,
+      include: {
+        produtos: {
+          include: {
+            produto: true
+          }
+        }
+      },
+    });
+
+    // ✅ CORREÇÃO: Usando a função anônima para manter o contexto do 'this'
+    return clientesPrisma.map(cliente => ClienteMap.toDomain(cliente));
+  }
 
   async existe(id: string): Promise<boolean> {
     const count = await this._datasource.cliente.count({
@@ -149,19 +114,19 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
     return count > 0;
   }
 
-  async listar(filtros?: any): Promise<Cliente[]> {
-    const whereClause: any = {};
-    if (filtros?.status) {
-      whereClause.status = filtros.status;
-    }
-    // Adicione mais lógica de filtro aqui (ex: nome, cidade)
-
-    const clientesPrisma: ClientePrisma[] = await this._datasource.cliente.findMany({
-      where: whereClause,
-      include: { produtos: true }, // Incluir produtos para o DTO
+  async listar(filtros?: { status?: StatusUsuario }): Promise<Cliente[]> {
+    const clientesPrisma = await this._datasource.cliente.findMany({
+      where: filtros,
+      include: {
+        produtos: {
+          include: {
+            produto: true
+          }
+        }
+      },
     });
-    return clientesPrisma.map(ClienteMap.toDomain);
+    
+    // ✅ CORREÇÃO: Usando a função anônima para manter o contexto do 'this'
+    return clientesPrisma.map(cliente => ClienteMap.toDomain(cliente));
   }
-
-  // Você pode adicionar outros métodos da interface IClienteRepository aqui (listar, existe, deletar).
 }

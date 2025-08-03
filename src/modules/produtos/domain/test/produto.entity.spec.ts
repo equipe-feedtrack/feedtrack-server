@@ -19,7 +19,6 @@ describe('Entidade Produto', () => {
     nome: 'Notebook Gamer Xtreme',
     descricao: 'Um notebook de alta performance para jogos e trabalho.',
     valor: 7500.00,
-    cliente_id: "89eebea5-2314-47bf-8510-e1ddf69503a9"
   };
 
   // --- Testes para o método 'criarProduto' ---
@@ -35,7 +34,6 @@ describe('Entidade Produto', () => {
     expect(produto.dataCriacao).toBeInstanceOf(Date);
     expect(produto.dataAtualizacao).toBeInstanceOf(Date);
     expect(produto.dataExclusao).toBeNull();
-    expect(produto.cliente_id).equals("89eebea5-2314-47bf-8510-e1ddf69503a9");
   });
 
   it('deve criar um produto com status INATIVO se especificado', () => {
@@ -84,7 +82,6 @@ describe('Entidade Produto', () => {
       dataAtualizacao: new Date('2024-01-01T00:00:00Z'),
       dataExclusao: new Date('2024-02-01T00:00:00Z'), // Excluído logicamente
       ativo: false, // Inativo
-      cliente_id: 'cliente-id-recuperado', // Vinculado a um cliente
     };
 
     const produto = Produto.recuperar(recuperacaoProps);
@@ -96,7 +93,6 @@ describe('Entidade Produto', () => {
     expect(produto.valor).toBe(recuperacaoProps.valor);
     expect(produto.ativo).toBe(false);
     expect(produto.dataExclusao).toEqual(recuperacaoProps.dataExclusao);
-    expect(produto.cliente_id).toBe(recuperacaoProps.cliente_id);
   });
 
   it('deve verificar se o produto está deletado corretamente', () => {

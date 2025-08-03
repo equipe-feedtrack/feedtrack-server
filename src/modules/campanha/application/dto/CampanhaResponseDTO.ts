@@ -9,7 +9,7 @@ export interface CampanhaResponseDTO {
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
   dataInicio: string; // String ISO
-  dataFim?: string; // String ISO
+  dataFim: string | null; // String ISO
   templateMensagem: string;
   formularioId: string;
   ativo: boolean;

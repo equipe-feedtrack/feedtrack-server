@@ -1,29 +1,32 @@
-import { IPergunta } from "@modules/formulario/domain/pergunta/pergunta.types";
-import { UseCaseException } from "@shared/application/use-case/use-case.exception";
-import { AtualizarPerguntaDTO } from "../../dto/pergunta/AtualizarPerguntaDTO";
+import { IUseCase } from "@shared/application/use-case/usecase.interface";
+import { PerguntaResponseDTO } from "../../dto/pergunta/PerguntaResponseDTO";
 import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
+import { PerguntaMap } from "@modules/formulario/infra/mappers/pergunta.map";
+import { AtualizarPerguntaInputDTO } from "../../dto/pergunta/AtualizarPerguntaDTO";
 
-export class AtualizarPerguntaUseCase {
-  constructor(private readonly perguntaRepository: IPerguntaRepository<IPergunta>) {}
+export class AtualizarPerguntaUseCase implements IUseCase<AtualizarPerguntaInputDTO, PerguntaResponseDTO> {
+  private readonly _perguntaRepository: IPerguntaRepository;
 
-  async execute(id: string, dto: AtualizarPerguntaDTO): Promise<void> {
-    // 1. Busca a entidade que será atualizada.
-    const pergunta = await this.perguntaRepository.recuperarPorUuid(id);
+  constructor(perguntaRepository: IPerguntaRepository) {
+    this._perguntaRepository = perguntaRepository;
+  }
 
+  async execute(input: AtualizarPerguntaInputDTO): Promise<PerguntaResponseDTO> {
+    // 1. Recuperar a entidade existente do banco de dados.
+    const pergunta = await this._perguntaRepository.recuperarPorUuid(input.id);
     if (!pergunta) {
-      throw new UseCaseException('Pergunta não encontrada.');
+      throw new Error(`Pergunta com ID ${input.id} não encontrada.`);
     }
 
-    // 2. Chama os métodos de negócio da própria entidade para alterar o estado.
-    // (Supondo que a entidade Pergunta tenha métodos como estes)
-    // if (dto.texto) {
-    //   pergunta.alterarTexto(dto.texto);
-    // }
-    // if (dto.tipo) {
-    //   pergunta.alterarTipoEopcoes(dto.tipo, dto.opcoes);
-    // }
+    // 2. Aplicar as atualizações na entidade de domínio.
+    if (typeof input.texto === 'string') {
+      pergunta.atualizarTexto(input.texto);
+    }
 
-    // 3. Salva a entidade com seu novo estado.
-    await this.perguntaRepository.inserir(pergunta);
+    // 3. Persistir a entidade atualizada no banco de dados.
+    await this._perguntaRepository.atualizar(pergunta);
+
+    // 4. Retornar o DTO de resposta com os dados atualizados.
+    return PerguntaMap.toDTO(pergunta);
   }
 }

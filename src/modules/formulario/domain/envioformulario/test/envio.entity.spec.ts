@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach, vi, afterEach } from 'vitest'; // Ajuste o caminho se necessário
-import { Status_formulario } from '@prisma/client'; // Importe o enum do Prisma
 import { Envio } from '../envio.entity.ts.js';
+import { StatusFormulario } from '@prisma/client';
 
 describe('Entidade Envio', () => {
   // Mock para controlar o tempo, se necessário para testes de data
@@ -25,7 +25,7 @@ describe('Entidade Envio', () => {
 
     expect(envio).toBeInstanceOf(Envio);
     expect(envio.id).toBeDefined(); // ID deve ser gerado
-    expect(envio.status).toBe('PENDENTE' as Status_formulario);
+    expect(envio.status).toBe('PENDENTE' as StatusFormulario);
     expect(envio.clienteId).toBe(mockPropsBase.clienteId);
     expect(envio.feedbackId).toBe(mockPropsBase.feedbackId);
     expect(envio.props.usuarioId).toBe(mockPropsBase.usuarioId); // Acessa diretamente se não tiver getter
@@ -45,7 +45,7 @@ describe('Entidade Envio', () => {
 
     envio.marcarComoEnviado();
 
-    expect(envio.status).toBe('ENVIADO' as Status_formulario);
+    expect(envio.status).toBe('ENVIADO' as StatusFormulario);
     expect(envio.props.dataEnvio).toBeInstanceOf(Date);
     expect(envio.props.dataEnvio?.getTime()).toBeGreaterThan(dataCriacaoOriginal.getTime()); // Data de envio deve ser maior
     expect(envio.props.ultimaMensagemErro).toBeNull(); // Mensagem de erro deve ser limpa
@@ -60,7 +60,7 @@ describe('Entidade Envio', () => {
 
     envio.marcarComoEnviado(); // Tenta marcar novamente
 
-    expect(envio.status).toBe('ENVIADO' as Status_formulario);
+    expect(envio.status).toBe('ENVIADO' as StatusFormulario);
     expect(envio.props.dataEnvio?.getTime()).toBe(dataEnvioOriginal?.getTime()); // Data de envio não deve mudar
   });
 
@@ -72,7 +72,7 @@ describe('Entidade Envio', () => {
 
     envio.marcarComoFalha(motivoFalha);
 
-    expect(envio.status).toBe('FALHA' as Status_formulario);
+    expect(envio.status).toBe('FALHA' as StatusFormulario);
     expect(envio.props.tentativasEnvio).toBe(tentativasIniciais + 1);
     expect(envio.props.ultimaMensagemErro).toBe(motivoFalha);
     expect(envio.props.dataEnvio).toBeNull(); // Data de envio não deve ser setada em caso de falha
@@ -86,7 +86,7 @@ describe('Entidade Envio', () => {
 
     envio.marcarComoFalha(novoMotivo); // Segunda falha
 
-    expect(envio.status).toBe('FALHA' as Status_formulario);
+    expect(envio.status).toBe('FALHA' as StatusFormulario);
     expect(envio.props.tentativasEnvio).toBe(tentativasAposPrimeira + 1);
     expect(envio.props.ultimaMensagemErro).toBe(novoMotivo);
   });

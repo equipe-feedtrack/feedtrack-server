@@ -1,4 +1,4 @@
-import { Envio_formulario as EnvioPrisma } from '@prisma/client';
+import { EnvioFormulario as EnvioPrisma } from '@prisma/client';
 import { Envio } from '@modules/formulario/domain/envioformulario/envio.entity.ts.js';
 import { EnvioResponseDTO } from '@modules/formulario/application/dto/envio/iniciarEnvioDTO';
 
@@ -11,7 +11,6 @@ export class EnvioMap {
       clienteId: raw.clienteId,
       usuarioId: raw.usuarioId,
       formularioId: raw.formularioId,
-      feedbackId: raw.feedbackId,
       status: raw.status as 'PENDENTE' | 'ENVIADO' | 'FALHA',
       dataCriacao: raw.dataCriacao,
       dataEnvio: raw.dataEnvio,

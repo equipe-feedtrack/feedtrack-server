@@ -1,70 +1,65 @@
-import { Produto } from '@modules/produtos/domain/produto.entity';
-import { RecuperarProdutoProps } from '@modules/produtos/domain/produto.types';
-import { Pessoa } from '@shared/domain/pessoa.entity'; // Sua entidade Pessoa
-import { randomUUID } from 'crypto'; // Para IDs
+// src/modules/gestao_clientes/domain/test/cliente.entity.spec.ts
+
+import { randomUUID } from 'crypto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Cliente } from '../cliente.entity'; // Ajuste o caminho
-import { ClienteExceptions } from '../cliente.exception'; // Suas exceções de cliente
+import { Pessoa } from '@shared/domain/pessoa.entity';
+import { Cliente } from '../cliente.entity';
+import { ClienteExceptions } from '../cliente.exception';
 import { CriarClienteProps, RecuperarClienteProps, StatusCliente } from '../cliente.types';
+import { IProduto } from '@modules/produtos/domain/produto.types';
+import { Produto } from '@modules/produtos/domain/produto.entity';
 
 describe('Entidade Cliente', () => {
-  // Configuração para controlar o tempo em testes de data
   beforeEach(() => {
-    vi.useFakeTimers(); 
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  // Mocks de dados base para Pessoa e Produto
+  // --- MOCKS DE DADOS ---
   const mockPessoaData = {
     nome: 'João Silva',
     email: 'joao.silva@example.com',
     telefone: '11987654321',
   };
 
-  const mockPessoaComTelefoneVazio = {
-    nome: 'Maria Souza',
-    email: 'maria@example.com',
-    telefone: '', // Telefone vazio
-  };
-
-  const mockProdutoData1 = {
+  const mockProdutoData1: IProduto = {
     id: randomUUID(),
     nome: 'Smartphone X',
     descricao: 'Um smartphone de última geração.',
     valor: 1500,
-    dataCriacao: new Date(),
-    dataAtualizacao: new Date(),
+    dataCriacao: new Date('2024-01-01T10:00:00Z'),
+    dataAtualizacao: new Date('2024-01-01T10:00:00Z'),
     ativo: true,
-    cliente_id: "89eebea5-2314-47bf-8510-e1ddf69503a9"
+    cliente_id: randomUUID(),
+    dataExclusao: null
   };
-  const mockProdutoData2 = {
+
+  const mockProdutoData2: IProduto = {
     id: randomUUID(),
     nome: 'Capa Protetora',
     descricao: 'Capa para smartphone X.',
     valor: 50,
-    dataCriacao: new Date(),
-    dataAtualizacao: new Date(),
+    dataCriacao: new Date('2024-01-01T10:00:00Z'),
+    dataAtualizacao: new Date('2024-01-01T10:00:00Z'),
     ativo: true,
-    cliente_id: "89eebea5-2314-47bf-8510-e1ddf69503a9"
+    cliente_id: randomUUID(),
+    dataExclusao: null
   };
 
-  // Instâncias de entidades Produto para usar nos mocks de Cliente
-  const produto1 = Produto.recuperar(mockProdutoData1 as RecuperarProdutoProps); // Casting temporário, Produto.recuperar espera RecuperarProdutoProps
-  const produto2 = Produto.recuperar(mockProdutoData2 as RecuperarProdutoProps);
+  const produto1 = Produto.recuperar(mockProdutoData1);
+  const produto2 = Produto.recuperar(mockProdutoData2);
 
-  // Mocks de dados base para Cliente
   const baseProps: CriarClienteProps = {
-    pessoa: Pessoa.criar(mockPessoaData), // Cria uma instância de Pessoa
+    pessoa: Pessoa.criar(mockPessoaData),
     cidade: 'São Paulo',
     vendedorResponsavel: 'Vendedor Alfa',
-    produtos: [produto1, produto2], // Lista de entidades Produto
+    produtos: [produto1, produto2],
   };
 
-
-  // --- Testes para o método 'criarCliente' ---
+  // --- TESTES PARA O MÉTODO 'criarCliente' ---
   it('deve criar um novo cliente com dados completos e status ATIVO por padrão', () => {
     const cliente = Cliente.criarCliente(baseProps);
 
@@ -74,9 +69,9 @@ describe('Entidade Cliente', () => {
     expect(cliente.pessoa.telefone).toBe(mockPessoaData.telefone);
     expect(cliente.cidade).toBe(baseProps.cidade);
     expect(cliente.vendedorResponsavel).toBe(baseProps.vendedorResponsavel);
-    expect(cliente.status).toBe(StatusCliente.ATIVO); // Padrão
+    expect(cliente.status).toBe(StatusCliente.ATIVO);
     expect(cliente.produtos).toHaveLength(2);
-    expect(cliente.produtos[0]).toBeInstanceOf(Produto); // Garante que são entidades Produto
+    expect(cliente.produtos[0]).toBeInstanceOf(Produto);
     expect(cliente.dataCriacao).toBeInstanceOf(Date);
     expect(cliente.dataAtualizacao).toBeInstanceOf(Date);
     expect(cliente.dataExclusao).toBeNull();
@@ -85,7 +80,7 @@ describe('Entidade Cliente', () => {
   it('deve lançar erro se o cliente for criado sem telefone na Pessoa', () => {
     const propsSemTelefone = {
       ...baseProps,
-      pessoa: Pessoa.criar({ ...mockPessoaData, telefone: undefined }), // Pessoa sem telefone
+      pessoa: Pessoa.criar({ ...mockPessoaData, telefone: null }),
     };
     expect(() => Cliente.criarCliente(propsSemTelefone)).toThrowError(
       ClienteExceptions.TelefoneObrigatorioParaClienteException,
@@ -95,7 +90,7 @@ describe('Entidade Cliente', () => {
   it('deve lançar erro se o cliente for criado com telefone vazio na Pessoa', () => {
     const propsTelefoneVazio = {
       ...baseProps,
-      pessoa: Pessoa.criar({ ...mockPessoaComTelefoneVazio, telefone: '' }), // Pessoa com telefone vazio
+      pessoa: Pessoa.criar({ ...mockPessoaData, telefone: '' }),
     };
     expect(() => Cliente.criarCliente(propsTelefoneVazio)).toThrowError(
       ClienteExceptions.TelefoneObrigatorioParaClienteException,
@@ -107,12 +102,14 @@ describe('Entidade Cliente', () => {
       ...baseProps,
       pessoa: Pessoa.criar({ ...mockPessoaData, nome: '' }),
     };
-    expect(() => Cliente.criarCliente(propsNomePessoaVazio)).toThrowError("Nome é obrigatório.");
+    expect(() => Cliente.criarCliente(propsNomePessoaVazio)).toThrowError(
+      "Nome é obrigatório para criar um Cliente.",
+    );
   });
 
   it('deve lançar erro se o cliente for criado com vendedor responsável vazio', () => {
     expect(() => Cliente.criarCliente({ ...baseProps, vendedorResponsavel: ' ' })).toThrowError(
-      "Vendedor responsável é obrigatório." // Exceção do setter
+      "Vendedor responsável é obrigatório.",
     );
   });
 
@@ -122,12 +119,44 @@ describe('Entidade Cliente', () => {
     );
   });
 
+  // --- TESTES PARA MÉTODOS DE COMPORTAMENTO ---
+  it('deve verificar se um cliente recém-criado não está deletado', () => {
+    const clienteAtivo = Cliente.criarCliente(baseProps);
 
-  // --- Testes para o método 'recuperar' ---
+    expect(clienteAtivo.estaDeletado()).toBe(false);
+    expect(clienteAtivo.dataExclusao).toBeNull();
+  });
+
+  it('deve inativar um cliente ativo com sucesso', () => {
+    const clienteAtivo = Cliente.criarCliente(baseProps);
+    expect(clienteAtivo.status).toBe(StatusCliente.ATIVO);
+    expect(clienteAtivo.dataExclusao).toBeNull();
+    const oldUpdateDate = clienteAtivo.dataAtualizacao;
+
+    vi.advanceTimersByTime(100);
+
+    clienteAtivo.inativar();
+
+    expect(clienteAtivo.status).toBe(StatusCliente.INATIVO);
+    expect(clienteAtivo.dataExclusao).toBeInstanceOf(Date);
+    expect(clienteAtivo.dataAtualizacao.getTime()).toBeGreaterThan(oldUpdateDate.getTime());
+    expect(clienteAtivo.estaDeletado()).toBe(true);
+  });
+
+  it('não deve inativar um cliente que já está inativo', () => {
+    const clienteAtivo = Cliente.criarCliente(baseProps);
+    clienteAtivo.inativar(); // Inativa pela primeira vez
+
+    expect(() => clienteAtivo.inativar()).toThrowError(
+      new ClienteExceptions.ClienteJaInativo(clienteAtivo.id),
+    );
+  });
+
+  // --- TESTES PARA O MÉTODO 'recuperar' ---
   it('deve recuperar um cliente existente corretamente', () => {
     const recuperacaoProps: RecuperarClienteProps = {
       id: randomUUID(),
-      pessoa: Pessoa.recuperar({ id: randomUUID(), nome: 'Ana Costa', telefone: '22987654321' }), // Entidade Pessoa recuperada
+      pessoa: Pessoa.recuperar({ id: randomUUID(), nome: 'Ana Costa', telefone: '22987654321', email: null }),
       cidade: 'Rio de Janeiro',
       vendedorResponsavel: 'Vendedor Beta',
       status: StatusCliente.INATIVO,
@@ -136,7 +165,6 @@ describe('Entidade Cliente', () => {
       dataAtualizacao: new Date('2024-01-01T00:00:00Z'),
       dataExclusao: new Date('2024-02-01T00:00:00Z'),
     };
-
     const cliente = Cliente.recuperar(recuperacaoProps);
 
     expect(cliente).toBeInstanceOf(Cliente);
@@ -148,15 +176,6 @@ describe('Entidade Cliente', () => {
     expect(cliente.produtos[0]).toBeInstanceOf(Produto);
   });
 
-  // --- Testes para Métodos de Comportamento ---
-  it('deve verificar se o cliente está deletado corretamente', () => {
-    const clienteAtivo = Cliente.criarCliente(baseProps);
-    expect(clienteAtivo.inativar()).toBe(false);
-
-    const clienteDeletado = Cliente.recuperar({ ...baseProps, id: randomUUID(), status: StatusCliente.INATIVO, dataExclusao: new Date(), pessoa: Pessoa.criar(mockPessoaData), dataCriacao: new Date(), dataAtualizacao: new Date(), produtos: [produto1] });
-    expect(clienteDeletado.inativar()).toBe(true);
-  });
-
   it('deve recuperar os dados essenciais do cliente', () => {
     const cliente = Cliente.criarCliente(baseProps);
     const dadosEssenciais = cliente.recuperarDadosEssenciais();
@@ -165,6 +184,6 @@ describe('Entidade Cliente', () => {
     expect(dadosEssenciais.email).toBe(cliente.pessoa.email);
     expect(dadosEssenciais.telefone).toBe(cliente.pessoa.telefone);
     expect(dadosEssenciais.vendedorResponsavel).toBe(cliente.vendedorResponsavel);
-    expect(dadosEssenciais.produtos).toHaveLength(2); // Retorna as entidades Produto
+    expect(dadosEssenciais.produtos).toHaveLength(2);
   });
 });

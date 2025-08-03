@@ -57,9 +57,9 @@ export class PerguntaMap {
       tipo: tipoPergunta,
       opcoes: opcoesTratadas, // Passa as opções já tratadas
       ativo: raw.ativo,
-      dataCriacao: raw.data_criacao,
-      dataAtualizacao: raw.data_atualizacao,
-      dataExclusao: raw.data_exclusao,
+      dataCriacao: raw.dataCriacao,
+      dataAtualizacao: raw.dataAtualizacao,
+      dataExclusao: raw.dataExclusao,
     };
 
     // A entidade Pergunta.recuperar apenas "hidrata" com os dados já preparados.
@@ -74,9 +74,9 @@ export class PerguntaMap {
       tipo: pergunta.tipo,
       opcoes: pergunta.opcoes ?? Prisma.JsonNull,
       ativo: pergunta.ativo,
-      data_criacao: pergunta.dataCriacao,
-      data_atualizacao: pergunta.dataAtualizacao,
-      data_exclusao: pergunta.dataExclusao,
+      dataCriacao: pergunta.dataCriacao,
+      dataAtualizacao: pergunta.dataAtualizacao,
+      dataExclusao: pergunta.dataExclusao,
     };
   }
 }

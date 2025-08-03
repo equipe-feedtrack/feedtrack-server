@@ -1,11 +1,17 @@
 import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
-import { IRepository } from "@shared/infra/repository.inteface";
 
+ interface IPerguntaRepository {
+  // Métodos de escrita
+  inserir(pergunta: Pergunta): Promise<void>;
+  atualizar(pergunta: Pergunta): Promise<void>;
+  deletar(id: string): Promise<void>;
 
-interface IPerguntaRepository<T> extends IRepository<T> {
-
-    // Quando eu for fazer contratos específicos tem que ser aqui, por exemplo recuperar somente perguntas que tenham multiplas escolhas e foi definido na minha regra de negócio.
-     buscarMuitosPorId(ids: string[]): Promise<Pergunta[]>;
+  // Métodos de leitura
+  recuperarPorUuid(id: string): Promise<Pergunta | null>;
+  buscarMuitosPorId(ids: string[]): Promise<Pergunta[]>;
+  
+  // Métodos de verificação
+  existe(id: string): Promise<boolean>;
 }
 
 export { IPerguntaRepository };

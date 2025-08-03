@@ -1,36 +1,26 @@
-import { IFormulario } from "@modules/formulario/domain/formulario/formulario.types";
-import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
-import { IPergunta } from "@modules/formulario/domain/pergunta/pergunta.types";
-import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
-import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
-import { CriarPerguntaDTO } from "../../dto/pergunta/CriarPerguntaDTO";
+import { IUseCase } from "@shared/application/use-case/usecase.interface";
+import { PerguntaResponseDTO } from "../../dto/pergunta/PerguntaResponseDTO";
 import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
+import { PerguntaMap } from "@modules/formulario/infra/mappers/pergunta.map";
+import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
+import { CriarPerguntaInputDTO } from "../../dto/pergunta/CriarPerguntaDTO";
 
-export class CriarPerguntaUseCase {
-  constructor(
-    private readonly perguntaRepository: IPerguntaRepository<IPergunta>,
-    private readonly formularioRepository: IFormularioRepository<IFormulario>,
-  ) {}
+export class CriarPerguntaUseCase implements IUseCase<CriarPerguntaInputDTO, PerguntaResponseDTO> {
+  private readonly _perguntaRepository: IPerguntaRepository;
 
-  async execute(dto: CriarPerguntaDTO): Promise<string> {
-    // 1. Regra de negócio: verificar se o formulário ao qual a pergunta pertence existe.
-    const formularioExiste = await this.formularioRepository.recuperarPorUuid(dto.formularioId);
-    if (!formularioExiste) {
-      throw new FormularioInexistente;
-    }
+  constructor(perguntaRepository: IPerguntaRepository) {
+    this._perguntaRepository = perguntaRepository;
+  }
 
-    // 2. Usa a fábrica da entidade para criar uma instância de domínio.
-    // A fábrica já contém as validações de texto, tipo, etc.
-    const pergunta = Pergunta.criar({
-      texto: dto.texto,
-      tipo: dto.tipo,
-      opcoes: dto.opcoes,
-    });
+  async execute(input: CriarPerguntaInputDTO): Promise<PerguntaResponseDTO> {
+    // 1. Usa o método de fábrica da entidade para criar uma nova instância de Pergunta.
+    // A entidade é responsável por validar todas as regras de negócio.
+    const pergunta = Pergunta.criar(input);
 
-    // 3. Persiste a nova entidade no banco de dados.
-    await this.perguntaRepository.inserir(pergunta);
+    // 2. Persiste a nova entidade no banco de dados.
+    await this._perguntaRepository.inserir(pergunta);
 
-    // 4. Retorna o ID da pergunta criada.
-    return pergunta.id;
+    // 3. Retorna um DTO com os dados da pergunta criada.
+    return PerguntaMap.toDTO(pergunta);
   }
 }

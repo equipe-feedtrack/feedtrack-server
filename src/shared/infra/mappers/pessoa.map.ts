@@ -8,11 +8,11 @@ export class PessoaMap {
    * @param raw Dados brutos (ex: ClientePrisma) que contêm as propriedades da Pessoa.
    * @returns Uma entidade Pessoa.
    */
-  public static toDomain(raw: { nome: string; email: string | null; telefone: string }): Pessoa {
+  public static toDomain(raw: { nome: string; email: string | null; telefone: string | null }): Pessoa {
     const pessoaProps: PessoaProps = {
       nome: raw.nome,
-      email: raw.email ?? undefined,
-      telefone: raw.telefone,
+      email: raw.email ?? null,
+      telefone: raw.telefone ?? null,
     };
     return Pessoa.recuperar(pessoaProps); // Usa o método de recuperação da entidade Pessoa
   }
@@ -26,7 +26,7 @@ export class PessoaMap {
     return {
       nome: pessoa.nome,
       email: pessoa.email ?? null,
-      telefone: pessoa.telefone,
+      telefone: pessoa.telefone ?? null,
       // Se Pessoa tivesse ID próprio e fosse uma relação, seria pessoaId: pessoa.id
     };
   }

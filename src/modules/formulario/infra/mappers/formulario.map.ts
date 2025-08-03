@@ -1,67 +1,67 @@
 import {
   Formulario as FormularioPrisma,
   Pergunta as PerguntaPrisma,
+  PerguntasOnFormularios, // Importa o tipo da tabela de junção
 } from '@prisma/client';
 
-import { PerguntaMap } from './pergunta.map';
-import { Pergunta } from '@modules/formulario/domain/pergunta/pergunta.entity';
-import { Formulario } from '@modules/formulario/domain/formulario/formulario.entity';
-import { ListarFormulariosResponseDTO } from '@modules/formulario/application/dto/formulario/ListarFormulariosResponseDTO';
 import { FormularioResponseDTO } from '@modules/formulario/application/dto/formulario/FormularioResponseDTO';
+import { ListarFormulariosResponseDTO } from '@modules/formulario/application/dto/formulario/ListarFormulariosResponseDTO';
+import { Formulario } from '@modules/formulario/domain/formulario/formulario.entity';
+import { PerguntaMap } from './pergunta.map';
 
-
-type FormularioComPerguntas = FormularioPrisma & { perguntas: PerguntaPrisma[] };
+// Define um tipo que representa a estrutura aninhada da consulta N-N do Prisma.
+type FormularioComPerguntasAninhadas = FormularioPrisma & {
+  perguntas: (PerguntasOnFormularios & {
+    pergunta: PerguntaPrisma;
+  })[];
+};
 
 export class FormularioMap {
   /**
-   * Converte o dado bruto do Prisma para a Entidade de Domínio.
+   * Converte o dado bruto do Prisma para a Entidade de Domínio Formulario.
    */
-  public static toDomain(raw: FormularioComPerguntas): Formulario {
-
-    const perguntas = raw.perguntas.map((p_prisma) =>
-      Pergunta.recuperar({
-        id: p_prisma.id,
-        texto: p_prisma.texto,
-        tipo: p_prisma.tipo as 'nota' | 'texto' | 'multipla_escolha',
-        opcoes: Array.isArray(p_prisma.opcoes) ? p_prisma.opcoes.map(String) : undefined,
-        dataCriacao: p_prisma.data_criacao,
-        dataAtualizacao: p_prisma.data_atualizacao,
-        dataExclusao: p_prisma.data_exclusao,
-        ativo: p_prisma.ativo,
-      })
+  public static toDomain(raw: FormularioComPerguntasAninhadas): Formulario {
+    
+    // ✅ CORREÇÃO: Delega a responsabilidade de mapear cada pergunta ao PerguntaMap.
+    // O código "desembrulha" a estrutura da tabela de junção.
+    const perguntasDeDominio = (raw.perguntas ?? []).map(itemDaJuncao =>
+      PerguntaMap.toDomain(itemDaJuncao.pergunta)
     );
 
-    // 2. Mapeamento do Formulário
-     return Formulario.recuperar({
+    // Mapeamento do Formulário, assumindo que no schema a coluna é 'titulo'
+    return Formulario.recuperar({
       id: raw.id,
-      titulo: raw.texto,
+      titulo: raw.titulo, // Assumindo que o campo no Prisma é 'titulo'
       descricao: raw.descricao,
-      perguntas: perguntas,
+      perguntas: perguntasDeDominio,
       ativo: raw.ativo,
-      dataCriacao: raw.data_criacao,
-      dataAtualizacao: raw.data_atualizacao,
-      dataExclusao: raw.data_exclusao ?? null,
+      dataCriacao: raw.dataCriacao,
+      dataAtualizacao: raw.dataAtualizacao,
+      dataExclusao: raw.dataExclusao ?? null,
     });
   }
 
   /**
    * Converte a Entidade de Domínio para o formato que o Prisma espera para persistência.
+   * A gestão da relação com perguntas (usando 'connect' ou 'set') é feita no repositório.
    */
   public static toPersistence(formulario: Formulario) {
-    // CORREÇÃO: Garantimos que o dado enviado ao Prisma corresponde ao schema.
-    // Se o seu Prisma espera 'texto' para o título, usamos 'texto'.
     return {
       id: formulario.id,
-      texto: formulario.titulo, // Mapeando 'titulo' do domínio para 'texto' do Prisma
-      descricao: formulario.descricao ?? " ",
+      titulo: formulario.titulo, // Mapeando 'titulo' do domínio para 'titulo' do Prisma
+      descricao: formulario.descricao ?? "",
       ativo: formulario.ativo,
-      data_criacao: formulario.dataCriacao,
-      data_atualizacao: formulario.dataAtualizacao,
-      data_exclusao: formulario.dataExclusao,
+      // O Prisma client lida com a conversão de nomes (camelCase para snake_case) se @map for usado no schema.
+      dataCriacao: formulario.dataCriacao,
+      dataAtualizacao: formulario.dataAtualizacao,
+      dataExclusao: formulario.dataExclusao,
     };
   }
 
-   public static toResponseDTO(formulario: Formulario): FormularioResponseDTO {
+  /**
+   * Converte a entidade Formulario para um DTO de resposta detalhado.
+   */
+  public static toResponseDTO(formulario: Formulario): FormularioResponseDTO {
     return {
       id: formulario.id,
       titulo: formulario.titulo,
@@ -69,19 +69,22 @@ export class FormularioMap {
       ativo: formulario.ativo,
       dataCriacao: formulario.dataCriacao.toISOString(),
       dataAtualizacao: formulario.dataAtualizacao.toISOString(),
-      // Mapeia cada entidade Pergunta para seu respectivo DTO
+      // Delega a conversão de cada Pergunta para o PerguntaMap
       perguntas: formulario.perguntas.map(pergunta => PerguntaMap.toDTO(pergunta)),
     };
   }
 
-   public static toListDTO(formulario: Formulario): ListarFormulariosResponseDTO {
+  /**
+   * Converte a entidade Formulario para um DTO de resposta resumido para listas.
+   */
+  public static toListDTO(formulario: Formulario): ListarFormulariosResponseDTO {
     return {
       id: formulario.id,
       titulo: formulario.titulo,
       descricao: formulario.descricao,
       ativo: formulario.ativo,
       dataCriacao: formulario.dataCriacao.toISOString(),
-      // Calcula a quantidade de perguntas sem expor os detalhes de cada uma
+      // Calcula a quantidade de perguntas sem expor os detalhes
       quantidadePerguntas: formulario.perguntas.length,
     };
   }

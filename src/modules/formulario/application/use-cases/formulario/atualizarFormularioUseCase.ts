@@ -1,37 +1,56 @@
-import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
-import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
+import { IUseCase } from "@shared/application/use-case/usecase.interface";
+import { FormularioResponseDTO } from "../../dto/formulario/FormularioResponseDTO";
+import { IPerguntaRepository } from "@modules/formulario/infra/pergunta/pergunta.repository.interface";
+import { AtualizarFormularioInputDTO } from "../../dto/formulario/atualizarFormularioDTO";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
-import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
-import { AtualizarFormularioDTO } from "../../dto/formulario/atualizarFormularioDTO";
+import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
+import { FormularioMap } from "@modules/formulario/infra/mappers/formulario.map";
 
-export class AtualizarFormularioUseCase {
-  constructor(private readonly formularioRepository: IFormularioRepository<Formulario>) {}
+export class AtualizarFormularioUseCase implements IUseCase<AtualizarFormularioInputDTO, FormularioResponseDTO> {
+  private readonly _formularioRepository: IFormularioRepository<Formulario>;
+  private readonly _perguntaRepository: IPerguntaRepository;
 
-  async execute(id: string, dto: AtualizarFormularioDTO): Promise<void> {
-    // 1. Busca a entidade que será atualizada.
-    const formulario = await this.formularioRepository.recuperarPorUuid(id);
+  constructor(
+    formularioRepository: IFormularioRepository<Formulario>,
+    perguntaRepository: IPerguntaRepository
+  ) {
+    this._formularioRepository = formularioRepository;
+    this._perguntaRepository = perguntaRepository;
+  }
 
+  async execute(input: AtualizarFormularioInputDTO): Promise<FormularioResponseDTO> {
+    // 1. Recuperar a entidade existente.
+    const formulario = await this._formularioRepository.recuperarPorUuid(input.id);
     if (!formulario) {
-      throw new FormularioInexistente;
+      throw new Error(`Formulário com ID ${input.id} não encontrado.`);
     }
 
-    // 2. Chama os métodos de negócio da entidade para alterar o estado.
-    formulario.atualizarTitulo(dto.titulo);
-    formulario.atualizarDescricao(dto.descricao);
+    // 2. Aplicar as atualizações na entidade de domínio.
+    if (typeof input.titulo === 'string') {
+      formulario.atualizarTitulo(input.titulo);
+    }
+    // Adicionar outros métodos de atualização para descricao, ativo, etc.
 
-    // 3. Cria as novas instâncias de Pergunta que substituirão as antigas.
-    const novasPerguntas = dto.perguntas.map(p =>
-      Pergunta.criar({
-        texto: p.texto,
-        tipo: p.tipo,
-        opcoes: p.opcoes,
-      })
-    );
-    
-    // 4. Chama um método na entidade Formulário para atualizar as perguntas.
-    formulario.substituirPerguntas(novasPerguntas);
+    // 3. Sincronizar a lista de perguntas, se fornecida.
+    if (Array.isArray(input.idsPerguntas)) {
+      const perguntasRecuperadas = await this._perguntaRepository.buscarMuitosPorId(input.idsPerguntas);
+      if (perguntasRecuperadas.length !== input.idsPerguntas.length) {
+        throw new Error("Uma ou mais IDs de perguntas fornecidas são inválidas.");
+      }
+      // Remove todas as perguntas antigas e adiciona as novas
+      const perguntasAtuaisIds = formulario.perguntas.map(p => p.id);
+      for (const id of perguntasAtuaisIds) {
+        formulario.removerPergunta(id);
+      }
+      for (const pergunta of perguntasRecuperadas) {
+        formulario.adicionarPergunta(pergunta);
+      }
+    }
 
-    // 5. Salva a entidade com seu novo estado.
-    await this.formularioRepository.inserir(formulario);
+    // 4. Persistir a entidade atualizada.
+    await this._formularioRepository.atualizar(formulario);
+
+    // 5. Retornar o DTO de resposta.
+    return FormularioMap.toResponseDTO(formulario);
   }
 }

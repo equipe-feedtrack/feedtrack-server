@@ -23,11 +23,10 @@ export class ProdutoRepositoryPrisma extends PrismaRepository implements IProdut
         nome: dadosParaPersistencia.nome,
         descricao: dadosParaPersistencia.descricao,
         valor: dadosParaPersistencia.valor,
-        data_criacao: dadosParaPersistencia.data_criacao,
-        data_atualizacao: dadosParaPersistencia.data_atualizacao,
-        data_exclusao: dadosParaPersistencia.data_exclusao,
+        dataCriacao: dadosParaPersistencia.data_criacao,
+        dataAtualizacao: dadosParaPersistencia.data_atualizacao,
+        dataExclusao: dadosParaPersistencia.data_exclusao,
         ativo: dadosParaPersistencia.ativo,
-       cliente_id: dadosParaPersistencia.cliente_id,
       },
     });
   }
@@ -57,10 +56,9 @@ export class ProdutoRepositoryPrisma extends PrismaRepository implements IProdut
         nome: dadosParaPersistencia.nome,
         descricao: dadosParaPersistencia.descricao,
         valor: dadosParaPersistencia.valor,
-        data_atualizacao: dadosParaPersistencia.data_atualizacao,
-        data_exclusao: dadosParaPersistencia.data_exclusao, // Pode ser null
+        dataAtualizacao: dadosParaPersistencia.data_atualizacao,
+        dataExclusao: dadosParaPersistencia.data_exclusao, // Pode ser null
         ativo: dadosParaPersistencia.ativo,
-        cliente_id: dadosParaPersistencia.cliente_id, // Pode ser null
       },
     });
   }

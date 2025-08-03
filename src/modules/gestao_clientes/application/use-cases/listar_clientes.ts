@@ -1,31 +1,34 @@
-import { SegmentoAlvo } from '@modules/campanha/domain/campanha.types'; // Para buscar por segmento
-import { StatusCliente } from '@modules/gestao_clientes/domain/cliente.types';
-import { IClienteRepository } from '@modules/gestao_clientes/infra/cliente.repository.interface';
-import { ClienteMap } from '@modules/gestao_clientes/infra/mappers/cliente.map';
-import { ClienteResponseDTO } from '../dto/cliente_response.dto';
+import { IUseCase } from "@shared/application/use-case/usecase.interface";
+import { ListarClientesInputDTO } from "../dto/listar_cliente_input.dto";
+import { ClienteResponseDTO } from "../dto/cliente_response.dto";
+import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
+import { ClienteMap } from "@modules/gestao_clientes/infra/mappers/cliente.map";
 
-interface ListarClientesInput {
-  status?: StatusCliente;
-  segmentoAlvo?: SegmentoAlvo; // Para reutilizar a lógica de busca por segmento
-  // Adicione outros filtros (ex: vendedorId, cidade, nome)
-}
+export class ListarClientesUseCase implements IUseCase<ListarClientesInputDTO | undefined, ClienteResponseDTO[]> {
+  private readonly _clienteRepository: IClienteRepository;
 
-export class ListarClientesUseCase {
-  constructor(private readonly clienteRepository: IClienteRepository) {}
+  constructor(clienteRepository: IClienteRepository) {
+    this._clienteRepository = clienteRepository;
+  }
 
-  async execute(filtros?: ListarClientesInput): Promise<ClienteResponseDTO[]> {
+  /**
+   * Executa a listagem de clientes.
+   * @param filtros Um objeto opcional com os filtros a serem aplicados.
+   * @returns Uma promessa que resolve com um array de DTOs de cliente.
+   */
+  async execute(filtros?: ListarClientesInputDTO): Promise<ClienteResponseDTO[]> {
     let clientes;
 
+    // Se um filtro de segmento for fornecido, ele tem prioridade.
     if (filtros?.segmentoAlvo) {
-      // Reutiliza a lógica de buscarPorSegmento do repositório
-      clientes = await this.clienteRepository.buscarPorSegmento(filtros.segmentoAlvo);
+      clientes = await this._clienteRepository.buscarPorSegmento(filtros.segmentoAlvo);
     } else {
-      // Se não há filtro de segmento, use um método listar geral (se existir no repositório)
-      // Você precisaria adicionar um método `listar` ao seu IClienteRepository
-      // e implementá-lo em ClienteRepositoryPrisma.
-      clientes = await this.clienteRepository.listar({ status: filtros?.status }); // Exemplo de filtro simples
+      // Caso contrário, usa o método de listagem geral do repositório,
+      // passando os filtros disponíveis (como o status).
+      clientes = await this._clienteRepository.listar({ status: filtros?.status });
     }
     
-    return clientes.map(ClienteMap.toResponseDTO);
+    // Mapeia a lista de entidades de domínio para uma lista de DTOs de resposta.
+    return clientes.map(cliente => ClienteMap.toResponseDTO(cliente));
   }
 }

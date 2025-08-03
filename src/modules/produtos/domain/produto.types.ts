@@ -9,7 +9,7 @@ interface IProduto extends IDatasControle {
     descricao: string;
     valor: number;
     ativo: boolean;
-    cliente_id?: string | null;
+
 }
 
 //Atributos que são necessários para criar um produto 

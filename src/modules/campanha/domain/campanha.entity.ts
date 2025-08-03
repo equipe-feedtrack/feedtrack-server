@@ -8,7 +8,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   private _tipoCampanha: TipoCampanha;
   private _segmentoAlvo: SegmentoAlvo;
   private _dataInicio: Date;
-  private _dataFim?: Date | null;
+  private _dataFim: Date | null;
   private _templateMensagem: string;
   private _formularioId: string;
   private _ativo: boolean;
@@ -22,7 +22,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   get tipoCampanha(): TipoCampanha { return this._tipoCampanha; }
   get segmentoAlvo(): SegmentoAlvo { return this._segmentoAlvo; }
   get dataInicio(): Date { return this._dataInicio; }
-  get dataFim(): Date | null | undefined { return this._dataFim; }
+  get dataFim(): Date | null  { return this._dataFim; }
   get templateMensagem(): string { return this._templateMensagem; }
   get formularioId(): string { return this._formularioId; }
   get ativo(): boolean { return this._ativo; }
@@ -46,7 +46,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   
   private set dataInicio(value: Date) { this._dataInicio = value; }
   
-  private set dataFim(value: Date | null | undefined) { this._dataFim = value; }
+  private set dataFim(value: Date | null ) { this._dataFim = value; }
   
   private set templateMensagem(value: string) {
     if (!value || value.trim().length === 0) {

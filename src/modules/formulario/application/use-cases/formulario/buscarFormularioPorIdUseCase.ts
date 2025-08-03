@@ -1,21 +1,22 @@
-import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
-import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
-import { FormularioInexistente } from "@shared/application/use-case/use-case.exception";
+import { IUseCase } from "@shared/application/use-case/usecase.interface";
 import { FormularioResponseDTO } from "../../dto/formulario/FormularioResponseDTO";
+import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
+import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
 import { FormularioMap } from "@modules/formulario/infra/mappers/formulario.map";
+export class BuscarFormularioPorIdUseCase implements IUseCase<string, FormularioResponseDTO | null> {
+  private readonly _formularioRepository: IFormularioRepository<Formulario>;
 
-export class BuscarFormularioPorIdUseCase {
-  constructor(private readonly formularioRepository: IFormularioRepository<Formulario>) {}
+  constructor(formularioRepository:  IFormularioRepository<Formulario>) {
+    this._formularioRepository = formularioRepository;
+  }
 
-  async execute(id: string): Promise<FormularioResponseDTO> {
-    // 1. Busca a entidade no repositório, incluindo suas perguntas.
-    const formulario = await this.formularioRepository.recuperarPorUuid(id);
+  async execute(id: string): Promise<FormularioResponseDTO | null> {
+    const formulario = await this._formularioRepository.recuperarPorUuid(id);
 
     if (!formulario) {
-      throw new FormularioInexistente;
+      return null;
     }
 
-    // 2. Usa o Mapper para converter a entidade em um DTO de resposta detalhado.
     return FormularioMap.toResponseDTO(formulario);
   }
 }

@@ -1,79 +1,100 @@
-import { Campanha as CampanhaPrisma, Prisma } from '@prisma/client';
-import { Campanha } from "@modules/campanha/domain/campanha.entity";
-import { RecuperarCampanhaProps, SegmentoAlvo, TipoCampanha } from "@modules/campanha/domain/campanha.types";
+import {
+  Campanha as CampanhaPrisma,
+  TipoCampanha as TipoCampanhaPrisma,
+  SegmentoAlvo as SegmentoAlvoPrisma,
+  Prisma,
+} from '@prisma/client';
+
+import { Campanha } from '@modules/campanha/domain/campanha.entity';
+import { ICampanha, TipoCampanha, SegmentoAlvo } from '@modules/campanha/domain/campanha.types';
 import { CampanhaResponseDTO } from '@modules/campanha/application/dto/CampanhaResponseDTO';
 
+// Define um tipo para o objeto CampanhaPrisma que pode ser usado nas conversões.
+type CampanhaPrismaDTO = CampanhaPrisma;
 
 export class CampanhaMap {
-  /**
-   * Converte o dado bruto do Prisma (CampanhaPrisma) para a Entidade de Domínio Campanha.
-   * Usado para "hidratar" a entidade após uma consulta ao banco de dados.
-   */
-  public static toDomain(raw: CampanhaPrisma): Campanha {
-    // Converte os enums do formato do DB para o formato de domínio
-    const tipoCampanha = raw.tipo_campanha as TipoCampanha;
-    const segmentoAlvo = raw.segmento_alvo as SegmentoAlvo;
-    console.log('MAPPER - templateMensagem em raw.template_mensagem:', raw.template_mensagem); // LOG 2
 
-    const props: RecuperarCampanhaProps = {
+  // Funções privadas para mapear enums de forma segura, evitando acoplamento frágil.
+  private static tipoToDomain(tipo: TipoCampanhaPrisma): TipoCampanha {
+    return tipo as unknown as TipoCampanha; // Mapeamento direto se os nomes forem idênticos
+  }
+
+  private static tipoToPersistence(tipo: TipoCampanha): TipoCampanhaPrisma {
+    return tipo as unknown as TipoCampanhaPrisma;
+  }
+
+  private static segmentoToDomain(segmento: SegmentoAlvoPrisma): SegmentoAlvo {
+    return segmento as unknown as SegmentoAlvo;
+  }
+
+  private static segmentoToPersistence(segmento: SegmentoAlvo): SegmentoAlvoPrisma {
+    return segmento as unknown as SegmentoAlvoPrisma;
+  }
+
+  /**
+   * Converte o dado bruto do Prisma para a Entidade de Domínio Campanha.
+   */
+  public static toDomain(raw: CampanhaPrismaDTO): Campanha {
+    const campanhaProps: ICampanha = {
       id: raw.id,
       titulo: raw.titulo,
-      descricao: raw.descricao ?? undefined, // DB pode ser null, domínio pode ser undefined
-      tipoCampanha: tipoCampanha,
-      segmentoAlvo: segmentoAlvo,
-      dataInicio: raw.data_inicio,
-      dataFim: raw.data_fim ?? null, // DB pode ser null, domínio também pode ser null
-      templateMensagem: raw.template_mensagem,
-      formularioId: raw.formularioId, // FK para Formulário
+      descricao: raw.descricao ?? undefined,
+      tipoCampanha: this.tipoToDomain(raw.tipoCampanha),
+      segmentoAlvo: this.segmentoToDomain(raw.segmentoAlvo),
+      dataInicio: raw.dataInicio,
+      dataFim: raw.dataFim,
+      templateMensagem: raw.templateMensagem,
+      formularioId: raw.formularioId,
       ativo: raw.ativo,
-      dataCriacao: raw.data_criacao,
-      dataAtualizacao: raw.data_atualizacao,
-      dataExclusao: raw.data_exclusao ?? null,
+      dataCriacao: raw.dataCriacao,
+      dataAtualizacao: raw.dataAtualizacao,
+      dataExclusao: raw.dataExclusao,
     };
-    return Campanha.recuperar(props);
+
+    return Campanha.recuperar(campanhaProps);
   }
 
   /**
-   * Converte a Entidade de Domínio Campanha para o formato que o Prisma espera para persistência.
-   * O objeto retornado aqui usa snake_case para os nomes das colunas conforme o schema.prisma.
+   * Converte a Entidade de Domínio para o formato que o Prisma espera para persistência.
    */
-  public static toPersistence(campanha: Campanha) {
+  public static toPersistence(campanha: Campanha): Prisma.CampanhaCreateInput {
     return {
-    id: campanha.id,
-    titulo: campanha.titulo,
-    descricao: campanha.descricao ?? null,
-    tipo_campanha: campanha.tipoCampanha, // mapeado para snake_case
-    segmento_alvo: campanha.segmentoAlvo, // mapeado para snake_case
-    data_inicio: campanha.dataInicio,     // mapeado para snake_case
-    data_fim: campanha.dataFim ?? null,   // mapeado para snake_case
-    template_mensagem: campanha.templateMensagem, // mapeado para snake_case
-    formularioId: campanha.formularioId,  // é FK, pode ser camelCase ou snake_case se não @map
-    ativo: campanha.ativo,
-    data_criacao: campanha.dataCriacao,   // mapeado para snake_case
-    data_atualizacao: campanha.dataAtualizacao, // mapeado para snake_case
-    data_exclusao: campanha.dataExclusao, // mapeado para snake_case
+      id: campanha.id,
+      titulo: campanha.titulo,
+      descricao: campanha.descricao,
+      tipoCampanha: this.tipoToPersistence(campanha.tipoCampanha),
+      segmentoAlvo: this.segmentoToPersistence(campanha.segmentoAlvo),
+      dataInicio: campanha.dataInicio,
+      dataFim: campanha.dataFim,
+      templateMensagem: campanha.templateMensagem,
+      ativo: campanha.ativo,
+      dataCriacao: campanha.dataCriacao,
+      dataAtualizacao: campanha.dataAtualizacao,
+      dataExclusao: campanha.dataExclusao,
+      // A conexão com o formulário é feita através do ID
+      formulario: {
+        connect: { id: campanha.formularioId },
+      },
     };
   }
 
   /**
-   * Converte a Entidade de Domínio Campanha para um DTO de resposta.
-   * Este DTO é usado para enviar dados da Campanha para a camada de apresentação (API).
+   * Converte a entidade Campanha para um DTO de resposta da API.
    */
   public static toResponseDTO(campanha: Campanha): CampanhaResponseDTO {
     return {
       id: campanha.id,
       titulo: campanha.titulo,
-      descricao: campanha.descricao ?? undefined, // DTOs geralmente preferem undefined para campos ausentes
+      descricao: campanha.descricao,
       tipoCampanha: campanha.tipoCampanha,
       segmentoAlvo: campanha.segmentoAlvo,
-      dataInicio: campanha.dataInicio.toISOString(), // Converte Date para string ISO
-      dataFim: campanha.dataFim ? campanha.dataFim.toISOString() : undefined, // Converte Date para string ISO ou undefined
+      dataInicio: campanha.dataInicio.toISOString(),
+      dataFim: campanha.dataFim ? campanha.dataFim.toISOString() : null,
       templateMensagem: campanha.templateMensagem,
       formularioId: campanha.formularioId,
       ativo: campanha.ativo,
       dataCriacao: campanha.dataCriacao.toISOString(),
       dataAtualizacao: campanha.dataAtualizacao.toISOString(),
-      // 'dataExclusao' geralmente não é incluído em DTOs de resposta de sucesso
     };
   }
 }

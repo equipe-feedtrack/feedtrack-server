@@ -20,7 +20,6 @@ vi.mock('../../domain/produtos/produto.entity', async (importOriginal) => {
 
 describe('ProdutoMap', () => {
   // Dados de mock para a entidade de domínio Produto
-   let CLIENTE_ID_PRODUTO_TESTE = randomUUID();
   const mockProdutoDomainData = {
     id: randomUUID(),
     nome: 'Fone Bluetooth XPTO',
@@ -30,7 +29,6 @@ describe('ProdutoMap', () => {
     dataAtualizacao: new Date('2024-05-10T11:00:00.000Z'),
     dataExclusao: null,
     ativo: true,
-    cliente_id: CLIENTE_ID_PRODUTO_TESTE,
   };
 
   const mockProdutoDomainSemOpcionaisData = {
@@ -42,7 +40,6 @@ describe('ProdutoMap', () => {
     dataAtualizacao: new Date('2024-06-01T09:00:00.000Z'),
     dataExclusao: null, // Mantém null se não especificado
     ativo: true,
-    cliente_id: CLIENTE_ID_PRODUTO_TESTE, // Sem cliente_id
   };
 
   const mockProdutoDomainDeletadoData = {
@@ -54,7 +51,6 @@ describe('ProdutoMap', () => {
     dataAtualizacao: new Date('2024-04-10T11:00:00Z'),
     dataExclusao: new Date('2024-04-15T12:00:00Z'), // Com data de exclusão
     ativo: false,
-    cliente_id: CLIENTE_ID_PRODUTO_TESTE,
   };
 
   // Instâncias da entidade Produto (criadas usando Produto.recuperar)
@@ -71,11 +67,10 @@ describe('ProdutoMap', () => {
       nome: mockProdutoDomainData.nome,
       descricao: mockProdutoDomainData.descricao,
       valor: mockProdutoDomainData.valor,
-      data_criacao: mockProdutoDomainData.dataCriacao,
-      data_atualizacao: mockProdutoDomainData.dataAtualizacao,
-      data_exclusao: mockProdutoDomainData.dataExclusao,
+      dataCriacao: mockProdutoDomainData.dataCriacao,
+      dataAtualizacao: mockProdutoDomainData.dataAtualizacao,
+      dataExclusao: mockProdutoDomainData.dataExclusao,
       ativo: mockProdutoDomainData.ativo,
-      cliente_id: mockProdutoDomainData.cliente_id,
     };
 
     const rawProdutoPrismaSemOpcionais: ProdutoPrisma = {
@@ -83,11 +78,10 @@ describe('ProdutoMap', () => {
       nome: mockProdutoDomainSemOpcionaisData.nome,
       descricao: mockProdutoDomainSemOpcionaisData.descricao,
       valor: mockProdutoDomainSemOpcionaisData.valor,
-      data_criacao: mockProdutoDomainSemOpcionaisData.dataCriacao,
-      data_atualizacao: mockProdutoDomainSemOpcionaisData.dataAtualizacao,
-      data_exclusao: null,
+      dataCriacao: mockProdutoDomainSemOpcionaisData.dataCriacao,
+      dataAtualizacao: mockProdutoDomainSemOpcionaisData.dataAtualizacao,
+      dataExclusao: null,
       ativo: mockProdutoDomainSemOpcionaisData.ativo,
-      cliente_id: mockProdutoDomainSemOpcionaisData.cliente_id
     };
 
     it('deve converter dados crus do Prisma para uma entidade Produto completa', () => {
@@ -98,11 +92,10 @@ describe('ProdutoMap', () => {
       expect(produto.nome).toBe(rawProdutoPrismaCompleto.nome);
       expect(produto.descricao).toBe(rawProdutoPrismaCompleto.descricao);
       expect(produto.valor).toBe(rawProdutoPrismaCompleto.valor);
-      expect(produto.dataCriacao).toEqual(rawProdutoPrismaCompleto.data_criacao); // Mapeia snake_case para camelCase
-      expect(produto.dataAtualizacao).toEqual(rawProdutoPrismaCompleto.data_atualizacao);
-      expect(produto.dataExclusao).toEqual(rawProdutoPrismaCompleto.data_exclusao);
+      expect(produto.dataCriacao).toEqual(rawProdutoPrismaCompleto.dataCriacao); // Mapeia snake_case para camelCase
+      expect(produto.dataAtualizacao).toEqual(rawProdutoPrismaCompleto.dataAtualizacao);
+      expect(produto.dataExclusao).toEqual(rawProdutoPrismaCompleto.dataExclusao);
       expect(produto.ativo).toBe(rawProdutoPrismaCompleto.ativo);
-      expect(produto.cliente_id).toBe(rawProdutoPrismaCompleto.cliente_id);
     });
 
     it('deve converter dados crus do Prisma com campos null para entidade com undefined/null corretamente', () => {
@@ -126,7 +119,6 @@ describe('ProdutoMap', () => {
         data_atualizacao: mockProdutoDomain.dataAtualizacao,
         data_exclusao: mockProdutoDomain.dataExclusao,
         ativo: mockProdutoDomain.ativo,
-        cliente_id: mockProdutoDomain.cliente_id,
       });
     });
 
@@ -151,7 +143,6 @@ describe('ProdutoMap', () => {
         dataAtualizacao: mockProdutoDomain.dataAtualizacao.toISOString(),
         dataExclusao: mockProdutoDomain.dataExclusao?.toISOString(), // Trata null
         ativo: mockProdutoDomain.ativo,
-        cliente_id: mockProdutoDomain.cliente_id,
       });
     });
 

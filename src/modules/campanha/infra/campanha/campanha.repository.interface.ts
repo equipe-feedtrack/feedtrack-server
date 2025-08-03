@@ -37,12 +37,12 @@ export interface ICampanhaRepository {
    * @param entity Parte da entidade com os dados a serem atualizados.
    * @returns Verdadeiro se a atualização for bem-sucedida, falso caso contrário.
    */
-  atualizar?(id: string, entity: Partial<ICampanha>): Promise<boolean>;
+  atualizar(entity: Partial<ICampanha>): Promise<void>;
 
   /**
    * Exclui (logicamente ou fisicamente) uma Campanha.
    * @param id O ID da Campanha a ser excluída.
    * @returns Verdadeiro se a exclusão for bem-sucedida, falso caso contrário.
    */
-  deletar?(id: string): Promise<boolean>;
+  deletar(id: string): Promise<void>;
 }

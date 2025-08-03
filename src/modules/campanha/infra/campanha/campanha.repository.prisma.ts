@@ -1,38 +1,35 @@
-// src/modules/campanha/infra/database/orm/prisma/repositories/campanha.repository.prisma.ts
-
-import { PrismaClient } from '@prisma/client'; // Importa o Prisma Client
-import { Campanha } from '@modules/campanha/domain/campanha.entity'; // Sua entidade Campanha
-import { ICampanha } from '@modules/campanha/domain/campanha.types'; // Sua interface ICampanha
-import { ICampanhaRepository } from './campanha.repository.interface'; // Sua interface de repositório
+import { PrismaClient } from '@prisma/client';
+import { Campanha } from '@modules/campanha/domain/campanha.entity';
 import { CampanhaMap } from '../mappers/campanha.map';
+import { ICampanhaRepository } from './campanha.repository.interface';
 
 export class CampanhaRepositoryPrisma implements ICampanhaRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  /**
-   * Insere ou atualiza uma Campanha no banco de dados.
-   * Utiliza upsert para tratar inserção ou atualização de forma transparente.
-   */
   async inserir(campanha: Campanha): Promise<void> {
     const dadosParaPersistencia = CampanhaMap.toPersistence(campanha);
+    await this.prisma.campanha.create({
+      data: dadosParaPersistencia,
+    });
+  }
 
-   await this.prisma.campanha.upsert({
+  async atualizar(campanha: Campanha): Promise<void> {
+    const dadosParaPersistencia = CampanhaMap.toPersistence(campanha);
+    // Removemos a relação do objeto principal para o Prisma lidar com ela separadamente
+    const { formulario, ...dadosEscalares } = dadosParaPersistencia;
+
+    await this.prisma.campanha.update({
       where: { id: campanha.id },
-      update: {
-        ...dadosParaPersistencia,
-        id: dadosParaPersistencia.id, // O ID é usado no 'where'
-        data_criacao: dadosParaPersistencia.data_criacao, // Geralmente não se atualiza a data de criação
-      },
-      create: { // Dados para criar uma nova campanha se ela não existe
-      ...dadosParaPersistencia,
+      data: {
+        ...dadosEscalares, // Atualiza campos como titulo, descricao, etc.
+        formulario: { // Conecta ao formulário, caso o ID tenha mudado
+          connect: { id: campanha.formularioId },
+        },
       },
     });
   }
 
-  /**
-   * Recupera uma Campanha pelo seu ID único.
-   */
-  async recuperarPorUuid(id: string): Promise<ICampanha | null> {
+  async recuperarPorUuid(id: string): Promise<Campanha | null> {
     const campanhaPrisma = await this.prisma.campanha.findUnique({
       where: { id },
     });
@@ -40,5 +37,25 @@ export class CampanhaRepositoryPrisma implements ICampanhaRepository {
     if (!campanhaPrisma) return null;
 
     return CampanhaMap.toDomain(campanhaPrisma);
+  }
+
+  async listar(): Promise<Campanha[]> {
+    const campanhasPrisma = await this.prisma.campanha.findMany({
+        orderBy: { dataCriacao: 'desc' }
+    });
+    return campanhasPrisma.map(campanha => CampanhaMap.toDomain(campanha));
+  }
+
+  async deletar(id: string): Promise<void> {
+    await this.prisma.campanha.delete({
+      where: { id },
+    });
+  }
+
+  async existe(id: string): Promise<boolean> {
+    const count = await this.prisma.campanha.count({
+      where: { id },
+    });
+    return count > 0;
   }
 }

@@ -1,6 +1,6 @@
-import { IProduto } from "@modules/produtos/domain/produto.types";
-import { IDatasControle, KeysDatasControle } from "@shared/domain/data.types";
-import {Pessoa } from "@shared/domain/pessoa.entity";
+import { Produto } from "@modules/produtos/domain/produto.entity";
+import { IDatasControle } from "@shared/domain/data.types";
+import { Pessoa } from "@shared/domain/pessoa.entity";
 
 enum StatusCliente {
 
@@ -12,27 +12,28 @@ enum StatusCliente {
 interface ICliente extends IDatasControle {
   id: string;
   pessoa: Pessoa;
-  cidade?: string;
+  cidade: string | null;
   vendedorResponsavel: string;
-  status?: StatusCliente;
-  produtos: Array<IProduto>;
+  status: StatusCliente;
+  produtos: Array<Produto>;
 }
 
 interface ClienteEssencial {
   nome: string;
   email?: string;
   telefone: string;
-  produtos: Array<IProduto>;
+  produtos: Array<Produto>;
   vendedorResponsavel: string;
 }
 
 
 // Tipo para criação de Cliente (sem id, dataCadastro e ativo — são automáticos)
-type CriarClienteProps = Omit<ICliente, 'id' | 'ativo' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>;
+type CriarClienteProps = Omit<ICliente, 'id' | 'ativo' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao' | 'status'>;
 
 //Atributos que são necessários para recuperar um cliente
 //Tipo representa um dos estados do ciclo de vida da entidade
 type RecuperarClienteProps = ICliente;
 
 
-export { ICliente, CriarClienteProps, RecuperarClienteProps, StatusCliente, ClienteEssencial };
+export { ClienteEssencial, CriarClienteProps, ICliente, RecuperarClienteProps, StatusCliente };
+

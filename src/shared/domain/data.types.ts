@@ -1,7 +1,7 @@
 interface IDatasControle {
     dataCriacao: Date;
     dataAtualizacao: Date;
-    dataExclusao?: Date | null;
+    dataExclusao: Date | null;
 }
 
 export enum TipoPergunta {

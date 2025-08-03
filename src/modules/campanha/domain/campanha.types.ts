@@ -19,7 +19,7 @@ export interface ICampanha {
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
   dataInicio: Date;
-  dataFim?: Date | null;
+  dataFim: Date | null;
   templateMensagem: string;
   formularioId: string;
   ativo: boolean; // Campanha é ativa ou inativa

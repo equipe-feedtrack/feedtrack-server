@@ -14,9 +14,8 @@ class Produto extends Entity<IProduto> implements IProduto {
     private _valor: number;
     private _dataCriacao: Date;
     private _dataAtualizacao: Date;
-    private _dataExclusao?: Date | null | undefined;
+    private _dataExclusao: Date | null ;
     private _ativo: boolean;
-    private _cliente_id?: string | null;
 
     //////////////
     //Constantes//
@@ -100,11 +99,11 @@ class Produto extends Entity<IProduto> implements IProduto {
         this._dataAtualizacao = value;
     }
 
-    public get dataExclusao(): Date | null | undefined {
+    public get dataExclusao(): Date | null  {
         return this._dataExclusao;
     }
 
-    private set dataExclusao(value: Date | null | undefined) {
+    private set dataExclusao(value: Date | null ) {
         this._dataExclusao = value;
     }
 
@@ -114,14 +113,6 @@ class Produto extends Entity<IProduto> implements IProduto {
 
     private set ativo(value: boolean ) {
         this._ativo = value;
-    }
-
-     public get cliente_id(): string | undefined | null {
-        return this._cliente_id;
-    }
-
-    public set cliente_id(value: string | undefined | null) {
-        this._cliente_id = value;
     }
 
     //////////////
@@ -137,7 +128,6 @@ class Produto extends Entity<IProduto> implements IProduto {
         this.dataAtualizacao = produto.dataAtualizacao;
         this.dataExclusao = produto.dataExclusao;
         this.ativo = produto.ativo;
-        this.cliente_id = produto.cliente_id;
     }
 
     /////////////////////////
@@ -154,7 +144,6 @@ class Produto extends Entity<IProduto> implements IProduto {
         dataCriacao: new Date(), // <-- Geramos a data de criação
         dataAtualizacao: new Date(), // <-- Geramos a data de atualização
         dataExclusao: null, // <-- Default para null
-        cliente_id: props.cliente_id, 
         };
         return new Produto(produtoCompleto); // Passa o IProduto completo para o construtor
     }

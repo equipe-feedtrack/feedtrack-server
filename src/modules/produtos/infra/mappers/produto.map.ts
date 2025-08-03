@@ -11,11 +11,10 @@ class ProdutoMap {
             nome: produto.nome,
             descricao: produto.descricao,
             valor: produto.valor,
-            dataCriacao: produto.data_criacao,
-            dataAtualizacao: produto.data_atualizacao,
-            dataExclusao: produto.data_exclusao ?? null, 
+            dataCriacao: produto.dataCriacao,
+            dataAtualizacao: produto.dataAtualizacao,
+            dataExclusao: produto.dataExclusao ?? null, 
             ativo: produto.ativo,
-            cliente_id: produto.cliente_id ?? undefined,
         };
         return Produto.recuperar(produtoProps);
     }
@@ -37,7 +36,6 @@ class ProdutoMap {
             data_criacao: produto.dataCriacao,
             data_atualizacao: produto.dataAtualizacao,
             data_exclusao: produto.dataExclusao ?? null, // undefined na entidade -> null no DB
-            cliente_id: produto.cliente_id ?? null, // FK para Cliente, undefined na entidade -> null no DB
         };
     }
 
@@ -51,7 +49,6 @@ class ProdutoMap {
             dataAtualizacao: produto.dataAtualizacao.toISOString(), // Converte Date para string ISO
             dataExclusao: produto.dataExclusao ? produto.dataExclusao.toISOString() : undefined, // Trata null/undefined
             ativo: produto.ativo,
-            cliente_id: produto.cliente_id ?? null ?? undefined, // Inclui cliente_id no DTO se necessário
         };
     }
 

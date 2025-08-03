@@ -47,7 +47,7 @@ describe('Entidade Campanha', () => {
     const campanha = Campanha.criar({
       ...baseProps,
       descricao: undefined,
-      dataFim: undefined,
+      dataFim: null,
     });
 
     expect(campanha.descricao).toBeUndefined();

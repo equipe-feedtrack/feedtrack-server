@@ -41,22 +41,22 @@ const produtoRouter = Router();
 
 // Rota para criar um novo produto
 // POST /produtos
-produtoRouter.post('/', (req, res) => produtoController.criarProduto(req, res));
+produtoRouter.post('/product', (req, res) => produtoController.criarProduto(req, res));
 
 // Rota para buscar um produto por ID
 // GET /produtos/:id
-produtoRouter.get('/:id', (req, res) => produtoController.buscarProdutoPorId(req, res));
+produtoRouter.get('/product/:id', (req, res) => produtoController.buscarProdutoPorId(req, res));
 
 // Rota para listar todos os produtos ou produtos filtrados
 // GET /produtos
-produtoRouter.get('/', (req, res) => produtoController.listarProdutos(req, res));
+produtoRouter.get('/products', (req, res) => produtoController.listarProdutos(req, res));
 
 // Rota para atualizar um produto existente
 // PUT /produtos/:id
-produtoRouter.put('/:id', (req, res) => produtoController.atualizarProduto(req, res));
+produtoRouter.put('/update-product/:id', (req, res) => produtoController.atualizarProduto(req, res));
 
 // Rota para deletar (logicamente) um produto
 // DELETE /produtos/:id
-produtoRouter.delete('/:id', (req, res) => produtoController.deletarProduto(req, res));
+produtoRouter.delete('/delete-product/:id', (req, res) => produtoController.deletarProduto(req, res));
 
 export default produtoRouter;

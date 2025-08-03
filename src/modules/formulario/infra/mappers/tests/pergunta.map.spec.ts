@@ -108,9 +108,9 @@ describe('PerguntaMap', () => {
       tipo: mockPerguntaData.tipo,
       opcoes: mockPerguntaData.opcoes as Prisma.JsonValue,
       ativo: mockPerguntaData.ativo,
-      data_criacao: mockPerguntaData.dataCriacao, // <-- CORRIGIDO: de dataCriacao para data_criacao
-      data_atualizacao: mockPerguntaData.dataAtualizacao, // <-- CORRIGIDO: de dataAtualizacao para data_atualizacao
-      data_exclusao: mockPerguntaData.dataExclusao, // <-- CORRIGIDO: de dataExclusao para data_exclusao
+      dataCriacao: mockPerguntaData.dataCriacao, // <-- CORRIGIDO: de dataCriacao para data_criacao
+      dataAtualizacao: mockPerguntaData.dataAtualizacao, // <-- CORRIGIDO: de dataAtualizacao para data_atualizacao
+      dataExclusao: mockPerguntaData.dataExclusao, // <-- CORRIGIDO: de dataExclusao para data_exclusao
     };
 
     const rawTexto: PerguntaPrisma = {
@@ -119,9 +119,9 @@ describe('PerguntaMap', () => {
       tipo: mockPerguntaTextoData.tipo,
       opcoes: null as Prisma.JsonValue,
       ativo: mockPerguntaTextoData.ativo,
-      data_criacao: mockPerguntaTextoData.dataCriacao, // <-- CORRIGIDO
-      data_atualizacao: mockPerguntaTextoData.dataAtualizacao, // <-- CORRIGIDO
-      data_exclusao: mockPerguntaTextoData.dataExclusao, // <-- CORRIGIDO
+      dataCriacao: mockPerguntaTextoData.dataCriacao, // <-- CORRIGIDO
+      dataAtualizacao: mockPerguntaTextoData.dataAtualizacao, // <-- CORRIGIDO
+      dataExclusao: mockPerguntaTextoData.dataExclusao, // <-- CORRIGIDO
     };
 
     const rawNota: PerguntaPrisma = {
@@ -130,9 +130,9 @@ describe('PerguntaMap', () => {
       tipo: mockPerguntaNotaData.tipo,
       opcoes: null as Prisma.JsonValue,
       ativo: mockPerguntaNotaData.ativo,
-      data_criacao: mockPerguntaNotaData.dataCriacao, // <-- CORRIGIDO
-      data_atualizacao: mockPerguntaNotaData.dataAtualizacao, // <-- CORRIGIDO
-      data_exclusao: mockPerguntaNotaData.dataExclusao, // <-- CORRIGIDO
+      dataCriacao: mockPerguntaNotaData.dataCriacao, // <-- CORRIGIDO
+      dataAtualizacao: mockPerguntaNotaData.dataAtualizacao, // <-- CORRIGIDO
+      dataExclusao: mockPerguntaNotaData.dataExclusao, // <-- CORRIGIDO
     };
 
     it('deve converter dados crus do Prisma (multipla_escolha) para uma entidade Pergunta', () => {
@@ -144,9 +144,9 @@ describe('PerguntaMap', () => {
       expect(pergunta.tipo).toBe(rawMultiplaEscolha.tipo);
       expect(pergunta.opcoes).toEqual(rawMultiplaEscolha.opcoes);
       expect(pergunta.ativo).toBe(rawMultiplaEscolha.ativo);
-      expect(pergunta.dataCriacao).toEqual(rawMultiplaEscolha.data_criacao); // <-- Comparar com snake_case do raw
-      expect(pergunta.dataAtualizacao).toEqual(rawMultiplaEscolha.data_atualizacao); // <-- Comparar com snake_case do raw
-      expect(pergunta.dataExclusao).toEqual(rawMultiplaEscolha.data_exclusao); // <-- Comparar com snake_case do raw
+      expect(pergunta.dataCriacao).toEqual(rawMultiplaEscolha.dataCriacao); // <-- Comparar com snake_case do raw
+      expect(pergunta.dataAtualizacao).toEqual(rawMultiplaEscolha.dataAtualizacao); // <-- Comparar com snake_case do raw
+      expect(pergunta.dataExclusao).toEqual(rawMultiplaEscolha.dataExclusao); // <-- Comparar com snake_case do raw
     });
 
     it('deve converter dados crus do Prisma (texto com opcoes null) para uma entidade Pergunta com opcoes undefined', () => {
@@ -172,10 +172,10 @@ describe('PerguntaMap', () => {
     it('deve lidar com dataExclusao não nula', () => {
       const rawComExclusao: PerguntaPrisma = {
         ...rawMultiplaEscolha,
-        data_exclusao: new Date('2023-04-01T15:00:00.000Z'), // <-- CORRIGIDO
+        dataExclusao: new Date('2023-04-01T15:00:00.000Z'), // <-- CORRIGIDO
       };
       const pergunta = PerguntaMap.toDomain(rawComExclusao);
-      expect(pergunta.dataExclusao).toEqual(rawComExclusao.data_exclusao); // <-- Comparar com snake_case
+      expect(pergunta.dataExclusao).toEqual(rawComExclusao.dataExclusao); // <-- Comparar com snake_case
     });
 
     it('deve lançar exceção ao tentar converter raw.opcoes que não são arrays válidos para multipla_escolha', () => {
@@ -200,9 +200,9 @@ describe('PerguntaMap', () => {
         tipo: mockPerguntaData.tipo,
         opcoes: mockPerguntaData.opcoes,
         ativo: mockPerguntaData.ativo,
-        data_criacao: mockPerguntaData.dataCriacao,
-        data_atualizacao: mockPerguntaData.dataAtualizacao,
-        data_exclusao: mockPerguntaData.dataExclusao,
+        dataCriacao: mockPerguntaData.dataCriacao,
+        dataAtualizacao: mockPerguntaData.dataAtualizacao,
+        dataExclusao: mockPerguntaData.dataExclusao,
       });
     });
 
@@ -214,9 +214,9 @@ describe('PerguntaMap', () => {
       expect(persistenceData.tipo).toBe(mockPerguntaTextoData.tipo);
       expect(persistenceData.opcoes).toBe(Prisma.JsonNull);
       expect(persistenceData.ativo).toBe(mockPerguntaTextoData.ativo);
-      expect(persistenceData.data_criacao).toEqual(mockPerguntaTextoData.dataCriacao);
-      expect(persistenceData.data_atualizacao).toEqual(mockPerguntaTextoData.dataAtualizacao);
-      expect(persistenceData.data_exclusao).toBe(mockPerguntaTextoData.dataExclusao);
+      expect(persistenceData.dataCriacao).toEqual(mockPerguntaTextoData.dataCriacao);
+      expect(persistenceData.dataAtualizacao).toEqual(mockPerguntaTextoData.dataAtualizacao);
+      expect(persistenceData.dataExclusao).toBe(mockPerguntaTextoData.dataExclusao);
     });
 
     it('deve converter uma entidade Pergunta (nota) para um objeto de persistência com opcoes definidas (padrão)', () => {
@@ -227,9 +227,9 @@ describe('PerguntaMap', () => {
       expect(persistenceData.tipo).toBe(mockPerguntaNotaData.tipo);
       expect(persistenceData.opcoes).toEqual(['1', '2', '3', '4', '5']);
       expect(persistenceData.ativo).toBe(mockPerguntaNotaData.ativo);
-      expect(persistenceData.data_criacao).toEqual(mockPerguntaNotaData.dataCriacao);
-      expect(persistenceData.data_atualizacao).toEqual(mockPerguntaNotaData.dataAtualizacao);
-      expect(persistenceData.data_exclusao).toBe(mockPerguntaNotaData.dataExclusao);
+      expect(persistenceData.dataCriacao).toEqual(mockPerguntaNotaData.dataCriacao);
+      expect(persistenceData.dataAtualizacao).toEqual(mockPerguntaNotaData.dataAtualizacao);
+      expect(persistenceData.dataExclusao).toBe(mockPerguntaNotaData.dataExclusao);
     });
 
     it('deve converter uma entidade Pergunta com dataExclusao para persistencia', () => {
@@ -241,7 +241,7 @@ describe('PerguntaMap', () => {
       const perguntaInativa = Pergunta.recuperar(perguntaInativaData);
 
       const persistenceData = PerguntaMap.toPersistence(perguntaInativa);
-      expect(persistenceData.data_exclusao).toEqual(perguntaInativaData.dataExclusao);
+      expect(persistenceData.dataExclusao).toEqual(perguntaInativaData.dataExclusao);
       expect(persistenceData.ativo).toBe(perguntaInativaData.ativo);
     });
   });

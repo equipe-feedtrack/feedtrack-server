@@ -11,7 +11,7 @@ export class EnvioRepositoryPrisma implements IEnvioRepository {
     const dadosParaPersistencia = EnvioMap.toPersistence(envio);
     
     // 2. Usa 'upsert' para criar ou atualizar o registro de forma atômica
-    await this.prisma.envio_formulario.upsert({
+    await this.prisma.envioFormulario.upsert({
       where: { id: envio.id },
       create: dadosParaPersistencia,
       update: dadosParaPersistencia,
@@ -23,7 +23,7 @@ export class EnvioRepositoryPrisma implements IEnvioRepository {
     // Focamos nos campos que a entidade 'Envio' muda através de seus comportamentos.
     const dadosParaPersistencia = EnvioMap.toPersistence(envio); // Mapeia o estado atualizado da entidade
 
-    await this.prisma.envio_formulario.update({
+    await this.prisma.envioFormulario.update({
       where: { id: envio.id }, // Usa o ID da entidade para encontrar o registro
       data: {
         status: dadosParaPersistencia.status, // Atualiza o status
@@ -38,7 +38,7 @@ export class EnvioRepositoryPrisma implements IEnvioRepository {
 
   async buscarPorId(id: string): Promise<Envio | null> {
     // 1. Busca o registro no banco de dados
-    const envioPrisma = await this.prisma.envio_formulario.findUnique({
+    const envioPrisma = await this.prisma.envioFormulario.findUnique({
       where: { id },
     });
 

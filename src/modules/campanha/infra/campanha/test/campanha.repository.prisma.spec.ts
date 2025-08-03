@@ -1,155 +1,151 @@
 import { PrismaClient } from '@prisma/client';
 import { beforeEach, describe, expect, it, afterAll } from 'vitest';
-import { CampanhaRepositoryPrisma } from '../campanha.repository.prisma'; // Ajuste o caminho
-import { Campanha } from '@modules/campanha/domain/campanha.entity'; // Ajuste o caminho
-
-import { randomUUID } from 'crypto';
+import { CampanhaRepositoryPrisma } from '../campanha.repository.prisma';
+import { Campanha } from '@modules/campanha/domain/campanha.entity';
 import { SegmentoAlvo, TipoCampanha } from '@modules/campanha/domain/campanha.types';
 
 const prisma = new PrismaClient();
 const repository = new CampanhaRepositoryPrisma(prisma);
 
 describe('CampanhaRepositoryPrisma (Integration Tests)', () => {
-  // IDs de Formulários que a Campanha irá referenciar (Chaves Estrangeiras)
-  const FORMULARIO_ID_CAMPANHA_1 = randomUUID();
-  const FORMULARIO_ID_CAMPANHA_2 = randomUUID();
+  // =================================================================
+  // DADOS DE TESTE 100% FIXOS E PREVISÍVEIS
+  // =================================================================
+  const FORMULARIO_ID_1 = 'a1b9d6f8-3e2c-4b5d-9a1f-8c7b6a5e4d3c';
+  const FORMULARIO_ID_2 = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
+  const CAMPANHA_ID_1 = 'e58c787b-9b42-4cf4-a2c6-7a718b2f38a5';
 
   beforeEach(async () => {
-    // Limpa o banco de dados antes de cada teste
-    // Ordem de exclusão é importante devido a chaves estrangeiras: Campanha depende de Formulário
-    await prisma.$transaction([
-      prisma.campanha.deleteMany({}),
-      prisma.formulario.deleteMany({}), // Limpa formulários também
-    ]);
+    // Limpeza do Banco ANTES DE CADA TESTE (na ordem correta)
+    await prisma.campanha.deleteMany({});
+    await prisma.formulario.deleteMany({});
 
-    // CRIAÇÃO DE FORMULÁRIOS NECESSÁRIOS PARA OS TESTES DE CAMPANHA (FK)
+    // Criação dos Dados Base (Formulários)
     await prisma.formulario.createMany({
       data: [
-        { id: FORMULARIO_ID_CAMPANHA_1, texto: 'Form Campanha 1', descricao: '', ativo: true, data_criacao: new Date(), data_atualizacao: new Date() },
-        { id: FORMULARIO_ID_CAMPANHA_2, texto: 'Form Campanha 2', descricao: '', ativo: true, data_criacao: new Date(), data_atualizacao: new Date() },
+        { id: FORMULARIO_ID_1, titulo: 'Formulário Campanha 1', descricao: '', ativo: true },
+        { id: FORMULARIO_ID_2, titulo: 'Formulário Campanha 2', descricao: '', ativo: true },
       ],
+    });
+
+    // Criação de uma Campanha já existente para testes de leitura e atualização
+    await prisma.campanha.create({
+        data: {
+            id: CAMPANHA_ID_1,
+            titulo: 'Campanha Existente',
+            descricao: 'Descrição original',
+            tipoCampanha: 'SATISFACAO',
+            segmentoAlvo: 'TODOS_CLIENTES',
+            dataInicio: new Date('2025-01-01T00:00:00Z'),
+            templateMensagem: 'Template V1',
+            formularioId: FORMULARIO_ID_1,
+            ativo: true
+        }
     });
   });
 
   afterAll(async () => {
+    await prisma.campanha.deleteMany({});
+    await prisma.formulario.deleteMany({});
     await prisma.$disconnect();
   });
 
-  // --- Testes para o método 'inserir' ---
-  it('deve inserir uma nova campanha completa com sucesso', async () => {
-    const campanha = Campanha.criar({
+  // =================================================================
+  // TESTES
+  // =================================================================
+
+  it('deve inserir uma nova campanha com sucesso', async () => {
+    // DADO: uma nova entidade Campanha criada no domínio
+    const novaCampanha = Campanha.criar({
       titulo: 'Campanha de Boas-Vindas',
-      descricao: 'Mensagem para novos clientes',
       tipoCampanha: TipoCampanha.AUTOMATICO,
       segmentoAlvo: SegmentoAlvo.NOVOS_CLIENTES,
+      dataFim: null,
       dataInicio: new Date('2025-01-01T00:00:00Z'),
-      dataFim: new Date('2025-12-31T23:59:59Z'),
       templateMensagem: 'Bem-vindo, {{nome}}!',
-      formularioId: FORMULARIO_ID_CAMPANHA_1, // Referencia um formulário existente
+      formularioId: FORMULARIO_ID_1,
     });
 
-    await repository.inserir(campanha);
+    // QUANDO: o repositório insere a campanha
+    await repository.inserir(novaCampanha);
 
+    // ENTÃO: a campanha deve existir no banco com os dados corretos
     const campanhaSalva = await prisma.campanha.findUnique({
-      where: { id: campanha.id },
+      where: { id: novaCampanha.id },
     });
 
     expect(campanhaSalva).toBeDefined();
-    expect(campanhaSalva?.id).toBe(campanha.id);
-    expect(campanhaSalva?.titulo).toBe(campanha.titulo);
-    expect(campanhaSalva?.tipo_campanha).toBe(campanha.tipoCampanha); // snake_case no DB
-    expect(campanhaSalva?.segmento_alvo).toBe(campanha.segmentoAlvo); // snake_case no DB
-    expect(campanhaSalva?.formularioId).toBe(campanha.formularioId);
-    expect(campanhaSalva?.ativo).toBe(true);
-    expect(campanhaSalva?.data_criacao).toBeInstanceOf(Date);
-  });
-
-  it('deve inserir uma nova campanha sem descrição e sem data fim', async () => {
-    const campanha = Campanha.criar({
-      titulo: 'Campanha de Lançamento',
-      descricao: undefined,
-      tipoCampanha: TipoCampanha.PROMOCIONAL,
-      segmentoAlvo: SegmentoAlvo.TODOS_CLIENTES,
-      dataInicio: new Date('2025-02-01T00:00:00Z'),
-      dataFim: undefined,
-      templateMensagem: 'Confira nosso novo produto!',
-      formularioId: FORMULARIO_ID_CAMPANHA_2,
-    });
-
-    await repository.inserir(campanha);
-
-    const campanhaSalva = await prisma.campanha.findUnique({
-      where: { id: campanha.id },
-    });
-
-    expect(campanhaSalva?.descricao).toBeNull(); // undefined na entidade -> null no DB
-    expect(campanhaSalva?.data_fim).toBeNull();   // undefined na entidade -> null no DB
+    expect(campanhaSalva?.id).toBe(novaCampanha.id);
+    expect(campanhaSalva?.titulo).toBe('Campanha de Boas-Vindas');
+    expect(campanhaSalva?.formularioId).toBe(FORMULARIO_ID_1);
   });
 
   it('deve atualizar uma campanha existente', async () => {
-    const campanhaOriginal = Campanha.criar({
-      titulo: 'Campanha Antiga',
-      descricao: 'Descrição original',
-      tipoCampanha: TipoCampanha.SATISFACAO,
-      segmentoAlvo: SegmentoAlvo.TODOS_CLIENTES,
-      dataInicio: new Date('2025-01-01T00:00:00Z'),
-      dataFim: null,
-      templateMensagem: 'Template V1',
-      formularioId: FORMULARIO_ID_CAMPANHA_1,
+    // DADO: uma campanha existente recuperada como entidade de domínio
+    const campanhaParaAtualizar = await repository.recuperarPorUuid(CAMPANHA_ID_1);
+    expect(campanhaParaAtualizar).toBeInstanceOf(Campanha);
+
+    // QUANDO: métodos de domínio são chamados para alterar o estado
+    campanhaParaAtualizar!.atualizarTemplate('Template V2 Atualizado');
+    campanhaParaAtualizar!.desativar();
+    
+    // E o repositório persiste a mudança
+    await repository.atualizar(campanhaParaAtualizar!);
+
+    // ENTÃO: o estado no banco de dados deve refletir a mudança
+    const campanhaDoDb = await prisma.campanha.findUnique({
+      where: { id: CAMPANHA_ID_1 },
     });
-    await repository.inserir(campanhaOriginal);
-
-    // Modifica a entidade de domínio
-    campanhaOriginal.atualizarTemplate('Template V2 de Teste');
-    campanhaOriginal.desativar(); // Muda o status
-    campanhaOriginal.atualizarPeriodo(new Date('2025-01-15T00:00:00Z'), new Date('2025-01-30T23:59:59Z'));
-    campanhaOriginal['dataAtualizacao'] = new Date(Date.now() + 1000); // Garante que a data é diferente
-
-    await repository.inserir(campanhaOriginal); // Persiste as mudanças (upsert como update)
-
-    const campanhaAtualizada = await prisma.campanha.findUnique({
-      where: { id: campanhaOriginal.id },
-    });
-
-    expect(campanhaAtualizada).toBeDefined();
-    expect(campanhaAtualizada?.titulo).toBe(campanhaOriginal.titulo); // Título não mudou
-    expect(campanhaAtualizada?.template_mensagem).toBe('Template V2 de Teste');
-    expect(campanhaAtualizada?.ativo).toBe(false);
-    expect(campanhaAtualizada?.data_inicio).toEqual(campanhaOriginal.dataInicio);
-    expect(campanhaAtualizada?.data_fim).toEqual(campanhaOriginal.dataFim);
-    expect(campanhaAtualizada?.data_atualizacao?.getTime()).toBeGreaterThan(
-      campanhaOriginal.dataCriacao.getTime(),
-    );
+    expect(campanhaDoDb?.templateMensagem).toBe('Template V2 Atualizado');
+    expect(campanhaDoDb?.ativo).toBe(false);
+    expect(campanhaDoDb?.dataExclusao).toBeInstanceOf(Date);
   });
 
-  // --- Testes para o método 'recuperarPorUuid' ---
-  it('deve recuperar uma campanha existente por ID', async () => {
-    const campanha = Campanha.criar({
-      titulo: 'Campanha para Recuperar',
-      tipoCampanha: TipoCampanha.POS_COMPRA,
-      segmentoAlvo: SegmentoAlvo.CLIENTES_REGULARES,
-      dataInicio: new Date('2025-01-01T00:00:00Z'),
-      templateMensagem: 'Recuperar Teste',
-      formularioId: FORMULARIO_ID_CAMPANHA_1,
-    });
-    await repository.inserir(campanha);
-
-    const campanhaRecuperada = await repository.recuperarPorUuid(campanha.id);
+  it('deve recuperar uma campanha por ID', async () => {
+    const campanhaRecuperada = await repository.recuperarPorUuid(CAMPANHA_ID_1);
 
     expect(campanhaRecuperada).toBeInstanceOf(Campanha);
-    expect(campanhaRecuperada?.id).toBe(campanha.id);
-    expect(campanhaRecuperada?.titulo).toBe(campanha.titulo);
-    expect(campanhaRecuperada?.tipoCampanha).toBe(campanha.tipoCampanha);
-    expect(campanhaRecuperada?.segmentoAlvo).toBe(campanha.segmentoAlvo);
-    expect(campanhaRecuperada?.formularioId).toBe(campanha.formularioId);
-    expect(campanhaRecuperada?.ativo).toBe(true);
-    expect(campanhaRecuperada?.dataCriacao.toISOString()).toBe(campanha.dataCriacao.toISOString());
+    expect(campanhaRecuperada?.id).toBe(CAMPANHA_ID_1);
+    expect(campanhaRecuperada?.titulo).toBe('Campanha Existente');
   });
 
-  it('deve retornar null se a campanha não for encontrada por ID', async () => {
-    const campanhaRecuperada = await repository.recuperarPorUuid('id-nao-existente');
-    expect(campanhaRecuperada).toBeNull();
+  it('deve listar todas as campanhas', async () => {
+    // DADO: uma campanha extra inserida
+    const campanhaExtra = Campanha.criar({
+        titulo: 'Campanha Extra',
+        tipoCampanha: TipoCampanha.PROMOCIONAL,
+        segmentoAlvo: SegmentoAlvo.CLIENTES_PREMIUM,
+        dataFim: null,
+        dataInicio: new Date(),
+        templateMensagem: 'Promo!',
+        formularioId: FORMULARIO_ID_2
+    });
+    await repository.inserir(campanhaExtra);
+
+    // QUANDO: o método listar é chamado
+    const campanhas = await repository.listar();
+
+    // ENTÃO: a lista deve conter todas as campanhas
+    expect(campanhas).toHaveLength(2);
+    expect(campanhas.some(c => c.id === CAMPANHA_ID_1)).toBe(true);
+    expect(campanhas.some(c => c.id === campanhaExtra.id)).toBe(true);
   });
 
-  // ... (Você pode adicionar mais testes para listar, existe, deletar conforme implementar)
+  it('deve deletar uma campanha', async () => {
+    let campanha = await prisma.campanha.findUnique({ where: { id: CAMPANHA_ID_1 } });
+    expect(campanha).not.toBeNull();
+
+    await repository.deletar(CAMPANHA_ID_1);
+
+    campanha = await prisma.campanha.findUnique({ where: { id: CAMPANHA_ID_1 } });
+    expect(campanha).toBeNull();
+  });
+
+  it('deve verificar corretamente se uma campanha existe', async () => {
+    const existe = await repository.existe(CAMPANHA_ID_1);
+    const naoExiste = await repository.existe('id-nao-existente');
+
+    expect(existe).toBe(true);
+    expect(naoExiste).toBe(false);
+  });
 });

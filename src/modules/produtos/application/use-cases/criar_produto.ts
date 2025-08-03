@@ -24,7 +24,6 @@ export class CriarProdutoUseCase {
       nome: input.nome,
       descricao: input.descricao,
       valor: input.valor,
-      cliente_id: input.cliente_id,
     });
 
     // 3. Persiste o Produto (e conecta ao Cliente)
