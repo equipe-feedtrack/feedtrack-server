@@ -44,18 +44,18 @@ const clienteController = new ClienteController(
 const clienteRouter = Router();
 
 // Rota para criar um novo cliente
-clienteRouter.post('/cliente', (req, res) => clienteController.criar(req, res));
+clienteRouter.post('/cliente', clienteController.criar);
 
 // Rota para listar todos os clientes (com filtros opcionais)
-clienteRouter.get('/clientes', (req, res) => clienteController.listar(req, res));
+clienteRouter.get('/clientes',clienteController.listar);
 
 // Rota para buscar um cliente específico por ID
-clienteRouter.get('/cliente/:id', (req, res) => clienteController.buscarPorId(req, res));
+clienteRouter.get('/cliente/:id', clienteController.buscarPorId);
 
 // Rota para atualizar um cliente existente
-clienteRouter.put('/update-cliente/:id', (req, res) => clienteController.atualizar(req, res));
+clienteRouter.put('/update-cliente/:id', clienteController.atualizar);
 
 // Rota para deletar (logicamente) um cliente
-clienteRouter.delete('/delete-cliente/:id', (req, res) => clienteController.deletar(req, res));
+clienteRouter.delete('/delete-cliente/:id', clienteController.deletar);
 
 export { clienteRouter };

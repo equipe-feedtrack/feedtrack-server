@@ -34,15 +34,15 @@ const perguntaController = new PerguntaController(
 const perguntaRouter = Router();
 
 // Rota para criar uma nova pergunta
-perguntaRouter.post('/pergunta', (req, res) => perguntaController.criar(req, res));
+perguntaRouter.post('/pergunta', perguntaController.criar);
 
 // Rota para buscar uma pergunta por ID
-perguntaRouter.get('/pergunta/:id', (req, res) => perguntaController.buscarPorId(req, res));
+perguntaRouter.get('/pergunta/:id', perguntaController.buscarPorId);
 
 // Rota para atualizar uma pergunta
-perguntaRouter.put('/update-pergunta/:id', (req, res) => perguntaController.atualizar(req, res));
+perguntaRouter.put('/update-pergunta/:id', perguntaController.atualizar);
 
 // Rota para deletar uma pergunta
-perguntaRouter.delete('/delete-pergunta/:id', (req, res) => perguntaController.deletar(req, res));
+perguntaRouter.delete('/delete-pergunta/:id', perguntaController.deletar);
 
 export { perguntaRouter };

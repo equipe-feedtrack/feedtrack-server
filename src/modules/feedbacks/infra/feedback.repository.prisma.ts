@@ -76,4 +76,15 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
 
     return FeedbackMap.toDomain(raw);
   }
+
+  async buscarTodos(): Promise<Feedback[]> {
+    const rawFeedbacks = await this.prisma.feedback.findMany();
+
+    if (!rawFeedbacks || rawFeedbacks.length === 0) {
+      return [];
+    }
+    
+    // Mapeia cada objeto do Prisma para uma entidade de domínio.
+    return rawFeedbacks.map(FeedbackMap.toDomain);
+  }
 }

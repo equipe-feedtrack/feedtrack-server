@@ -1,6 +1,6 @@
-// src/modules/produtos/presentation/controllers/produto.controller.ts (Adaptado)
+// src/modules/produtos/presentation/controllers/produto.controller.ts
 
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 // Importar todos os casos de uso
 import { ListarProdutosInput, ListarProdutosUseCase } from '@modules/produtos/application/use-cases/listar_produtos';
 import { DeletarProdutoUseCase } from '@modules/produtos/application/use-cases/deletar_produto';
@@ -11,8 +11,6 @@ import { CriarProdutoUseCase } from '@modules/produtos/application/use-cases/cri
 // Importar DTOs de input/output
 import { AtualizarProdutoInputDTO } from '@modules/produtos/application/dto/atualizar_produto_input.dto';
 import { CriarProdutoInputDTO } from '@modules/produtos/application/dto/criar_produto_input.dto';
-
- // Para validações de enum
 
 // Exceções personalizadas (se tiver)
 class BadRequestError extends Error { /* ... */ }
@@ -25,23 +23,21 @@ export class ProdutoController {
     private readonly atualizarProdutoUseCase: AtualizarProdutoUseCase,
     private readonly deletarProdutoUseCase: DeletarProdutoUseCase,
     private readonly listarProdutosUseCase: ListarProdutosUseCase
-  ) {}
+  ) { }
 
   // Métodos do Controlador
-  public async criarProduto(req: Request, res: Response): Promise<Response> {
+  public criarProduto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // ... (validações de input) ...
       const inputDTO: CriarProdutoInputDTO = req.body; // Requisição direta
       const produtoCriado = await this.criarProdutoUseCase.execute(inputDTO);
-      return res.status(201).json(produtoCriado);
+      res.status(201).json(produtoCriado);
     } catch (error: any) {
-      if (error instanceof BadRequestError) return res.status(400).json({ message: error.message });
-      // ... tratar outras exceções ...
-      return res.status(500).json({ message: 'Erro interno do servidor.', error: error.message });
+      next(error); // Encaminha o erro para o middleware de erros global
     }
   }
 
-  public async buscarProdutoPorId(req: Request, res: Response): Promise<Response> {
+  public buscarProdutoPorId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       if (!id) throw new BadRequestError('ID do produto é obrigatório.');
@@ -49,16 +45,13 @@ export class ProdutoController {
       const produto = await this.buscarProdutoPorIdUseCase.execute(id);
       if (!produto) throw new NotFoundError(`Produto com ID ${id} não encontrado.`);
 
-      return res.status(200).json(produto);
+      res.status(200).json(produto);
     } catch (error: any) {
-      if (error instanceof BadRequestError) return res.status(400).json({ message: error.message });
-      if (error instanceof NotFoundError) return res.status(404).json({ message: error.message });
-      console.error('Erro ao buscar produto:', error);
-      return res.status(500).json({ message: 'Erro interno do servidor.', error: error.message });
+      next(error);
     }
   }
 
-  public async listarProdutos(req: Request, res: Response): Promise<Response> {
+  public listarProdutos = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Implementar lógica de filtros a partir de req.query
       const { ativo, cliente_id } = req.query; // Tipagem básica para filtros
@@ -72,14 +65,13 @@ export class ProdutoController {
         cliente_id: typeof cliente_id === 'string' ? cliente_id : undefined, // Garante que cliente_id é string ou undefined
       };
       const produtos = await this.listarProdutosUseCase.execute(filtros);
-      return res.status(200).json(produtos);
+      res.status(200).json(produtos);
     } catch (error: any) {
-      console.error('Erro ao listar produtos:', error);
-      return res.status(500).json({ message: 'Erro interno do servidor.', error: error.message });
+      next(error);
     }
   }
 
-  public async atualizarProduto(req: Request, res: Response): Promise<Response> {
+  public atualizarProduto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       if (!id) throw new BadRequestError('ID do produto é obrigatório para atualização.');
@@ -87,28 +79,22 @@ export class ProdutoController {
       const inputDTO: AtualizarProdutoInputDTO = { id, ...req.body };
       const produtoAtualizado = await this.atualizarProdutoUseCase.execute(inputDTO);
 
-      return res.status(200).json(produtoAtualizado);
+      res.status(200).json(produtoAtualizado);
     } catch (error: any) {
-      if (error instanceof BadRequestError) return res.status(400).json({ message: error.message });
-      // ... Tratar outras exceções, como produto não encontrado ...
-      console.error('Erro ao atualizar produto:', error);
-      return res.status(500).json({ message: 'Erro interno do servidor.', error: error.message });
+      next(error);
     }
   }
 
-  public async deletarProduto(req: Request, res: Response): Promise<Response> {
+  public deletarProduto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       if (!id) throw new BadRequestError('ID do produto é obrigatório para exclusão.');
 
       await this.deletarProdutoUseCase.execute(id);
 
-      return res.status(204).send(); // 204 No Content para deleção bem-sucedida
+      res.status(204).send(); // 204 No Content para deleção bem-sucedida
     } catch (error: any) {
-      if (error instanceof BadRequestError) return res.status(400).json({ message: error.message });
-      // ... Tratar outras exceções ...
-      console.error('Erro ao deletar produto:', error);
-      return res.status(500).json({ message: 'Erro interno do servidor.', error: error.message });
+      next(error);
     }
   }
 }

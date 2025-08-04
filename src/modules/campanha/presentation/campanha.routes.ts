@@ -44,18 +44,18 @@ const campanhaController = new CampanhaController(
 const campanhaRouter = Router();
 
 // Rota para criar uma nova campanha
-campanhaRouter.post('/campanha', (req, res) => campanhaController.criar(req, res));
+campanhaRouter.post('/campanha',  campanhaController.criar);
 
 // Rota para listar todas as campanhas
-campanhaRouter.get('/campanhas', (req, res) => campanhaController.listar(req, res));
+campanhaRouter.get('/campanhas',  campanhaController.listar);
 
 // Rota para buscar uma campanha por ID
-campanhaRouter.get('/campanha/:id', (req, res) => campanhaController.buscarPorId(req, res));
+campanhaRouter.get('/campanha/:id', campanhaController.buscarPorId);
 
 // Rota para atualizar uma campanha
-campanhaRouter.put('/update-campanha/:id', (req, res) => campanhaController.atualizar(req, res));
+campanhaRouter.put('/update-campanha/:id', campanhaController.atualizar);
 
 // Rota para deletar uma campanha
-campanhaRouter.delete('/delete-campanha/:id', (req, res) => campanhaController.deletar(req, res));
+campanhaRouter.delete('/delete-campanha/:id', campanhaController.deletar);
 
 export { campanhaRouter };

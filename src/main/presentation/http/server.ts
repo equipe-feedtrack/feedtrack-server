@@ -11,7 +11,7 @@ const createHTTPServer = async (): Promise<http.Server>  => {
     app.use(express.json());
     app.use(morgan('tiny'));
     app.use('/api/v1', apiv1Router);
-    app.use(whatsappRoutes); // Registra as rotas
+    // app.use(whatsappRoutes); // Registra as rotas
     const httpServer: http.Server = http.createServer(app);
     return httpServer;
 };

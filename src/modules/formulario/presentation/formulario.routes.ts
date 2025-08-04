@@ -43,18 +43,18 @@ const formularioController = new FormularioController(
 const formularioRouter = Router();
 
 // Rota para criar um novo formulário
-formularioRouter.post('/formulario', (req, res) => formularioController.criar(req, res));
+formularioRouter.post('/formulario',formularioController.criar);
 
 // Rota para listar todos os formulários
-formularioRouter.get('/formularios', (req, res) => formularioController.listar(req, res));
+formularioRouter.get('/formularios',  formularioController.listar);
 
 // Rota para buscar um formulário por ID
-formularioRouter.get('/formulario/:id', (req, res) => formularioController.buscarPorId(req, res));
+formularioRouter.get('/formulario/:id',  formularioController.buscarPorId);
 
 // Rota para atualizar um formulário
-formularioRouter.put('/update-formulario/:id', (req, res) => formularioController.atualizar(req, res));
+formularioRouter.put('/update-formulario/:id', formularioController.atualizar);
 
 // Rota para deletar um formulário
-formularioRouter.delete('/delete-formulario/:id', (req, res) => formularioController.deletar(req, res));
+formularioRouter.delete('/delete-formulario/:id', formularioController.deletar);
 
 export { formularioRouter };

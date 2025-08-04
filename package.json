@@ -55,11 +55,13 @@
     "@types/axios": "^0.9.36",
     "axios": "^1.10.0",
     "body-parser": "^2.2.0",
+    "class-validator": "^0.14.2",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.1",
     "nodemailer": "^7.0.3",
+    "reflect-metadata": "^0.2.2",
     "sqlite": "^5.1.1"
   }
 }

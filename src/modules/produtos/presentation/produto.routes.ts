@@ -1,3 +1,5 @@
+// src/modules/formulario/infra/http/routes/produto.routes.ts
+
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 
@@ -41,22 +43,22 @@ const produtoRouter = Router();
 
 // Rota para criar um novo produto
 // POST /produtos
-produtoRouter.post('/product', (req, res) => produtoController.criarProduto(req, res));
+produtoRouter.post('/product', produtoController.criarProduto);
 
 // Rota para buscar um produto por ID
 // GET /produtos/:id
-produtoRouter.get('/product/:id', (req, res) => produtoController.buscarProdutoPorId(req, res));
+produtoRouter.get('/product/:id', produtoController.buscarProdutoPorId);
 
 // Rota para listar todos os produtos ou produtos filtrados
 // GET /produtos
-produtoRouter.get('/products', (req, res) => produtoController.listarProdutos(req, res));
+produtoRouter.get('/products', produtoController.listarProdutos);
 
 // Rota para atualizar um produto existente
 // PUT /produtos/:id
-produtoRouter.put('/update-product/:id', (req, res) => produtoController.atualizarProduto(req, res));
+produtoRouter.put('/update-product/:id', produtoController.atualizarProduto);
 
 // Rota para deletar (logicamente) um produto
 // DELETE /produtos/:id
-produtoRouter.delete('/delete-product/:id', (req, res) => produtoController.deletarProduto(req, res));
+produtoRouter.delete('/delete-product/:id', produtoController.deletarProduto);
 
 export default produtoRouter;

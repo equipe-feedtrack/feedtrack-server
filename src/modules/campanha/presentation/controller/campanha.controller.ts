@@ -1,9 +1,15 @@
+import { Request, Response, NextFunction } from 'express';
 import { AtualizarCampanhaUseCase } from "@modules/campanha/application/use-cases/atualizarCampanhaUseCase";
 import { BuscarCampanhaPorIdUseCase } from "@modules/campanha/application/use-cases/buscarCampanhaUseCase";
 import { CriarCampanhaUseCase } from "@modules/campanha/application/use-cases/criarCampanhaUseCase";
 import { DeletarCampanhaUseCase } from "@modules/campanha/application/use-cases/deletarCampanhaUseCase";
 import { ListarCampanhasUseCase } from "@modules/campanha/application/use-cases/listarCampanhaUseCase";
 
+/**
+ * Controller responsável por gerir as requisições HTTP para o recurso de Campanhas.
+ * A refatoração utiliza arrow functions para manter o contexto do 'this' e o
+ * parâmetro 'next' para um tratamento de erros mais robusto.
+ */
 export class CampanhaController {
   constructor(
     private readonly _criarCampanhaUseCase: CriarCampanhaUseCase,
@@ -11,101 +17,89 @@ export class CampanhaController {
     private readonly _buscarCampanhaPorIdUseCase: BuscarCampanhaPorIdUseCase,
     private readonly _atualizarCampanhaUseCase: AtualizarCampanhaUseCase,
     private readonly _deletarCampanhaUseCase: DeletarCampanhaUseCase
-  ) {}
+  ) { }
 
   /**
    * Lida com a requisição para criar uma nova campanha.
    * Rota: POST /campanhas
    */
-  async criar(req: Request, res: Response): Promise<Response> {
+  public criar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const campanhaCriadaDTO = await this._criarCampanhaUseCase.execute(req.body);
-      return res.status(201).json(campanhaCriadaDTO);
+      res.status(201).json(campanhaCriadaDTO);
     } catch (error: any) {
-      return res.status(400).json({
-        message: 'Erro ao criar campanha.',
-        error: error.message,
-      });
+      next(error);
     }
-  }
+  };
 
   /**
    * Lida com a requisição para listar todas as campanhas.
    * Rota: GET /campanhas
    */
-  async listar(req: Request, res: Response): Promise<Response> {
+  public listar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const campanhasDTO = await this._listarCampanhasUseCase.execute();
-      return res.status(200).json(campanhasDTO);
+      res.status(200).json(campanhasDTO);
     } catch (error: any) {
-      return res.status(500).json({
-        message: 'Erro ao listar campanhas.',
-        error: error.message,
-      });
+      next(error);
     }
-  }
+  };
 
   /**
    * Lida com a requisição para buscar uma campanha por seu ID.
    * Rota: GET /campanhas/:id
    */
-  async buscarPorId(req: Request, res: Response): Promise<Response> {
+  public buscarPorId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       const campanhaDTO = await this._buscarCampanhaPorIdUseCase.execute(id);
 
       if (!campanhaDTO) {
-        return res.status(404).json({ message: 'Campanha não encontrada.' });
+        res.status(404).json({ message: 'Campanha não encontrada.' });
+        return;
       }
 
-      return res.status(200).json(campanhaDTO);
+      res.status(200).json(campanhaDTO);
     } catch (error: any) {
-      return res.status(500).json({
-        message: 'Erro ao buscar campanha.',
-        error: error.message,
-      });
+      next(error);
     }
-  }
+  };
 
   /**
    * Lida com a requisição para atualizar uma campanha existente.
    * Rota: PUT /campanhas/:id
    */
-  async atualizar(req: Request, res: Response): Promise<Response> {
+  public atualizar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       const inputDTO = { id, ...req.body };
-      
+
       const campanhaAtualizadaDTO = await this._atualizarCampanhaUseCase.execute(inputDTO);
-      return res.status(200).json(campanhaAtualizadaDTO);
+      res.status(200).json(campanhaAtualizadaDTO);
     } catch (error: any) {
-      if (error.message.includes('não encontrada')) {
-        return res.status(404).json({ message: error.message });
+      if (error ) {
+        res.status(404).json({ message: error.message });
+        return;
       }
-      return res.status(400).json({
-        message: 'Erro ao atualizar campanha.',
-        error: error.message,
-      });
+      next(error);
     }
-  }
+  };
 
   /**
    * Lida com a requisição para deletar uma campanha.
    * Rota: DELETE /campanhas/:id
    */
-  async deletar(req: Request, res: Response): Promise<Response> {
+  public deletar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       await this._deletarCampanhaUseCase.execute(id);
-      return res.status(204).send();
+      res.status(204).send();
     } catch (error: any) {
-      if (error.message.includes('não encontrada')) {
-        return res.status(404).json({ message: error.message });
+      if (error) {
+        res.status(404).json({ message: error.message });
+        return;
       }
-      return res.status(500).json({
-        message: 'Erro ao deletar campanha.',
-        error: error.message,
-      });
+      next(error);
     }
-  }
+  };
 }
