@@ -1,16 +1,15 @@
-import { TipoPergunta } from "@shared/domain/data.types";
-
 interface IFeedback {
   id: string;
   formularioId: string;
-  resposta: Record<string, any>; // <-- AGORA É UM ÚNICO OBJETO JSON
-  dataCriacao: Date; // Usar dataCriacao para alinhamento com IDatasControle
+  envioId: string; // Adicionado para consistência com a entidade
+  respostas: Record<string, any>[];
+  dataCriacao: Date;
   dataExclusao?: Date | null;
 }
 
 /**
  * Dados necessários para criar um novo feedback.
- * Não exige `id` nem `data_resposta` pois são definidos pela entidade.
+ * Não exige `id`, `dataCriacao` nem `dataExclusao` pois são definidos pela entidade.
  */
 type CriarFeedbackProps = Omit<IFeedback, "id" | "dataCriacao" | "dataExclusao">;
 

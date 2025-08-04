@@ -1,127 +1,117 @@
-import { Feedback } from "@modules/feedbacks/domain/feedback.entity";
-import { PrismaClient } from "@prisma/client";
-import { TipoPergunta } from "@shared/domain/data.types";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { FeedbackRepositoryPrisma } from "../feedback.repository.prisma";
+import { randomUUID } from "crypto";
+import { PrismaClient, Feedback as FeedbackPrisma } from "@prisma/client";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import { TipoPergunta } from "@shared/domain/data.types";
+
+import { FeedbackRepositoryPrisma } from "../feedback.repository.prisma";
+import { Feedback } from "@modules/feedbacks/domain/feedback.entity";
+
+// Mock do PrismaClient para isolar os testes do banco de dados real
 vi.mock("@prisma/client", () => {
+  const mockPrisma = {
+    feedback: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      upsert: vi.fn(), // Adicionado para mockar a função upsert
+      findMany: vi.fn(),
+    },
+    $transaction: vi.fn(async (callback) => await callback(mockPrisma)),
+  };
   return {
-    PrismaClient: vi.fn().mockImplementation(() => ({
-      feedback: {
-        create: vi.fn(),
-        findUnique: vi.fn(),
-        findMany: vi.fn(),
-      },
-    })),
+    PrismaClient: vi.fn(() => mockPrisma),
   };
 });
 
 describe("FeedbackRepositoryPrisma", () => {
   let prisma: PrismaClient;
   let repo: FeedbackRepositoryPrisma;
-  let id = "b7f8c150-4d7b-4e2e-a9f7-2b9457e5a2d3";
 
   beforeEach(() => {
+    vi.clearAllMocks();
     prisma = new PrismaClient();
     repo = new FeedbackRepositoryPrisma(prisma);
   });
 
-  it("deve salvar um feedback", async () => {
-    const mockCreate = prisma.feedback.create as unknown as ReturnType<typeof vi.fn>;
-    mockCreate.mockResolvedValueOnce({});
+  it("deve salvar um novo feedback (upsert)", async () => {
+    const feedbackId = randomUUID();
+    const formularioId = randomUUID();
+    const envioId = randomUUID();
 
-    const feedback = Feedback.criarFeedback({
-      formularioId: id,
-      perguntaId: id,
-      tipo: TipoPergunta.TEXTO,
-      resposta_texto: "Teste",
-    });
+    const mockFeedbackData = {
+      formularioId,
+      envioId,
+      respostas: [{
+        perguntaId: randomUUID(),
+        tipo: TipoPergunta.NOTA,
+        nota: 5,
+        data_resposta: new Date(),
+      }],
+    };
+    
+    const feedbackEntity = Feedback.criar(mockFeedbackData, feedbackId);
+    
+    // Simula o comportamento de upsert
+    vi.mocked(prisma.feedback.upsert).mockResolvedValue({
+      id: feedbackEntity.id,
+      formularioId: feedbackEntity.formularioId,
+      envioId: feedbackEntity.envioId,
+      resposta: feedbackEntity.respostas,
+      dataCriacao: feedbackEntity.dataCriacao,
+      dataExclusao: feedbackEntity.dataExclusao,
+    } as FeedbackPrisma);
 
-    await repo.salvar(feedback);
+    await repo.salvar(feedbackEntity);
 
-    expect(mockCreate).toHaveBeenCalledWith({
-      data: {
-        id: feedback.id,
-        formularioId: id,
-        resposta: {
-          perguntaId: id,
-          tipo: TipoPergunta.TEXTO,
-          resposta_texto: "Teste",
-          nota: undefined,
-          opcaoEscolhida: undefined,
-          data_resposta: expect.any(Date),
-        },
-        data_criacao: expect.any(Date),
-      },
+    expect(prisma.feedback.upsert).toHaveBeenCalledWith({
+      where: { id: feedbackEntity.id },
+      create: expect.objectContaining({
+        id: feedbackId,
+        formularioId,
+        envioId,
+        resposta: feedbackEntity.respostas,
+        dataCriacao: expect.any(Date),
+        dataExclusao: null,
+      }),
+      update: expect.objectContaining({
+        resposta: feedbackEntity.respostas,
+        dataExclusao: null,
+      }),
     });
   });
 
-  it("deve buscar feedback por id", async () => {
-    const mockFindUnique = prisma.feedback.findUnique as unknown as ReturnType<typeof vi.fn>;
-
-    const dataFromDb = {
-      id: id,
-      formularioId: id,
-      resposta: {
-        perguntaId: id,
-        tipo: TipoPergunta.NOTA,
-        resposta_texto: null,
-        nota: 8,
-        opcaoEscolhida: null,
-        data_resposta: new Date("2025-07-18T00:00:00Z"),
-      },
-      data_criacao: new Date("2025-07-18T00:00:00Z"),
+  it("deve buscar um feedback por ID", async () => {
+    const feedbackId = randomUUID();
+    const mockDbResponse = {
+      id: feedbackId,
+      formularioId: randomUUID(),
+      envioId: randomUUID(),
+      resposta: [{
+        perguntaId: randomUUID(),
+        tipo: TipoPergunta.TEXTO,
+        resposta_texto: "Teste de busca",
+        data_resposta: new Date(),
+      }],
+      dataCriacao: new Date(),
+      dataExclusao: null,
     };
 
-    mockFindUnique.mockResolvedValueOnce(dataFromDb);
+    vi.mocked(prisma.feedback.findUnique).mockResolvedValue(mockDbResponse as FeedbackPrisma);
 
-    const feedback = await repo.buscarPorId(id);
+    const result = await repo.recuperarPorUuid(feedbackId);
 
-    expect(mockFindUnique).toHaveBeenCalledWith({ where: { id: id } });
-
-    expect(feedback).toBeInstanceOf(Feedback);
-    expect(feedback?.id).toBe(id);
-    expect(feedback?.nota).toBe(8);
-    expect(feedback?.resposta_texto).toBeUndefined();
+    expect(prisma.feedback.findUnique).toHaveBeenCalledWith({ where: { id: feedbackId } });
+    expect(result).toBeInstanceOf(Feedback);
+    expect(result?.id).toBe(feedbackId);
+    expect(result?.respostas[0].resposta_texto).toBe("Teste de busca");
   });
 
-  it("deve retornar null se feedback não encontrado", async () => {
-    const mockFindUnique = prisma.feedback.findUnique as unknown as ReturnType<typeof vi.fn>;
+  it("deve retornar null se o feedback não for encontrado por ID", async () => {
+    vi.mocked(prisma.feedback.findUnique).mockResolvedValue(null);
 
-    mockFindUnique.mockResolvedValueOnce(null);
+    const result = await repo.recuperarPorUuid(randomUUID());
 
-    const feedback = await repo.buscarPorId("id-inexistente");
-
-    expect(feedback).toBeNull();
-  });
-
-  it("deve buscar feedbacks por formularioId", async () => {
-    const mockFindMany = prisma.feedback.findMany as unknown as ReturnType<typeof vi.fn>;
-
-    const dataRows = [
-      {
-        id: id,
-        formularioId: id,
-        resposta: {
-          perguntaId: id,
-          tipo: TipoPergunta.MULTIPLA_ESCOLHA,
-          resposta_texto: null,
-          nota: null,
-          opcaoEscolhida: "Opção 1",
-          data_resposta: new Date("2025-07-18T00:00:00Z"),
-        },
-        data_criacao: new Date("2025-07-18T00:00:00Z"),
-      },
-    ];
-
-    mockFindMany.mockResolvedValueOnce(dataRows);
-
-    const feedbacks = await repo.buscarPorFormulario(id);
-
-    expect(mockFindMany).toHaveBeenCalledWith({ where: { formularioId: id } });
-
-    expect(feedbacks).toHaveLength(1);
-    expect(feedbacks[0]).toBeInstanceOf(Feedback);
-    expect(feedbacks[0].opcaoEscolhida).toBe("Opção 1");
+    expect(result).toBeNull();
   });
 });

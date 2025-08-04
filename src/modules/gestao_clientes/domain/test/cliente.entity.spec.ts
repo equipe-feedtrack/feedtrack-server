@@ -33,7 +33,6 @@ describe('Entidade Cliente', () => {
     dataCriacao: new Date('2024-01-01T10:00:00Z'),
     dataAtualizacao: new Date('2024-01-01T10:00:00Z'),
     ativo: true,
-    cliente_id: randomUUID(),
     dataExclusao: null
   };
 
@@ -45,7 +44,6 @@ describe('Entidade Cliente', () => {
     dataCriacao: new Date('2024-01-01T10:00:00Z'),
     dataAtualizacao: new Date('2024-01-01T10:00:00Z'),
     ativo: true,
-    cliente_id: randomUUID(),
     dataExclusao: null
   };
 

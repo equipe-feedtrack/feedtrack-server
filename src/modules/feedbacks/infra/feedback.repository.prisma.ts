@@ -1,41 +1,79 @@
-import { PrismaClient } from '@prisma/client';
-import { Feedback } from '../domain/feedback.entity';
-import { FeedbackMap } from './mappers/feedback.map';
-import { IFeedback } from '../domain/feedback.types';
-import { PrismaRepository } from '@shared/infra/prisma.repository';
-import { IFeedbackRepository } from './feedback.repository';
+import { PrismaClient } from "@prisma/client";
+import { Feedback } from "../domain/feedback.entity";
+import { IFeedbackRepository } from "./feedback.repository";
+import { FeedbackMap } from "./mappers/feedback.map";
 
-export class FeedbackRepositoryPrisma extends PrismaRepository implements IFeedbackRepository {
-  constructor(prisma: PrismaClient) {
-    super(prisma);
-  }
-
-  async inserir(feedback: Feedback): Promise<void> {
+export class FeedbackRepositoryPrisma implements IFeedbackRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+  /**
+   * Salva ou atualiza um registro de Feedback.
+   * Usa o método 'upsert' do Prisma para lidar com ambos os cenários de forma atômica.
+   *
+   * @param feedback A entidade de domínio Feedback a ser salva.
+   */
+  async salvar(feedback: Feedback): Promise<void> {
     const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
-    await this._datasource.feedback.create({
-      data: dadosParaPersistencia,
+
+    await this.prisma.feedback.upsert({
+      where: { id: feedback.id },
+      create: dadosParaPersistencia,
+      update: {
+        // A entidade de Feedback tem poucos campos mutáveis.
+        // Focamos naqueles que podem ser alterados, como a exclusão lógica.
+        resposta: dadosParaPersistencia.resposta,
+        dataExclusao: dadosParaPersistencia.dataExclusao,
+      },
     });
   }
 
+  /**
+   * Busca um registro de Feedback pelo seu ID.
+   *
+   * @param id O ID do feedback a ser buscado.
+   * @returns A entidade de domínio Feedback ou null se não for encontrado.
+   */
   async recuperarPorUuid(id: string): Promise<Feedback | null> {
-    const feedbackPrisma = await this._datasource.feedback.findUnique({
+    const raw = await this.prisma.feedback.findUnique({
       where: { id },
     });
-    if (!feedbackPrisma) return null;
-    return FeedbackMap.toDomain(feedbackPrisma);
+
+    if (!raw) {
+      return null;
+    }
+
+    return FeedbackMap.toDomain(raw);
   }
 
-  async buscarPorEnvioId(envioId: string): Promise<IFeedback | null> {
-    const envioFormulario = await this._datasource.envio_formulario.findUnique({
-        where: { feedbackId: envioId },
-        // Não precisamos incluir o Feedback aqui, apenas o ID do Feedback.
-        // Se a FK de Feedback está em Envio_formulario (feedbackId String @unique),
-        // então o feedbackId de Envio_formulario É o ID do Feedback.
+  /**
+   * Realiza a exclusão lógica de um registro de Feedback.
+   *
+   * @param feedback A entidade de domínio Feedback a ser excluída.
+   */
+  async excluirLogicamente(feedback: Feedback): Promise<void> {
+    await this.prisma.feedback.update({
+      where: { id: feedback.id },
+      data: {
+        dataExclusao: feedback.dataExclusao,
+      },
+    });
+  }
+
+  /**
+   * Busca um Feedback pelo ID do EnvioFormulario associado.
+   * No seu schema, a relação é 1:1, com a FK 'envioId' na tabela 'Feedback'.
+   *
+   * @param envioId O ID do envio associado ao feedback.
+   * @returns A entidade de domínio Feedback ou null se não for encontrado.
+   */
+  async buscarPorEnvioId(envioId: string): Promise<Feedback | null> {
+    const raw = await this.prisma.feedback.findUnique({
+      where: { envioId },
     });
 
-    if (!envioFormulario) return null;
+    if (!raw) {
+      return null;
+    }
 
-    // Recupera o Feedback pelo ID encontrado no Envio_formulario
-    return this.recuperarPorUuid(envioFormulario.feedbackId); 
+    return FeedbackMap.toDomain(raw);
   }
 }
