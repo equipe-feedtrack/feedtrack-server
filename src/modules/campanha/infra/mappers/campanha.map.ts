@@ -88,7 +88,7 @@ export class CampanhaMap {
       descricao: campanha.descricao,
       tipoCampanha: campanha.tipoCampanha,
       segmentoAlvo: campanha.segmentoAlvo,
-      dataInicio: campanha.dataInicio.toISOString(),
+      dataInicio: new Date(campanha.dataInicio).toISOString(),
       dataFim: campanha.dataFim ? campanha.dataFim.toISOString() : null,
       templateMensagem: campanha.templateMensagem,
       formularioId: campanha.formularioId,

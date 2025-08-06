@@ -33,16 +33,198 @@ const perguntaController = new PerguntaController(
 
 const perguntaRouter = Router();
 
-// Rota para criar uma nova pergunta
+/**
+ * @swagger
+ * /pergunta:
+ *   post:
+ *     summary: Cria uma nova pergunta
+ *     tags: [Perguntas]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - texto
+ *               - tipo
+ *             properties:
+ *               texto:
+ *                 type: string
+ *                 description: O texto da pergunta.
+ *               tipo:
+ *                 type: string
+ *                 enum: [nota, texto, multipla_escolha]
+ *                 description: O tipo da pergunta.
+ *               opcoes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Opções para perguntas de múltipla escolha (obrigatório se tipo for 'multipla_escolha').
+ *     responses:
+ *       201:
+ *         description: Pergunta criada com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 texto:
+ *                   type: string
+ *                 tipo:
+ *                   type: string
+ *                 opcoes:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *       400:
+ *         description: Dados inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 perguntaRouter.post('/pergunta', perguntaController.criar);
 
-// Rota para buscar uma pergunta por ID
+/**
+ * @swagger
+ * /pergunta/{id}:
+ *   get:
+ *     summary: Busca uma pergunta por ID
+ *     tags: [Perguntas]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID da pergunta.
+ *     responses:
+ *       200:
+ *         description: Detalhes da pergunta.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 texto:
+ *                   type: string
+ *                 tipo:
+ *                   type: string
+ *                 opcoes:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *       404:
+ *         description: Pergunta não encontrada.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 perguntaRouter.get('/pergunta/:id', perguntaController.buscarPorId);
 
-// Rota para atualizar uma pergunta
-perguntaRouter.put('/update-pergunta/:id', perguntaController.atualizar);
+/**
+ * @swagger
+ * /atualizar-pergunta/{id}:
+ *   put:
+ *     summary: Atualiza uma pergunta existente
+ *     tags: [Perguntas]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID da pergunta a ser atualizada.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               texto:
+ *                 type: string
+ *                 description: Novo texto da pergunta (opcional).
+ *     responses:
+ *       200:
+ *         description: Pergunta atualizada com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 texto:
+ *                   type: string
+ *                 tipo:
+ *                   type: string
+ *                 opcoes:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *       400:
+ *         description: Dados inválidos.
+ *       404:
+ *         description: Pergunta não encontrada.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+perguntaRouter.put('/atualizar-pergunta/:id', perguntaController.atualizar);
 
-// Rota para deletar uma pergunta
-perguntaRouter.delete('/delete-pergunta/:id', perguntaController.deletar);
+/**
+ * @swagger
+ * /deletar-pergunta/{id}:
+ *   delete:
+ *     summary: Deleta uma pergunta (exclusão lógica)
+ *     tags: [Perguntas]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID da pergunta a ser deletada.
+ *     responses:
+ *       204:
+ *         description: Pergunta deletada com sucesso (sem conteúdo).
+ *       404:
+ *         description: Pergunta não encontrada.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+perguntaRouter.delete('/deletar-pergunta/:id', perguntaController.deletar);
 
 export { perguntaRouter };
