@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,147 +10,265 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-enum Status_usuarios {
+// --- ENUMS (Padronizados para PascalCase) ---
+
+enum StatusUsuario {
   ATIVO
   INATIVO
 }
 
-enum Tipo_usuario {
+enum TipoUsuario {
   USER
   ADMIN
   SUPER_ADMIN
 }
 
-enum Status_formulario {
+enum StatusFormulario {
   PENDENTE
   ENVIADO
   FALHA
 }
 
-model Usuario {
-  id               String           @id @default(uuid())
-  nome             String           @unique
-  email            String           @unique
-  senha            String
-  tipo             Tipo_usuario
-  status           Status_usuarios
-  data_criacao     DateTime
-  data_atualizacao DateTime
-  data_exclusao    DateTime?
+enum TipoCampanha {
+  POS_COMPRA
+  AUTOMATICO
+  PROMOCIONAL
+  SATISFACAO
+}
 
-  funcionario      Funcionario?
-  envia_formulario Envio_formulario[]
+enum SegmentoAlvo {
+  TODOS_CLIENTES
+  CLIENTES_REGULARES
+  NOVOS_CLIENTES
+  CLIENTES_PREMIUM
+}
+
+enum TipoAcao {
+  CRIAR_USUARIO
+  ATUALIZAR_USUARIO
+  CRIAR_CLIENTE
+  ATUALIZAR_CLIENTE
+  DESATIVAR_CAMPANHA
+  INICIAR_ENVIO_CAMPANHA
+  // ... adicione todas as ações necessárias
+}
+
+enum EntidadeAlvoTipo {
+  USUARIO
+  CLIENTE
+  CAMPANHA
+  FORMULARIO
+  PRODUTO
+  ENVIO_FORMULARIO
+}
+
+// --- MODELS ---
+
+model Usuario {
+  id                String    @id @default(uuid())
+  nome              String    @unique
+  email             String    @unique
+  senha             String
+  tipo              TipoUsuario
+  status            StatusUsuario
+  dataCriacao       DateTime  @default(now()) @map("data_criacao")
+  dataAtualizacao   DateTime  @updatedAt @map("data_atualizacao")
+  dataExclusao      DateTime? @map("data_exclusao")
+
+  // Relações
+  funcionario       Funcionario?
+  enviosFormulario  EnvioFormulario[]
+  logsAtividade     LogAtividade[]
+  //clientesAtendidos Cliente[] // Clientes sob responsabilidade deste usuário/vendedor
+
+  @@map("usuarios")
 }
 
 model Funcionario {
-  id               String           @id @default(uuid())
-  usuarioId        String           @unique       // garante 1‑para‑1
-  usuario          Usuario          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  id              String   @id @default(uuid())
+  cargo           String
+  dataAdmissao    DateTime @map("data_admissao")
+  status          StatusUsuario @default(ATIVO)
+  dataCriacao     DateTime @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime? @map("data_exclusao")
 
-  cargo            String
-  status           Status_usuarios
-  data_criacao     DateTime
-  data_atualizacao DateTime
-  data_exclusao    DateTime?
+  // Relação 1-para-1 com Usuario
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId String  @unique @map("usuario_id")
+
+  @@map("funcionarios")
 }
 
+model LogAtividade {
+  id               String           @id @default(uuid())
+  acao             TipoAcao
+  detalhes         String?
+  dataOcorrencia   DateTime         @default(now()) @map("data_ocorrencia")
 
+  // Denormalizado para facilitar consulta de logs
+  nomeUsuario      String           @map("nome_usuario")
+  tipoUsuario      TipoUsuario      @map("tipo_usuario")
+
+  // Relação com o usuário que realizou a ação
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  usuarioId String  @map("usuario_id")
+
+  // Identificação polimórfica do alvo da ação
+  entidadeAlvoId   String?          @map("entidade_alvo_id")
+  entidadeAlvoTipo EntidadeAlvoTipo? @map("entidade_alvo_tipo")
+
+  @@map("logs_atividade")
+}
 
 model Cliente {
-  id               String @id @default(uuid())
-  nome             String
-  telefone         String
-  email            String?
-  cidade           String
-  status           Status_usuarios
-  data_criacao     DateTime
-  data_atualizacao DateTime
-  data_exclusao    DateTime?
-  produtos         Produto[]
-  
-  envio_formulario Envio_formulario[]
+  id              String   @id @default(uuid())
+  nome            String
+  telefone        String?
+  email           String?
+  vendedorResponsavel String  @map("vendedor_responsavel")
+  cidade          String?
+  status          StatusUsuario
+  dataCriacao     DateTime @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime? @map("data_exclusao")
+
+
+  // Relações
+  produtos            ClientesOnProdutos[]
+  enviosFormulario EnvioFormulario[]
+
+  @@map("clientes")
+}
+
+model ClientesOnProdutos {
+  cliente    Cliente  @relation(fields: [clienteId], references: [id])
+  clienteId  String   @map("cliente_id")
+  produto    Produto  @relation(fields: [produtoId], references: [id])
+  produtoId  String   @map("produto_id")
+
+  @@id([clienteId, produtoId])
+  @@map("clientes_on_produtos")
 }
 
 model Produto {
-  id               String @id @default(uuid())
-  nome             String
-  descricao        String
-  data_criacao     DateTime
-  data_atualizacao DateTime
-  data_exclusao    DateTime?
-  cliente_id       String
-  cliente         Cliente  @relation(fields: [cliente_id], references: [id])
+  id              String    @id @default(uuid())
+  nome            String
+  descricao       String
+  valor           Int
+  ativo           Boolean   @default(true)
+  dataCriacao     DateTime  @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime? @map("data_exclusao")
+
+  // Relação Um-para-Muitos (um Cliente pode ter vários Produtos)
+  clientes        ClientesOnProdutos[]
+
+  @@map("produtos")
 }
 
 model Pergunta {
-  id               String    @id @default(uuid())
-  texto            String
-  tipo             String
-  opcoes           Json?
-  ativo            Boolean   @default(true)
-  data_criacao     DateTime
-  data_atualizacao DateTime
-  data_exclusao    DateTime?
+  id              String    @id @default(uuid())
+  texto           String
+  tipo            String
+  opcoes          Json?
+  ativo           Boolean   @default(true)
+  dataCriacao     DateTime  @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime? @map("data_exclusao")
 
-  formularios      Formulario[]
-
+  // Relação Muitos-para-Muitos com Formulário
+  formularios PerguntasOnFormularios[]
 
   @@map("perguntas")
 }
 
-
-model Envio_formulario {
-   
-  id                String    @id @default(uuid())
-  // Relações que você já tinha, agora padronizadas
-  formulario        Formulario @relation(fields: [formularioId], references: [id])
-  formularioId      String     @map("formulario_id")
-
-  cliente           Cliente    @relation(fields: [clienteId], references: [id])
-  clienteId         String     @map("cliente_id")
-
-  usuario           Usuario    @relation(fields: [usuarioId], references: [id])
-  usuarioId         String     @map("usuario_id")
-
-  // Campo crucial que conecta ao subdomínio de feedback
-  feedbackId        String     @unique @map("feedback_id")
-
-  // Status padronizado usando o enum
-  status            Status_formulario @default(PENDENTE)
-  
-  // Campos de rastreamento do envio
-  dataCriacao       DateTime  @default(now()) @map("data_criacao")
-  dataEnvio         DateTime? @map("data_envio")
-  tentativasEnvio   Int       @default(0) @map("tentativas_envio")
-  ultimaMensagemErro String?   @map("ultima_mensagem_erro")
-
-  @@map("envios")
-
-}
-
 model Formulario {
-  id               String     @id @default(uuid())
-  texto           String
-  descricao        String
-  ativo            Boolean
-  data_criacao     DateTime
-  data_atualizacao DateTime
-  data_exclusao    DateTime?
-  
-  feedbacks        Feedback[]
-  envio_formulario Envio_formulario[]
-  perguntas        Pergunta[] 
+  id              String    @id @default(uuid())
+  titulo          String // Renomeado de 'texto' para 'titulo' para maior clareza
+  descricao       String
+  ativo           Boolean
+  dataCriacao     DateTime  @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime? @map("data_exclusao")
+
+  // Relações
+  perguntas PerguntasOnFormularios[]
+  campanhas Campanha[]
+  feedbacks Feedback[]
+  envios    EnvioFormulario[]
 
   @@map("formularios")
 }
 
-model Feedback {
-  id               String     @id @default(uuid())
-  resposta         Json
-  data_criacao     DateTime @default(now())
-  data_exclusao    DateTime?
-  formularioId     String
-  formulario       Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+// Tabela de junção explícita para a relação N-N entre Pergunta e Formulário
+model PerguntasOnFormularios {
+  pergunta    Pergunta @relation(fields: [perguntaId], references: [id])
+  perguntaId  String   @map("pergunta_id")
+  formulario  Formulario @relation(fields: [formularioId], references: [id])
+  formularioId String  @map("formulario_id")
+
+  // Exemplo de campo extra na tabela de junção
+  ordemNaLista Int     @map("ordem_na_lista")
+
+  @@id([perguntaId, formularioId])
+  @@map("perguntas_on_formularios")
 }
 
+model Campanha {
+  id                String       @id @default(uuid())
+  titulo            String
+  descricao         String?
+  tipoCampanha      TipoCampanha @map("tipo_campanha")
+  segmentoAlvo      SegmentoAlvo @map("segmento_alvo")
+  dataInicio        DateTime     @map("data_inicio")
+  dataFim           DateTime?    @map("data_fim")
+  templateMensagem  String       @map("template_mensagem")
+  ativo             Boolean      @default(true)
+  dataCriacao       DateTime     @default(now()) @map("data_criacao")
+  dataAtualizacao   DateTime     @updatedAt @map("data_atualizacao")
+  dataExclusao      DateTime?    @map("data_exclusao")
 
+  // Relação com o Formulário
+  formulario   Formulario @relation(fields: [formularioId], references: [id])
+  formularioId String     @map("formulario_id")
+
+  @@map("campanhas")
+}
+
+model EnvioFormulario {
+  id                 String           @id @default(uuid())
+  status             StatusFormulario @default(PENDENTE)
+  tentativasEnvio    Int              @default(0) @map("tentativas_envio")
+  ultimaMensagemErro String?          @map("ultima_mensagem_erro")
+  dataCriacao        DateTime         @default(now()) @map("data_criacao")
+  dataEnvio          DateTime?        @map("data_envio")
+
+  // Relações
+  formulario   Formulario @relation(fields: [formularioId], references: [id])
+  formularioId String     @map("formulario_id")
+  cliente      Cliente    @relation(fields: [clienteId], references: [id])
+  clienteId    String     @map("cliente_id")
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id]) // Usuário que disparou o envio
+  usuarioId    String     @map("usuario_id")
+  feedback     Feedback? // Relação 1-para-1 com Feedback
+
+  @@map("envios_formulario")
+}
+
+model Feedback {
+  id            String   @id @default(uuid())
+  resposta      Json
+  dataCriacao   DateTime @default(now()) @map("data_criacao")
+  dataExclusao  DateTime? @map("data_exclusao")
+
+  // Relação com o Formulário (para saber a estrutura das perguntas)
+  formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+  formularioId String     @map("formulario_id")
+
+  // Relação 1-para-1 com EnvioFormulario
+  envio   EnvioFormulario @relation(fields: [envioId], references: [id])
+  envioId String          @unique @map("envio_id")
+
+  @@map("feedbacks")
+}

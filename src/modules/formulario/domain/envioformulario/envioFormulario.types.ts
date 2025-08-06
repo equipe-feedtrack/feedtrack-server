@@ -1,4 +1,4 @@
-import { Status_formulario } from "@prisma/client";
+import { StatusFormulario } from "@prisma/client";
 
 interface EnvioProps {
   id: string;
@@ -6,7 +6,7 @@ interface EnvioProps {
   usuarioId: string;
   formularioId: string;
   feedbackId: string;
-  status: Status_formulario;
+  status: StatusFormulario;
   dataCriacao: Date;
   dataEnvio?: Date | null;
   tentativasEnvio: number;

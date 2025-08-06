@@ -1,18 +1,7 @@
 import { TipoPergunta } from "@shared/domain/data.types";
 
-export interface AtualizarPerguntaDTO {
-  /**
-   * O novo texto da pergunta. Opcional.
-   */
+export interface AtualizarPerguntaInputDTO {
+  id: string; // O ID da pergunta a ser atualizada é obrigatório.
   texto?: string;
-
-  /**
-   * O novo tipo da pergunta. Opcional.
-   */
-  tipo?: TipoPergunta;
-
-  /**
-   * O novo conjunto de opções. Opcional.
-   */
-  opcoes?: string[];
+  // Outros campos como 'tipo' e 'opcoes' podem ser adicionados se a atualização deles for permitida.
 }

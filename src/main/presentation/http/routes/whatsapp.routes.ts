@@ -1,4 +1,4 @@
-import { WhatsAppApiGateway } from '@modules/formulario/infra/envio/gateways/WhatsAppApiGateway';
+import { WhatsAppApiGateway } from '@modules/formulario/presentation/gateways/WhatsAppApiGateway';
 import { Router } from 'express';
 
 const router = Router();

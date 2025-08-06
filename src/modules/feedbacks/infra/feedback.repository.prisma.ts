@@ -1,68 +1,90 @@
-import { PrismaClient, Feedback as PrismaFeedback } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { Feedback } from "../domain/feedback.entity";
-import { FeedbackRepository } from "./feedback.repository";
-import { TipoPergunta } from "@shared/domain/data.types";
+import { IFeedbackRepository } from "./feedback.repository";
+import { FeedbackMap } from "./mappers/feedback.map";
 
-export class FeedbackRepositoryPrisma implements FeedbackRepository {
-
+export class FeedbackRepositoryPrisma implements IFeedbackRepository {
   constructor(private readonly prisma: PrismaClient) {}
+  /**
+   * Salva ou atualiza um registro de Feedback.
+   * Usa o método 'upsert' do Prisma para lidar com ambos os cenários de forma atômica.
+   *
+   * @param feedback A entidade de domínio Feedback a ser salva.
+   */
   async salvar(feedback: Feedback): Promise<void> {
-    await this.prisma.feedback.create({
-      data: {
-        id: feedback.id,
-        formularioId: feedback.formularioId,
-        resposta: {
-          perguntaId: feedback.perguntaId,
-          tipo: feedback.tipo,
-          resposta_texto: feedback.resposta_texto,
-          nota: feedback.nota,
-          opcaoEscolhida: feedback.opcaoEscolhida,
-          data_resposta: feedback.data_resposta,
-        },
-        data_criacao: feedback.data_resposta,
+    const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
+
+    await this.prisma.feedback.upsert({
+      where: { id: feedback.id },
+      create: dadosParaPersistencia,
+      update: {
+        // A entidade de Feedback tem poucos campos mutáveis.
+        // Focamos naqueles que podem ser alterados, como a exclusão lógica.
+        resposta: dadosParaPersistencia.resposta,
+        dataExclusao: dadosParaPersistencia.dataExclusao,
       },
     });
   }
 
-  async buscarPorId(id: string): Promise<Feedback | null> {
-    const data = await this.prisma.feedback.findUnique({
+  /**
+   * Busca um registro de Feedback pelo seu ID.
+   *
+   * @param id O ID do feedback a ser buscado.
+   * @returns A entidade de domínio Feedback ou null se não for encontrado.
+   */
+  async recuperarPorUuid(id: string): Promise<Feedback | null> {
+    const raw = await this.prisma.feedback.findUnique({
       where: { id },
     });
 
-    if (!data) return null;
+    if (!raw) {
+      return null;
+    }
 
-    const resposta = data.resposta as any;
+    return FeedbackMap.toDomain(raw);
+  }
 
-    return new Feedback({
-      id: data.id,
-      formularioId: data.formularioId,
-      perguntaId: resposta.perguntaId,
-      tipo: resposta.tipo as TipoPergunta,
-      resposta_texto: resposta.resposta_texto,
-      nota: resposta.nota,
-      opcaoEscolhida: resposta.opcaoEscolhida,
-      data_resposta: resposta.data_resposta || data.data_criacao,
+  /**
+   * Realiza a exclusão lógica de um registro de Feedback.
+   *
+   * @param feedback A entidade de domínio Feedback a ser excluída.
+   */
+  async excluirLogicamente(feedback: Feedback): Promise<void> {
+    await this.prisma.feedback.update({
+      where: { id: feedback.id },
+      data: {
+        dataExclusao: feedback.dataExclusao,
+      },
     });
   }
 
-  async buscarPorFormulario(formularioId: string): Promise<Feedback[]> {
-    const rows = await this.prisma.feedback.findMany({
-      where: { formularioId },
+  /**
+   * Busca um Feedback pelo ID do EnvioFormulario associado.
+   * No seu schema, a relação é 1:1, com a FK 'envioId' na tabela 'Feedback'.
+   *
+   * @param envioId O ID do envio associado ao feedback.
+   * @returns A entidade de domínio Feedback ou null se não for encontrado.
+   */
+  async buscarPorEnvioId(envioId: string): Promise<Feedback | null> {
+    const raw = await this.prisma.feedback.findUnique({
+      where: { envioId },
     });
 
-    return rows.map((row) => {
-      const resposta = row.resposta as any;
+    if (!raw) {
+      return null;
+    }
 
-      return new Feedback({
-        id: row.id,
-        formularioId: row.formularioId,
-        perguntaId: resposta.perguntaId,
-        tipo: resposta.tipo as TipoPergunta,
-        resposta_texto: resposta.resposta_texto,
-        nota: resposta.nota,
-        opcaoEscolhida: resposta.opcaoEscolhida,
-        data_resposta: resposta.data_resposta || row.data_criacao,
-      });
-    });
+    return FeedbackMap.toDomain(raw);
+  }
+
+  async buscarTodos(): Promise<Feedback[]> {
+    const rawFeedbacks = await this.prisma.feedback.findMany();
+
+    if (!rawFeedbacks || rawFeedbacks.length === 0) {
+      return [];
+    }
+    
+    // Mapeia cada objeto do Prisma para uma entidade de domínio.
+    return rawFeedbacks.map(FeedbackMap.toDomain);
   }
 }

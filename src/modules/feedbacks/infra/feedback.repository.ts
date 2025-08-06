@@ -1,7 +1,7 @@
 import { Feedback } from "../domain/feedback.entity";
 
-export interface FeedbackRepository {
+export interface IFeedbackRepository {
   salvar(feedback: Feedback): Promise<void>;
-  buscarPorId(id: string): Promise<Feedback | null>;
-  buscarPorFormulario(formularioId: string): Promise<Feedback[]>;
+  recuperarPorUuid(id: string): Promise<Feedback | null>;
+  buscarTodos(): Promise<Feedback[]>
 }

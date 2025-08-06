@@ -7,6 +7,15 @@ class ApplicationException extends Error {
     }
 }
 
+class FormularioNaoEncontrado extends ApplicationException {
+    public constructor(message:string = '⚠️ O ID da entidade formulário não foi encontrado.') {
+        super(message);
+        this.name = 'FormularioNaoEncontrado'
+        this.message = message;
+    }
+}
+
 export {
-    ApplicationException
+    ApplicationException,
+    FormularioNaoEncontrado
 }

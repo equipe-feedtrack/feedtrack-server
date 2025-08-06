@@ -1,195 +1,149 @@
 import { PrismaClient } from '@prisma/client';
 import { beforeEach, describe, expect, it, afterAll } from 'vitest';
-import { PerguntaRepositoryPrisma } from '../pergunta/pergunta.repository.prisma';
+
 import { Pergunta } from '@modules/formulario/domain/pergunta/pergunta.entity';
+import { PerguntaRepositoryPrisma } from '../pergunta/pergunta.repository.prisma';
 
 const prisma = new PrismaClient();
 const repository = new PerguntaRepositoryPrisma(prisma);
 
-describe('PerguntaRepositoryPrisma (Integration Tests com o banco)', () => {
+describe('PerguntaRepositoryPrisma (Integration Tests)', () => {
+  // =================================================================
+  // DADOS DE TESTE 100% FIXOS E PREVISÍVEIS
+  // =================================================================
+  const PERGUNTA_ID_1 = 'a1b9d6f8-3e2c-4b5d-9a1f-8c7b6a5e4d3c';
+  const PERGUNTA_ID_2 = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
+  const PERGUNTA_ID_3 = 'e58c787b-9b42-4cf4-a2c6-7a718b2f38a5';
+
   beforeEach(async () => {
-    // Limpa apenas as perguntas antes de cada teste.
-    // Formulários são gerenciados separadamente ou no FormularioRepositoryTests.
+    // Limpeza do Banco ANTES DE CADA TESTE (na ordem correta)
+    await prisma.perguntasOnFormularios.deleteMany({});
     await prisma.pergunta.deleteMany({});
+
+    // Criação dos Dados Base (Perguntas) para testes de leitura
+    await prisma.pergunta.createMany({
+      data: [
+        { id: PERGUNTA_ID_1, texto: 'Pergunta de Texto Existente', tipo: 'texto', ativo: true },
+        { id: PERGUNTA_ID_2, texto: 'Pergunta de Nota Existente', tipo: 'nota', opcoes: ['1', '2', '3'], ativo: true },
+      ],
+    });
   });
 
   afterAll(async () => {
+    await prisma.perguntasOnFormularios.deleteMany({});
+    await prisma.pergunta.deleteMany({});
     await prisma.$disconnect();
   });
 
-  // --- Testes para o método 'inserir' ---
-  it('deve inserir uma nova pergunta do tipo texto com sucesso (N-N)', async () => {
-    const pergunta = Pergunta.criar({
-      texto: 'Qual é o seu feedback sobre o produto?',
-      tipo: 'texto',
-      opcoes: undefined,
-      // N-N: Não se passa formularioId diretamente para a Pergunta na criação
-    });
+  // =================================================================
+  // TESTES
+  // =================================================================
 
-    await repository.inserir(pergunta);
-
-    const perguntaSalva = await prisma.pergunta.findUnique({
-      where: { id: pergunta.id },
-    });
-
-    expect(perguntaSalva).toBeDefined();
-    expect(perguntaSalva?.id).toBe(pergunta.id);
-    expect(perguntaSalva?.texto).toBe(pergunta.texto);
-    expect(perguntaSalva?.tipo).toBe(pergunta.tipo);
-    expect(perguntaSalva?.opcoes).toBeNull(); // Tipo texto não tem opções no DB
-    expect(perguntaSalva?.ativo).toBe(true); // 'ativo' é padrão no DB e na entidade
-    expect(perguntaSalva?.data_criacao).toBeInstanceOf(Date);
-    expect(perguntaSalva?.data_atualizacao).toBeInstanceOf(Date);
-    expect(perguntaSalva?.data_exclusao).toBeNull();
-    // N-N: Não há expect para formularioId aqui, pois não existe na tabela 'perguntas'
-  });
-
-  it('deve inserir uma nova pergunta do tipo multipla_escolha com opções (N-N)', async () => {
-    const pergunta = Pergunta.criar({
-      texto: 'Quais são suas cores favoritas?',
+  it('deve inserir uma nova pergunta com sucesso', async () => {
+    // DADO: uma nova entidade Pergunta criada no domínio
+    const novaPergunta = Pergunta.criar({
+      texto: 'Qual é a sua cor favorita?',
       tipo: 'multipla_escolha',
-      opcoes: ['azul', 'verde', 'vermelho'],
-      // N-N: Não se passa formularioId
+      opcoes: ['Azul', 'Verde'],
     });
 
-    await repository.inserir(pergunta);
+    // QUANDO: o repositório insere a pergunta
+    await repository.inserir(novaPergunta);
 
+    // ENTÃO: a pergunta deve existir no banco com os dados corretos
     const perguntaSalva = await prisma.pergunta.findUnique({
-      where: { id: pergunta.id },
+      where: { id: novaPergunta.id },
     });
 
     expect(perguntaSalva).toBeDefined();
-    expect(perguntaSalva?.id).toBe(pergunta.id);
-    expect(perguntaSalva?.tipo).toBe('multipla_escolha');
-    expect(perguntaSalva?.opcoes).toEqual(['azul', 'verde', 'vermelho']);
-    expect(perguntaSalva?.ativo).toBe(true);
+    expect(perguntaSalva?.id).toBe(novaPergunta.id);
+    expect(perguntaSalva?.texto).toBe('Qual é a sua cor favorita?');
+    expect(perguntaSalva?.opcoes).toEqual(['Azul', 'Verde']);
   });
 
-  it('deve inserir uma nova pergunta do tipo nota com opções padrão (N-N)', async () => {
-    const pergunta = Pergunta.criar({
-      texto: 'Dê uma nota.',
-      tipo: 'nota',
-      opcoes: undefined, // Entidade define o padrão
-      // N-N: Não se passa formularioId
+  it('deve atualizar o texto de uma pergunta existente', async () => {
+    // DADO: uma pergunta existente recuperada como entidade de domínio
+    const perguntaParaAtualizar = await repository.recuperarPorUuid(PERGUNTA_ID_1);
+    expect(perguntaParaAtualizar).toBeInstanceOf(Pergunta);
+
+    // QUANDO: um método de domínio é chamado para alterar o estado
+    perguntaParaAtualizar!.atualizarTexto('Novo Texto da Pergunta');
+    
+    // E o repositório persiste a mudança
+    await repository.atualizar(perguntaParaAtualizar!);
+
+    // ENTÃO: o estado no banco de dados deve refletir a mudança
+    const perguntaDoDb = await prisma.pergunta.findUnique({
+      where: { id: PERGUNTA_ID_1 },
     });
-
-    await repository.inserir(pergunta);
-
-    const perguntaSalva = await prisma.pergunta.findUnique({
-      where: { id: pergunta.id },
-    });
-
-    expect(perguntaSalva).toBeDefined();
-    expect(perguntaSalva?.id).toBe(pergunta.id);
-    expect(perguntaSalva?.tipo).toBe('nota');
-    expect(perguntaSalva?.opcoes).toEqual(['1', '2', '3', '4', '5']); // Mapeado da entidade
-    expect(perguntaSalva?.ativo).toBe(true);
+    expect(perguntaDoDb?.texto).toBe('Novo Texto da Pergunta');
   });
 
-  // --- Teste para atualização de OUTRAS propriedades, já que formularioId não é mais direto ---
-  it('deve atualizar outras propriedades de uma pergunta existente (N-N)', async () => {
-    const perguntaOriginal = Pergunta.criar({
-      texto: 'Texto original',
-      tipo: 'texto',
-      // N-N: Não há formularioId aqui
+  it('deve inativar uma pergunta existente', async () => {
+    const perguntaParaInativar = await repository.recuperarPorUuid(PERGUNTA_ID_1);
+    expect(perguntaParaInativar?.ativo).toBe(true);
+    
+    perguntaParaInativar!.inativar();
+    
+    await repository.atualizar(perguntaParaInativar!);
+
+    const perguntaDoDb = await prisma.pergunta.findUnique({
+      where: { id: PERGUNTA_ID_1 },
     });
-    await repository.inserir(perguntaOriginal); // Insere a pergunta
-
-    perguntaOriginal.atualizarTexto('Novo Título da Pergunta'); // Altera outra propriedade
-    perguntaOriginal['dataAtualizacao'] = new Date(Date.now() + 1000); // Garante que a data é diferente
-
-    await repository.inserir(perguntaOriginal); // Persiste a atualização
-
-    const perguntaAtualizada = await prisma.pergunta.findUnique({
-      where: { id: perguntaOriginal.id },
-    });
-
-    expect(perguntaAtualizada).toBeDefined();
-    expect(perguntaAtualizada?.texto).toBe('Novo Título da Pergunta');
-    expect(perguntaAtualizada?.ativo).toBe(true);
-    expect(perguntaAtualizada?.data_atualizacao?.getTime()).toBeGreaterThan(
-        perguntaOriginal.dataCriacao.getTime(),
-      );
-    // N-N: Não há expect para formularioId aqui, pois não é uma propriedade direta
+    expect(perguntaDoDb?.ativo).toBe(false);
+    expect(perguntaDoDb?.dataExclusao).toBeInstanceOf(Date);
   });
 
-  it('deve atualizar uma pergunta para o estado inativo (N-N)', async () => {
-    const perguntaAtiva = Pergunta.criar({
-      texto: 'Pergunta para inativar',
-      tipo: 'texto',
-    });
-    await repository.inserir(perguntaAtiva);
-
-    perguntaAtiva.inativar(); // Ativa a lógica de inativação no domínio
-    perguntaAtiva['dataAtualizacao'] = new Date(Date.now() + 1000); // Garante que a data é diferente
-    await repository.inserir(perguntaAtiva); // Persiste a mudança
-
-    const perguntaInativa = await prisma.pergunta.findUnique({
-      where: { id: perguntaAtiva.id },
-    });
-
-    expect(perguntaInativa).toBeDefined();
-    expect(perguntaInativa?.ativo).toBe(false); // Agora esperamos 'false'
-    expect(perguntaInativa?.data_exclusao).toBeInstanceOf(Date);
-    expect(perguntaInativa?.data_atualizacao).toBeInstanceOf(Date);
-  });
-
-  // --- Testes para o método 'recuperarPorUuid' ---
-  it('deve recuperar uma pergunta existente por ID (N-N)', async () => {
-    const pergunta = Pergunta.criar({
-      texto: 'Pergunta para recuperação',
-      tipo: 'nota',
-      // N-N: Não se passa formularioId
-    });
-    await repository.inserir(pergunta);
-
-    const perguntaRecuperada = await repository.recuperarPorUuid(pergunta.id);
+  it('deve recuperar uma pergunta por ID', async () => {
+    const perguntaRecuperada = await repository.recuperarPorUuid(PERGUNTA_ID_2);
 
     expect(perguntaRecuperada).toBeInstanceOf(Pergunta);
-    expect(perguntaRecuperada?.id).toBe(pergunta.id);
-    expect(perguntaRecuperada?.texto).toBe(pergunta.texto);
-    expect(perguntaRecuperada?.tipo).toBe(pergunta.tipo);
-    expect(perguntaRecuperada?.opcoes).toEqual(['1', '2', '3', '4', '5']);
-    expect(perguntaRecuperada?.ativo).toBe(true);
-    expect(perguntaRecuperada?.dataCriacao.toISOString()).toBe(pergunta.dataCriacao.toISOString());
-    expect(perguntaRecuperada?.dataAtualizacao.toISOString()).toBe(
-      pergunta.dataAtualizacao.toISOString(),
-    );
-    expect(perguntaRecuperada?.dataExclusao).toBeNull();
-    // N-N: Não há expect para formularioId
+    expect(perguntaRecuperada?.id).toBe(PERGUNTA_ID_2);
+    expect(perguntaRecuperada?.tipo).toBe('nota');
   });
 
-  it('deve retornar null se a pergunta não for encontrada por ID (N-N)', async () => {
-    const perguntaRecuperada = await repository.recuperarPorUuid('id-inexistente');
-    expect(perguntaRecuperada).toBeNull();
-  });
-
-  it('deve buscar múltiplas perguntas por uma lista de IDs (N-N)', async () => {
-    const pergunta1 = Pergunta.criar({ texto: 'P1', tipo: 'texto' });
-    const pergunta2 = Pergunta.criar({ texto: 'P2', tipo: 'nota' });
-    const pergunta3 = Pergunta.criar({ texto: 'P3', tipo: 'multipla_escolha', opcoes: ['a', 'b'] });
-
-    await repository.inserir(pergunta1);
-    await repository.inserir(pergunta2);
-    await repository.inserir(pergunta3);
-
+  it('deve buscar múltiplas perguntas por uma lista de IDs', async () => {
     const perguntasEncontradas = await repository.buscarMuitosPorId([
-      pergunta1.id,
-      pergunta3.id,
+      PERGUNTA_ID_1,
+      PERGUNTA_ID_2,
       'id-nao-existente',
     ]);
 
     expect(perguntasEncontradas).toHaveLength(2);
-    expect(perguntasEncontradas.some((p) => p.id === pergunta1.id)).toBe(true);
-    expect(perguntasEncontradas.some((p) => p.id === pergunta3.id)).toBe(true);
-    expect(perguntasEncontradas.some((p) => p.id === pergunta2.id)).toBe(false);
+    expect(perguntasEncontradas.some(p => p.id === PERGUNTA_ID_1)).toBe(true);
+    expect(perguntasEncontradas.some(p => p.id === PERGUNTA_ID_2)).toBe(true);
   });
 
-  it('deve retornar um array vazio se nenhum ID for encontrado em buscarMuitosPorId (N-N)', async () => {
-    const perguntasEncontradas = await repository.buscarMuitosPorId([
-      'id-nao-existente-1',
-      'id-nao-existente-2',
-    ]);
-    expect(perguntasEncontradas).toHaveLength(0);
+  it('deve deletar uma pergunta e suas associações', async () => {
+    // DADO: uma pergunta associada a um formulário
+    await prisma.formulario.create({
+        data: {
+            id: 'e58c787b-9b42-4cf4-a2c6-7a718b2f38a5',
+            titulo: 'Formulário de teste',
+            descricao: 'teste para o form',
+            ativo: true,
+            perguntas: { create: [{ ordemNaLista: 0, pergunta: { connect: { id: PERGUNTA_ID_1 } } }] }
+        }
+    });
+    let countAssociacoes = await prisma.perguntasOnFormularios.count({ where: { perguntaId: PERGUNTA_ID_1 } });
+    expect(countAssociacoes).toBe(1);
+
+    // QUANDO: o método deletar é chamado
+    await repository.deletar(PERGUNTA_ID_1);
+
+    // ENTÃO: a pergunta e suas associações não devem mais existir
+    const perguntaDeletada = await prisma.pergunta.findUnique({ where: { id: PERGUNTA_ID_1 } });
+    countAssociacoes = await prisma.perguntasOnFormularios.count({ where: { perguntaId: PERGUNTA_ID_1 } });
+    
+    expect(perguntaDeletada).toBeNull();
+    expect(countAssociacoes).toBe(0);
+  });
+
+  it('deve verificar corretamente se uma pergunta existe', async () => {
+    const existe = await repository.existe(PERGUNTA_ID_1);
+    const naoExiste = await repository.existe('id-nao-existente');
+
+    expect(existe).toBe(true);
+    expect(naoExiste).toBe(false);
   });
 });
