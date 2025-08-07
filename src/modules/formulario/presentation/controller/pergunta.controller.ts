@@ -6,6 +6,7 @@ import { BuscarPerguntaPorIdUseCase } from '@modules/formulario/application/use-
 import { CriarPerguntaUseCase } from '@modules/formulario/application/use-cases/pergunta/criarPerguntaUseCase';
 import { DeletarPerguntaUseCase } from '@modules/formulario/application/use-cases/pergunta/DeletarPerguntaUseCase';
 import { PerguntaException } from '@modules/formulario/domain/pergunta/pergunta.exception';
+import { ListarPerguntasInputDTO, ListarPerguntasUseCase } from '@modules/formulario/application/use-cases/pergunta/listar-perguntas.usecase';
 
 /**
  * Controller responsável por gerir as requisições HTTP para o recurso de Perguntas.
@@ -14,6 +15,7 @@ export class PerguntaController {
   constructor(
     private readonly _criarPerguntaUseCase: CriarPerguntaUseCase,
     private readonly _buscarPerguntaPorIdUseCase: BuscarPerguntaPorIdUseCase,
+    private readonly _listarPerguntasUseCase: ListarPerguntasUseCase,
     private readonly _atualizarPerguntaUseCase: AtualizarPerguntaUseCase,
     private readonly _deletarPerguntaUseCase: DeletarPerguntaUseCase
   ) { }
@@ -49,6 +51,24 @@ export class PerguntaController {
       next(error);
     }
   };
+
+  
+   public listar = async (req: Request, res: Response, next: NextFunction): Promise<Response> => {
+    try {
+      const { ativo } = req.query;
+      const filtros: ListarPerguntasInputDTO = {};
+
+      if (ativo !== undefined) {
+        // Converte a string 'true'/'false' da query para um booleano
+        filtros.ativo = ativo === 'true';
+      }
+      
+      const perguntasDTO = await this._listarPerguntasUseCase.execute(filtros);
+      return res.status(200).json(perguntasDTO);
+    } catch (error: any) {
+      next(error)
+    }
+  }
 
   /**
    * Lida com a requisição para atualizar uma pergunta existente.

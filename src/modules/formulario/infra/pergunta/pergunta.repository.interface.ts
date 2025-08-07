@@ -9,6 +9,7 @@ import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
   // Métodos de leitura
   recuperarPorUuid(id: string): Promise<Pergunta | null>;
   buscarMuitosPorId(ids: string[]): Promise<Pergunta[]>;
+  listar(filtros?: { ativo?: boolean }): Promise<Pergunta[]>;
   
   // Métodos de verificação
   existe(id: string): Promise<boolean>;

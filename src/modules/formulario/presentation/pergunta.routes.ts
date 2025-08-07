@@ -6,6 +6,7 @@ import { BuscarPerguntaPorIdUseCase } from '../application/use-cases/pergunta/Bu
 import { AtualizarPerguntaUseCase } from '../application/use-cases/pergunta/AtualizarPerguntaUseCase';
 import { DeletarPerguntaUseCase } from '../application/use-cases/pergunta/DeletarPerguntaUseCase';
 import { PerguntaController } from './controller/pergunta.controller';
+import { ListarPerguntasUseCase } from '../application/use-cases/pergunta/listar-perguntas.usecase';
 
 
 // ====================================================================
@@ -17,12 +18,14 @@ const perguntaRepository = new PerguntaRepositoryPrisma(prismaClient);
 
 const criarPerguntaUseCase = new CriarPerguntaUseCase(perguntaRepository);
 const buscarPerguntaPorIdUseCase = new BuscarPerguntaPorIdUseCase(perguntaRepository);
+const listarPerguntasUseCase = new ListarPerguntasUseCase(perguntaRepository);
 const atualizarPerguntaUseCase = new AtualizarPerguntaUseCase(perguntaRepository);
 const deletarPerguntaUseCase = new DeletarPerguntaUseCase(perguntaRepository);
 
 const perguntaController = new PerguntaController(
   criarPerguntaUseCase,
   buscarPerguntaPorIdUseCase,
+  listarPerguntasUseCase,
   atualizarPerguntaUseCase,
   deletarPerguntaUseCase
 );
@@ -95,6 +98,8 @@ const perguntaRouter = Router();
  *         description: Erro interno do servidor.
  */
 perguntaRouter.post('/pergunta', perguntaController.criar);
+
+perguntaRouter.get('/perguntas', perguntaController.listar);
 
 /**
  * @swagger

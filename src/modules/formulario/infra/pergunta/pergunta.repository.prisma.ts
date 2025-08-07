@@ -10,6 +10,16 @@ import { IPerguntaRepository } from "./pergunta.repository.interface";
  */
 export class PerguntaRepositoryPrisma implements IPerguntaRepository {
   constructor(private readonly prisma: PrismaClient) {}
+  
+  async listar(filtros?: { ativo?: boolean; }): Promise<Pergunta[]> {
+    const perguntasPrisma = await this.prisma.pergunta.findMany({
+      where: {
+        ativo: filtros?.ativo, // Filtro opcional por status 'ativo'
+      }
+    });
+
+    return perguntasPrisma.map(p => PerguntaMap.toDomain(p));
+  }
 
   async recuperarPorUuid(id: string): Promise<Pergunta | null> {
     const perguntaPrisma = await this.prisma.pergunta.findUnique({
