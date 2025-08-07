@@ -276,7 +276,7 @@ produtoRouter.put('/atualizar-produto/:id', produtoController.atualizarProduto);
 
 /**
  * @swagger
- * /delete-product/{id}:
+ * /deletar-produto/{id}:
  *   delete:
  *     summary: Deleta um produto (exclusão lógica)
  *     tags: [Produtos]

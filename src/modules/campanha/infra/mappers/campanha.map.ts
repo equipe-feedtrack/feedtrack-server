@@ -89,12 +89,12 @@ export class CampanhaMap {
       tipoCampanha: campanha.tipoCampanha,
       segmentoAlvo: campanha.segmentoAlvo,
       dataInicio: new Date(campanha.dataInicio).toISOString(),
-      dataFim: campanha.dataFim ? campanha.dataFim.toISOString() : null,
+      dataFim: campanha.dataFim ? new Date(campanha.dataFim).toISOString() : null,
       templateMensagem: campanha.templateMensagem,
       formularioId: campanha.formularioId,
       ativo: campanha.ativo,
-      dataCriacao: campanha.dataCriacao.toISOString(),
-      dataAtualizacao: campanha.dataAtualizacao.toISOString(),
+      dataCriacao: new Date(campanha.dataCriacao).toISOString(),
+      dataAtualizacao: new Date(campanha.dataAtualizacao).toISOString(),
     };
   }
 }

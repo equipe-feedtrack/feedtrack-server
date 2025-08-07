@@ -13,6 +13,7 @@ import { AtualizarClienteUseCase } from "../application/use-cases/atualizar_clie
 import { DeletarClienteUseCase } from "../application/use-cases/deletar_cliente";
 import { ClienteController } from "./controller/gestao_clientes.controller";
 import { Router } from "express";
+import { GerenciarProdutosClienteUseCase } from "../application/use-cases/gerenciarProdutosCliente.use-case";
 
 // 1. Instanciar o Prisma Client
 const PrismaRepository = new PrismaClient();
@@ -27,6 +28,7 @@ const listarClientesUseCase = new ListarClientesUseCase(clienteRepository);
 const buscarClientePorIdUseCase = new BuscarClientePorIdUseCase(clienteRepository);
 const atualizarClienteUseCase = new AtualizarClienteUseCase(clienteRepository, produtoRepository);
 const deletarClienteUseCase = new DeletarClienteUseCase(clienteRepository);
+const gerenciarProdutosClienteUseCase = new GerenciarProdutosClienteUseCase(clienteRepository, produtoRepository);
 
 // 4. Instanciar o Controller, injetando os casos de uso
 const clienteController = new ClienteController(
@@ -34,7 +36,8 @@ const clienteController = new ClienteController(
   listarClientesUseCase,
   buscarClientePorIdUseCase,
   atualizarClienteUseCase,
-  deletarClienteUseCase
+  deletarClienteUseCase,
+  gerenciarProdutosClienteUseCase
 );
 
 // ====================================================================
@@ -430,5 +433,47 @@ clienteRouter.put('/atualizar-cliente/:id', clienteController.atualizar);
  *         description: Erro interno do servidor.
  */
 clienteRouter.delete('/deletar-cliente/:id', clienteController.deletar);
+
+/**
+ * @swagger
+ * /cliente/{clienteId}/produtos:
+ *   post:
+ *     summary: Gerencia produtos associados a um cliente (adicionar/remover)
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: path
+ *         name: clienteId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do cliente.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idsProdutosParaAdicionar:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: IDs de produtos para adicionar ao cliente (opcional).
+ *               idsProdutosParaRemover:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: IDs de produtos para remover do cliente (opcional).
+ *     responses:
+ *       200:
+ *         description: Produtos do cliente atualizados com sucesso.
+ *       400:
+ *         description: Dados inválidos.
+ *       404:
+ *         description: Cliente ou produto não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+clienteRouter.post('/:clienteId/produtos', (req, res, next) => clienteController.gerenciarProdutos(req, res, next));
 
 export { clienteRouter };

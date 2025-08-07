@@ -22,8 +22,16 @@ export class AtualizarCampanhaUseCase implements IUseCase<AtualizarCampanhaInput
     if (input.templateMensagem) {
       campanha.atualizarTemplate(input.templateMensagem);
     }
-    if (input.dataInicio) {
+    if (input.dataInicio || input.dataFim) {
       campanha.atualizarPeriodo(input.dataInicio, input.dataFim);
+    }
+
+    if (input.ativo !== undefined) {
+      if (input.ativo) {
+        campanha.ativar();
+      } else {
+        campanha.inativar();
+      }
     }
 
     // 3. Persistir a entidade atualizada

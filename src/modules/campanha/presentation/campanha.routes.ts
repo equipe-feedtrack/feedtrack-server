@@ -287,6 +287,9 @@ campanhaRouter.get('/campanha/:id', campanhaController.buscarPorId);
  *                 format: date-time
  *                 nullable: true
  *                 description: Nova data de fim (ISO 8601, opcional).
+ *               ativo:
+ *                 type: boolean
+ *                 description: Status de ativação da campanha (true para ativa, false para inativa).
  *     responses:
  *       200:
  *         description: Campanha atualizada com sucesso.
