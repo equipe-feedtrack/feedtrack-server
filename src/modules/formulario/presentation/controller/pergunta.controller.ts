@@ -53,7 +53,7 @@ export class PerguntaController {
   };
 
   
-   public listar = async (req: Request, res: Response, next: NextFunction): Promise<Response> => {
+   public listar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { ativo } = req.query;
       const filtros: ListarPerguntasInputDTO = {};
@@ -64,9 +64,9 @@ export class PerguntaController {
       }
       
       const perguntasDTO = await this._listarPerguntasUseCase.execute(filtros);
-      return res.status(200).json(perguntasDTO);
+      res.status(200).json(perguntasDTO);
     } catch (error: any) {
-      next(error)
+      next(error);
     }
   }
 
