@@ -13,11 +13,6 @@ export class CriarProdutoUseCase {
   ) {}
 
   async execute(input: CriarProdutoInputDTO): Promise<ProdutoResponseDTO> {
-    // 1. Valida se o Cliente existe (FK obrigatória)
-    const clienteExiste = await this.clienteRepository.existe(input.cliente_id);
-    if (!clienteExiste) {
-      throw new Error(`Cliente com ID ${input.cliente_id} não encontrado.`); // Exceção específica
-    }
 
     // 2. Cria a entidade Produto
     const produto = Produto.criarProduto({

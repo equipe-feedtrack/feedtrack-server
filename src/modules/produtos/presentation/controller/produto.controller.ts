@@ -91,7 +91,7 @@ export class ProdutoController {
       if (!id) throw new BadRequestError('ID do produto é obrigatório para exclusão.');
 
       await this.deletarProdutoUseCase.execute(id);
-
+      res.json({ message: 'Produto deletado com sucesso.' });
       res.status(204).send(); // 204 No Content para deleção bem-sucedida
     } catch (error: any) {
       next(error);

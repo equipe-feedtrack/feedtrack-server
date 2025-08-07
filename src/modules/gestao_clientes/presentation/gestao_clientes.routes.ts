@@ -43,19 +43,392 @@ const clienteController = new ClienteController(
 
 const clienteRouter = Router();
 
-// Rota para criar um novo cliente
+/**
+ * @swagger
+ * /cliente:
+ *   post:
+ *     summary: Cria um novo cliente
+ *     tags: [Clientes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - pessoa
+ *               - vendedorResponsavel
+ *               - idsProdutos
+ *             properties:
+ *               pessoa:
+ *                 type: object
+ *                 required:
+ *                   - nome
+ *                   - telefone
+ *                 properties:
+ *                   nome:
+ *                     type: string
+ *                     description: Nome da pessoa.
+ *                   email:
+ *                     type: string
+ *                     format: email
+ *                     nullable: true
+ *                     description: Email da pessoa (opcional).
+ *                   telefone:
+ *                     type: string
+ *                     description: Telefone da pessoa.
+ *               cidade:
+ *                 type: string
+ *                 nullable: true
+ *                 description: Cidade do cliente (opcional).
+ *               vendedorResponsavel:
+ *                 type: string
+ *                 description: Nome do vendedor responsável.
+ *               idsProdutos:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: IDs dos produtos associados ao cliente.
+ *     responses:
+ *       201:
+ *         description: Cliente criado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 pessoa:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     nome:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     telefone:
+ *                       type: string
+ *                 cidade:
+ *                   type: string
+ *                 vendedorResponsavel:
+ *                   type: string
+ *                 status:
+ *                   type: string
+ *                 produtos:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       nome:
+ *                         type: string
+ *                       descricao:
+ *                         type: string
+ *                       valor:
+ *                         type: number
+ *                       ativo:
+ *                         type: boolean
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *       400:
+ *         description: Dados inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 clienteRouter.post('/cliente', clienteController.criar);
 
-// Rota para listar todos os clientes (com filtros opcionais)
+/**
+ * @swagger
+ * /clientes:
+ *   get:
+ *     summary: Lista todos os clientes
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [ATIVO, INATIVO]
+ *         description: Filtra clientes por status (opcional).
+ *     responses:
+ *       200:
+ *         description: Lista de clientes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   pessoa:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       nome:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       telefone:
+ *                         type: string
+ *                   cidade:
+ *                     type: string
+ *                   vendedorResponsavel:
+ *                     type: string
+ *                   status:
+ *                     type: string
+ *                   produtos:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                         nome:
+ *                           type: string
+ *                         descricao:
+ *                           type: string
+ *                         valor:
+ *                           type: number
+ *                         ativo:
+ *                           type: boolean
+ *                   dataCriacao:
+ *                     type: string
+ *                     format: date-time
+ *                   dataAtualizacao:
+ *                     type: string
+ *                     format: date-time
+ *                   dataExclusao:
+ *                     type: string
+ *                     format: date-time
+ *                     nullable: true
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 clienteRouter.get('/clientes',clienteController.listar);
 
-// Rota para buscar um cliente específico por ID
+/**
+ * @swagger
+ * /cliente/{id}:
+ *   get:
+ *     summary: Busca um cliente por ID
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do cliente.
+ *     responses:
+ *       200:
+ *         description: Detalhes do cliente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 pessoa:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     nome:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     telefone:
+ *                       type: string
+ *                 cidade:
+ *                   type: string
+ *                 vendedorResponsavel:
+ *                   type: string
+ *                 status:
+ *                   type: string
+ *                 produtos:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       nome:
+ *                         type: string
+ *                       descricao:
+ *                         type: string
+ *                       valor:
+ *                         type: number
+ *                       ativo:
+ *                         type: boolean
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *       404:
+ *         description: Cliente não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 clienteRouter.get('/cliente/:id', clienteController.buscarPorId);
 
-// Rota para atualizar um cliente existente
-clienteRouter.put('/update-cliente/:id', clienteController.atualizar);
+/**
+ * @swagger
+ * /atualizar-cliente/{id}:
+ *   put:
+ *     summary: Atualiza um cliente existente
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do cliente a ser atualizado.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pessoa:
+ *                 type: object
+ *                 properties:
+ *                   nome:
+ *                     type: string
+ *                     description: Novo nome da pessoa (opcional).
+ *                   email:
+ *                     type: string
+ *                     format: email
+ *                     nullable: true
+ *                     description: Novo email da pessoa (opcional).
+ *                   telefone:
+ *                     type: string
+ *                     description: Novo telefone da pessoa (opcional).
+ *               cidade:
+ *                 type: string
+ *                 nullable: true
+ *                 description: Nova cidade do cliente (opcional).
+ *               vendedorResponsavel:
+ *                 type: string
+ *                 description: Novo vendedor responsável (opcional).
+ *               status:
+ *                 type: string
+ *                 enum: [ATIVO, INATIVO]
+ *                 description: Novo status do cliente (opcional).
+ *               idsProdutosParaAdicionar:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: IDs de produtos para adicionar ao cliente (opcional).
+ *               idsProdutosParaRemover:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: IDs de produtos para remover do cliente (opcional).
+ *     responses:
+ *       200:
+ *         description: Cliente atualizado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 pessoa:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     nome:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     telefone:
+ *                       type: string
+ *                 cidade:
+ *                   type: string
+ *                 vendedorResponsavel:
+ *                   type: string
+ *                 status:
+ *                   type: string
+ *                 produtos:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       nome:
+ *                         type: string
+ *                       descricao:
+ *                         type: string
+ *                       valor:
+ *                         type: number
+ *                       ativo:
+ *                         type: boolean
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *       400:
+ *         description: Dados inválidos.
+ *       404:
+ *         description: Cliente não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+clienteRouter.put('/atualizar-cliente/:id', clienteController.atualizar);
 
-// Rota para deletar (logicamente) um cliente
-clienteRouter.delete('/delete-cliente/:id', clienteController.deletar);
+/**
+ * @swagger
+ * /deletar-cliente/{id}:
+ *   delete:
+ *     summary: Deleta um cliente (exclusão lógica)
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do cliente a ser deletado.
+ *     responses:
+ *       204:
+ *         description: Cliente deletado com sucesso (sem conteúdo).
+ *       404:
+ *         description: Cliente não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+clienteRouter.delete('/deletar-cliente/:id', clienteController.deletar);
 
 export { clienteRouter };

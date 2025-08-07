@@ -15,7 +15,7 @@ async function bootstrap() {
     const httpServer = await createHTTPServer();
 
     httpServer.listen({ port: port }, async () => {
-        console.log(`[${api_name}] ✅ Servidor HTTP pronto e ouvindo em http://${host_name}:${port}`);
+        console.log(`[${api_name}] ✅ Servidor HTTP pronto e ouvindo em http://${host_name}:${port}/api/v1 \n[Swagger Docs] ✅ Swagger http://localhost:3000/api-docs`);
     });
 
 }

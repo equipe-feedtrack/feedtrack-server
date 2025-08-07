@@ -42,19 +42,305 @@ const formularioController = new FormularioController(
 
 const formularioRouter = Router();
 
-// Rota para criar um novo formulário
+/**
+ * @swagger
+ * /formulario:
+ *   post:
+ *     summary: Cria um novo formulário
+ *     tags: [Formulários]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - titulo
+ *               - descricao
+ *               - idsPerguntas
+ *             properties:
+ *               titulo:
+ *                 type: string
+ *                 description: Título do formulário.
+ *               descricao:
+ *                 type: string
+ *                 description: Descrição do formulário.
+ *               ativo:
+ *                 type: boolean
+ *                 description: Indica se o formulário está ativo (opcional, padrão true).
+ *               idsPerguntas:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: IDs das perguntas a serem associadas ao formulário.
+ *     responses:
+ *       201:
+ *         description: Formulário criado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 titulo:
+ *                   type: string
+ *                 descricao:
+ *                   type: string
+ *                 ativo:
+ *                   type: boolean
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *                 perguntas:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       texto:
+ *                         type: string
+ *                       tipo:
+ *                         type: string
+ *                       opcoes:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *       400:
+ *         description: Dados inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 formularioRouter.post('/formulario',formularioController.criar);
 
-// Rota para listar todos os formulários
+/**
+ * @swagger
+ * /formularios:
+ *   get:
+ *     summary: Lista todos os formulários
+ *     tags: [Formulários]
+ *     responses:
+ *       200:
+ *         description: Lista de formulários.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   titulo:
+ *                     type: string
+ *                   descricao:
+ *                     type: string
+ *                   ativo:
+ *                     type: boolean
+ *                   dataCriacao:
+ *                     type: string
+ *                     format: date-time
+ *                   dataAtualizacao:
+ *                     type: string
+ *                     format: date-time
+ *                   dataExclusao:
+ *                     type: string
+ *                     format: date-time
+ *                     nullable: true
+ *                   perguntas:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                         texto:
+ *                           type: string
+ *                         tipo:
+ *                           type: string
+ *                         opcoes:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 formularioRouter.get('/formularios',  formularioController.listar);
 
-// Rota para buscar um formulário por ID
+/**
+ * @swagger
+ * /formulario/{id}:
+ *   get:
+ *     summary: Busca um formulário por ID
+ *     tags: [Formulários]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do formulário.
+ *     responses:
+ *       200:
+ *         description: Detalhes do formulário.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 titulo:
+ *                   type: string
+ *                 descricao:
+ *                   type: string
+ *                 ativo:
+ *                   type: boolean
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *                 perguntas:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       texto:
+ *                         type: string
+ *                       tipo:
+ *                         type: string
+ *                       opcoes:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *       404:
+ *         description: Formulário não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 formularioRouter.get('/formulario/:id',  formularioController.buscarPorId);
 
-// Rota para atualizar um formulário
+/**
+ * @swagger
+ * /update-formulario/{id}:
+ *   put:
+ *     summary: Atualiza um formulário existente
+ *     tags: [Formulários]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do formulário a ser atualizado.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               titulo:
+ *                 type: string
+ *                 description: Novo título do formulário (opcional).
+ *               descricao:
+ *                 type: string
+ *                 description: Nova descrição do formulário (opcional).
+ *               ativo:
+ *                 type: boolean
+ *                 description: Novo status de ativo do formulário (opcional).
+ *               idsPerguntas:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Nova lista de IDs de perguntas para o formulário (substitui as existentes).
+ *     responses:
+ *       200:
+ *         description: Formulário atualizado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 titulo:
+ *                   type: string
+ *                 descricao:
+ *                   type: string
+ *                 ativo:
+ *                   type: boolean
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *                 perguntas:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       texto:
+ *                         type: string
+ *                       tipo:
+ *                         type: string
+ *                       opcoes:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *       400:
+ *         description: Dados inválidos.
+ *       404:
+ *         description: Formulário não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 formularioRouter.put('/update-formulario/:id', formularioController.atualizar);
 
-// Rota para deletar um formulário
+/**
+ * @swagger
+ * /delete-formulario/{id}:
+ *   delete:
+ *     summary: Deleta um formulário (exclusão lógica)
+ *     tags: [Formulários]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do formulário a ser deletado.
+ *     responses:
+ *       204:
+ *         description: Formulário deletado com sucesso (sem conteúdo).
+ *       404:
+ *         description: Formulário não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 formularioRouter.delete('/delete-formulario/:id', formularioController.deletar);
 
 export { formularioRouter };
