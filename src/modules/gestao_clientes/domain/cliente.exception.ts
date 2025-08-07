@@ -117,6 +117,32 @@ class DataCadastroInvalida extends ClienteException {
     }
   }
 
+   class ClienteProdutoIdObrigatorio extends ClienteException {
+    constructor(id: string) {
+      super('ID do produto é obrigatório.');
+      this.name = 'ClienteProdutoIdObrigatorio';
+    }
+  }
+
+   class ClienteProdutoJaTem extends ClienteException {
+    constructor(id: string) {
+      super('O cliente já possui este produto.');
+      this.name = 'ClienteProdutoObrigatorio';
+    }
+  }
+
+  class ClienteNaoPossuiProduto extends ClienteException {
+    constructor(id: string) {
+      super('O cliente não possui este produto.');
+      this.name = 'ClienteProdutoObrigatorio';
+    }
+  }
+  class InvalidOperationError extends ClienteException {
+    constructor(id: string) {
+      super('Operação está dando erro.');
+      this.name = 'InvalidOperationError';
+    }
+  }
 
 const ClienteExceptions = {
   ClienteException,
@@ -133,7 +159,11 @@ const ClienteExceptions = {
   ConsentimentoLGPDInvalido,
   DataCadastroInvalida,
   ClienteJaInativo,
-  ClienteJaAtivo
+  ClienteJaAtivo,
+  ClienteProdutoIdObrigatorio,
+  ClienteProdutoJaTem,
+  ClienteNaoPossuiProduto,
+  InvalidOperationError
 };
 
 export {

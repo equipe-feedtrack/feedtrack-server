@@ -17,6 +17,7 @@ import { CriarClienteUseCase } from "@modules/gestao_clientes/application/use-ca
 import { DeletarClienteUseCase } from "@modules/gestao_clientes/application/use-cases/deletar_cliente";
 import { ListarClientesUseCase } from "@modules/gestao_clientes/application/use-cases/listar_clientes";
 import { ClienteExceptions } from "@modules/gestao_clientes/domain/cliente.exception";
+import { GerenciarProdutosClienteUseCase } from '@modules/gestao_clientes/application/use-cases/gerenciarProdutosCliente.use-case';
 
 
 // Exceções personalizadas (se tiver)
@@ -29,7 +30,8 @@ export class ClienteController {
     private readonly _listarClientesUseCase: ListarClientesUseCase,
     private readonly _buscarClientePorIdUseCase: BuscarClientePorIdUseCase,
     private readonly _atualizarClienteUseCase: AtualizarClienteUseCase,
-    private readonly _deletarClienteUseCase: DeletarClienteUseCase
+    private readonly _deletarClienteUseCase: DeletarClienteUseCase,
+    private readonly _gerenciarProdutosClienteUseCase: GerenciarProdutosClienteUseCase
   ) { }
 
   /**
@@ -118,4 +120,30 @@ export class ClienteController {
       next(error);
     }
   }
+
+  public gerenciarProdutos = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { clienteId } = req.params;
+      const { action, produtoId, novoProdutoId } = req.body;
+
+      await this._gerenciarProdutosClienteUseCase.execute({
+        clienteId,
+        action,
+        produtoId,
+        novoProdutoId,
+      });
+
+      res.status(200).json({ message: 'Operação de produto concluída com sucesso.' });
+    } catch (error: any) {
+      if (error instanceof ClienteExceptions.ClienteNaoEncontrado) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof ClienteExceptions.InvalidOperationError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      next(error);
+    }
+  };
 }

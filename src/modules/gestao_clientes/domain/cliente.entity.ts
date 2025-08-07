@@ -166,21 +166,33 @@ class Cliente extends Entity<ICliente> {
         this.dataAtualizacao = new Date();
     }
 
-    public adicionarProduto(produto: Produto): void {
-    if (!this._produtos.some(p => p.id === produto.id)) {
-      this._produtos.push(produto);
-      this._dataAtualizacao = new Date();
+  public adicionarProduto(produto: Produto): void {
+    if (!produto || !produto.id) {
+      throw  ClienteExceptions.ClienteProdutoIdObrigatorio;
     }
+    if (this.produtos.some(p => p.id === produto.id)) {
+      throw  ClienteExceptions.ClienteProdutoJaTem;
+    }
+    this.produtos.push(produto);
   }
 
-  public removerProduto(produtoId: string): void {
-    const totalProdutos = this._produtos.length;
-    this._produtos = this._produtos.filter(p => p.id !== produtoId);
-
-    // Se um produto foi realmente removido, atualiza a data.
-    if (this._produtos.length < totalProdutos) {
-      this._dataAtualizacao = new Date();
+ 
+  public removerProduto(produto: Produto): void {
+    const produtoIndex = this.produtos.findIndex(p => p.id === produto.id);
+    if (produtoIndex === -1) {
+      throw ClienteExceptions.ClienteNaoPossuiProduto;
     }
+    this.produtos.splice(produtoIndex, 1);
+  }
+
+  /**
+   * Edita um produto, substituindo um produto antigo por um novo.
+   * @param produtoIdAntigo O ID do produto a ser substituído.
+   * @param produtoNovo O objeto do novo produto.
+   */
+  public editarProduto(produtoIdAntigo: Produto, produtoNovo: Produto): void {
+    this.removerProduto(produtoIdAntigo);
+    this.adicionarProduto(produtoNovo);
   }
 
     public inativar(): void {

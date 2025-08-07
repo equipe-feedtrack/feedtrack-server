@@ -13,6 +13,7 @@ import { AtualizarClienteUseCase } from "../application/use-cases/atualizar_clie
 import { DeletarClienteUseCase } from "../application/use-cases/deletar_cliente";
 import { ClienteController } from "./controller/gestao_clientes.controller";
 import { Router } from "express";
+import { GerenciarProdutosClienteUseCase } from "../application/use-cases/gerenciarProdutosCliente.use-case";
 
 // 1. Instanciar o Prisma Client
 const PrismaRepository = new PrismaClient();
@@ -27,6 +28,7 @@ const listarClientesUseCase = new ListarClientesUseCase(clienteRepository);
 const buscarClientePorIdUseCase = new BuscarClientePorIdUseCase(clienteRepository);
 const atualizarClienteUseCase = new AtualizarClienteUseCase(clienteRepository, produtoRepository);
 const deletarClienteUseCase = new DeletarClienteUseCase(clienteRepository);
+const gerenciarProdutosClienteUseCase = new GerenciarProdutosClienteUseCase(clienteRepository, produtoRepository);
 
 // 4. Instanciar o Controller, injetando os casos de uso
 const clienteController = new ClienteController(
@@ -34,7 +36,8 @@ const clienteController = new ClienteController(
   listarClientesUseCase,
   buscarClientePorIdUseCase,
   atualizarClienteUseCase,
-  deletarClienteUseCase
+  deletarClienteUseCase,
+  gerenciarProdutosClienteUseCase
 );
 
 // ====================================================================
@@ -430,5 +433,8 @@ clienteRouter.put('/atualizar-cliente/:id', clienteController.atualizar);
  *         description: Erro interno do servidor.
  */
 clienteRouter.delete('/deletar-cliente/:id', clienteController.deletar);
+
+// Definição da nova rota para gerenciar produtos
+clienteRouter.post('/:clienteId/produtos', (req, res, next) => clienteController.gerenciarProdutos(req, res, next));
 
 export { clienteRouter };
