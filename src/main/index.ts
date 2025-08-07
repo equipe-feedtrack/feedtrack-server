@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 import { createHTTPServer } from './presentation/http/server';
 
+
+
 async function bootstrap() {
 
     //Carrega variáveis de ambiente do arquivo .env

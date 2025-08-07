@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import { apiv1Router } from './rest/api.v1';
 import whatsappRoutes from './routes/whatsapp.routes';
 import { swaggerUi, specs } from '../../swagger'; // Importa o Swagger
+import cors from 'cors'; // Importa o middleware CORS
 
 const app: Application = express();
 
@@ -11,6 +12,7 @@ const createHTTPServer = async (): Promise<http.Server>  => {
     app.disabled('x-powered-by');
     app.use(express.json());
     app.use(morgan('tiny'));
+    app.use(cors()); // Configura o CORS para permitir requisições de outros domínios
 
     // Configuração do Swagger
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
