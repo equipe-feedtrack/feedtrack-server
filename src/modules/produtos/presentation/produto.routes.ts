@@ -234,9 +234,6 @@ produtoRouter.get('/produtos', produtoController.listarProdutos);
  *                 type: number
  *                 format: float
  *                 description: Novo valor do produto (opcional).
- *               ativo:
- *                 type: boolean
- *                 description: Novo status ativo do produto (opcional).
  *     responses:
  *       200:
  *         description: Produto atualizado com sucesso.

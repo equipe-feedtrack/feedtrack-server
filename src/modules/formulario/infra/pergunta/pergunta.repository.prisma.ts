@@ -32,18 +32,19 @@ export class PerguntaRepositoryPrisma implements IPerguntaRepository {
     return PerguntaMap.toDomain(perguntaPrisma);
   }
 
-  async buscarMuitosPorId(ids: string[]): Promise<Pergunta[]> {
-    const perguntasPrisma = await this.prisma.pergunta.findMany({
-      where: {
-        id: {
-          in: ids, // Usa o filtro 'in' para encontrar todos os IDs na lista.
-        },
+async buscarMuitosPorId(ids: (string | null | undefined)[]): Promise<Pergunta[]> {
+  const filteredIds = ids.filter((id): id is string => !!id); // filtra só strings válidas
+  const perguntasPrisma = await this.prisma.pergunta.findMany({
+    where: {
+      id: {
+        in: filteredIds,
       },
-    });
+    },
+  });
 
-    // Converte cada resultado para a entidade de domínio.
-    return perguntasPrisma.map(p => PerguntaMap.toDomain(p));
-  }
+  return perguntasPrisma.map(p => PerguntaMap.toDomain(p));
+}
+
 
   async inserir(pergunta: Pergunta): Promise<void> {
     const dadosParaPersistencia = PerguntaMap.toPersistence(pergunta);

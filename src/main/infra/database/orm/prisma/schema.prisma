@@ -205,7 +205,7 @@ model Formulario {
 model PerguntasOnFormularios {
   pergunta    Pergunta @relation(fields: [perguntaId], references: [id])
   perguntaId  String   @map("pergunta_id")
-  formulario  Formulario @relation(fields: [formularioId], references: [id])
+  formulario  Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
   formularioId String  @map("formulario_id")
 
   // Exemplo de campo extra na tabela de junção
@@ -230,7 +230,7 @@ model Campanha {
   dataExclusao      DateTime?    @map("data_exclusao")
 
   // Relação com o Formulário
-  formulario   Formulario @relation(fields: [formularioId], references: [id])
+  formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
   formularioId String     @map("formulario_id")
 
   @@map("campanhas")
