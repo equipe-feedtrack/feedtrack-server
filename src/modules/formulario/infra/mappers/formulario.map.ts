@@ -84,8 +84,7 @@ export class FormularioMap {
       descricao: formulario.descricao,
       ativo: formulario.ativo,
       dataCriacao: formulario.dataCriacao.toISOString(),
-      // Calcula a quantidade de perguntas sem expor os detalhes
-      quantidadePerguntas: formulario.perguntas.length,
+      perguntas: formulario.perguntas,
     };
   }
 }

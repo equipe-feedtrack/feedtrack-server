@@ -9,7 +9,7 @@ import { PerguntaMap } from '../pergunta.map';
 
 
 // --- MOCKS DAS DEPENDÊNCIAS (PerguntaMap) ---
-vi.mock('../mappers/pergunta.map');
+vi.mock('../pergunta.map');
 
 describe('FormularioMap', () => {
 

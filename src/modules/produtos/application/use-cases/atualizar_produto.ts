@@ -25,11 +25,6 @@ export class AtualizarProdutoUseCase {
       produto.atualizarValor(input.valor); // Crie este método na entidade Produto
     }
     
-    // Para 'ativo', você pode ter 'ativar()'/'inativar()' na entidade
-    if (input.ativo !== undefined) {
-        if (input.ativo) { produto.ativar(); } else { produto.inativar(); } // Assumindo métodos ativar/inativar
-    }
-    
     // 3. Persistir a entidade atualizada
     await this.produtoRepository.atualizar(produto);
 

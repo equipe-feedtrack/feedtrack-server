@@ -18,15 +18,12 @@ describe('PerguntaRepositoryPrisma (Integration Tests)', () => {
   beforeEach(async () => {
     // Limpeza do Banco ANTES DE CADA TESTE (na ordem correta)
     await prisma.perguntasOnFormularios.deleteMany({});
+    await prisma.formulario.deleteMany({});
     await prisma.pergunta.deleteMany({});
 
     // Criação dos Dados Base (Perguntas) para testes de leitura
-    await prisma.pergunta.createMany({
-      data: [
-        { id: PERGUNTA_ID_1, texto: 'Pergunta de Texto Existente', tipo: 'texto', ativo: true },
-        { id: PERGUNTA_ID_2, texto: 'Pergunta de Nota Existente', tipo: 'nota', opcoes: ['1', '2', '3'], ativo: true },
-      ],
-    });
+    await prisma.pergunta.create({ data: { id: PERGUNTA_ID_1, texto: 'Pergunta de Texto Existente', tipo: 'texto', ativo: true } });
+    await prisma.pergunta.create({ data: { id: PERGUNTA_ID_2, texto: 'Pergunta de Nota Existente', tipo: 'nota', opcoes: ['1', '2', '3'], ativo: true } });
   });
 
   afterAll(async () => {

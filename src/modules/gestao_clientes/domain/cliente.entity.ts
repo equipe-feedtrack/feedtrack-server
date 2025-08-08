@@ -178,11 +178,11 @@ class Cliente extends Entity<ICliente> {
 
  
   public removerProduto(produto: Produto): void {
-    const produtoIndex = this.produtos.findIndex(p => p.id === produto.id);
+    const produtoIndex = this._produtos.findIndex(p => p.id === produto.id);
     if (produtoIndex === -1) {
       throw ClienteExceptions.ClienteNaoPossuiProduto;
     }
-    this.produtos.splice(produtoIndex, 1);
+    this._produtos.splice(produtoIndex, 1);
   }
 
   /**
