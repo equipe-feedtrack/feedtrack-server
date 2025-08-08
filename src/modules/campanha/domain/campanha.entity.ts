@@ -106,7 +106,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
         dataFim: props.dataFim ?? null, // Default null se não fornecido na criação
         templateMensagem: props.templateMensagem,
         formularioId: props.formularioId,
-        ativo: true, // Nova campanha é ativa por padrão
+        ativo: false, // Nova campanha é ativa por padrão
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
         dataExclusao: null,

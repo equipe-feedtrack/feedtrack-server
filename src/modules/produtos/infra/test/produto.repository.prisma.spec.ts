@@ -14,6 +14,7 @@ describe('ProdutoRepositoryPrisma (Integration Tests)', () => {
 
   beforeEach(async () => {
     await prisma.$transaction([
+      prisma.clientesOnProdutos.deleteMany({}),
       prisma.envioFormulario.deleteMany({}),
       prisma.produto.deleteMany({}),
       prisma.cliente.deleteMany({}),

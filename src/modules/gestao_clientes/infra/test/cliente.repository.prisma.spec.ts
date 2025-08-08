@@ -134,7 +134,7 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
     expect(clienteRecuperado).toBeDefined();
 
     clienteRecuperado!.atualizarCidade('Nova Cidade');
-    clienteRecuperado!.removerProduto(PRODUTO_ID_1); // Remove um produto
+    clienteRecuperado!.removerProduto(produtoDb1); // Remove um produto
     
     await repository.atualizar(clienteRecuperado!);
 

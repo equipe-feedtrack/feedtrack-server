@@ -18,19 +18,12 @@ export class AtualizarCampanhaUseCase implements IUseCase<AtualizarCampanhaInput
       throw new Error(`Campanha com ID ${input.id} não encontrada.`);
     }
 
-    // 2. Aplicar as atualizações usando os métodos de domínio
-    if (input.templateMensagem) {
-      campanha.atualizarTemplate(input.templateMensagem);
-    }
-    if (input.dataInicio || input.dataFim) {
-      campanha.atualizarPeriodo(input.dataInicio, input.dataFim);
-    }
 
     if (input.ativo !== undefined) {
       if (input.ativo) {
         campanha.ativar();
       } else {
-        campanha.inativar();
+        campanha.desativar();
       }
     }
 

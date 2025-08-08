@@ -18,6 +18,7 @@ describe('CampanhaRepositoryPrisma (Integration Tests)', () => {
   beforeEach(async () => {
     // Limpeza do Banco ANTES DE CADA TESTE (na ordem correta)
     await prisma.campanha.deleteMany({});
+    await prisma.perguntasOnFormularios.deleteMany({});
     await prisma.formulario.deleteMany({});
 
     // Criação dos Dados Base (Formulários)
@@ -46,6 +47,7 @@ describe('CampanhaRepositoryPrisma (Integration Tests)', () => {
 
   afterAll(async () => {
     await prisma.campanha.deleteMany({});
+    await prisma.perguntasOnFormularios.deleteMany({});
     await prisma.formulario.deleteMany({});
     await prisma.$disconnect();
   });
