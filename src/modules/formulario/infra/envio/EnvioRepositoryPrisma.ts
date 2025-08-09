@@ -1,10 +1,7 @@
-// src/modules/formulario/infra/prisma/envio.repository.prisma.ts
-
 import { PrismaClient } from "@prisma/client";
 import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
 import { IEnvioRepository } from "./IEnvioRepository";
 import { EnvioMap } from "../mappers/EnvioMap";
-import { Prisma } from "@prisma/client";
 
 /**
  * @description Repositório para a entidade Envio, utilizando o Prisma Client.
@@ -19,8 +16,6 @@ export class EnvioRepositoryPrisma implements IEnvioRepository {
 
   /**
    * Salva ou atualiza um registro de Envio.
-   * Utiliza o método `upsert` do Prisma para criar ou atualizar o registro de forma atômica.
-   *
    * @param envio A entidade de domínio Envio a ser salva.
    */
   async salvar(envio: Envio): Promise<void> {

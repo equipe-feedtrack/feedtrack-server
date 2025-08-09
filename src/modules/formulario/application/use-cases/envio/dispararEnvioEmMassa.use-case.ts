@@ -50,8 +50,8 @@ export class DispararEnvioEmMassaUseCase {
         try {
           // Lógica de envio por e-mail ou WhatsApp com base na Campanha
          const conteudo = campanha.templateMensagem;
-         const formulario = envio.formularioId;
-         const link = `https://seusistema.com/feedback/${envio.feedbackId}`;
+         const formulario = envio.campanhaId;
+         const link = `https://localhost:3000/${envio.feedbackId}`; // VINCULAR O LINK REAL QUE IRÁ GERAR A PÁGINA DE FEEDBACK'
          const clienteParaEnvio = clientes.find(c => c.id === envio.clienteId);
           if (!clienteParaEnvio) { 
             envio.registrarFalha(`Cliente com ID ${envio.clienteId} não encontrado na lista de clientes da campanha.`);

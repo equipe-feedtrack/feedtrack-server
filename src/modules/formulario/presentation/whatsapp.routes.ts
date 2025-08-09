@@ -1,9 +1,9 @@
-import { WhatsAppApiGateway } from '@modules/formulario/presentation/gateways/WhatsAppApiGateway';
+import { WhatsAppApiGateway } from '@modules/formulario/infra/envio/gateways/WhatsAppApiGateway';
 import { Router } from 'express';
 
 const router = Router();
 
-router.post('/campanha', async (req: any, res: any) => {
+router.post('/envio-unico', async (req: any, res: any) => {
 
     const { chatId, text } = req.body;
 

@@ -43,13 +43,12 @@ export class DispararEnvioIndividualUseCase {
         const destinatarioEmail = cliente.pessoa.email;
         const conteudo = campanha.templateMensagem;
         const formulario = envio.formularioId;
-        const link = `https://seusistema.com/feedback/${envio.feedbackId}`;
 
       if (campanha.canalEnvio === CanalEnvio.EMAIL) {
           await enviarPorEmail(destinatarioEmail, conteudo, formulario);
 
       } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-        await this.whatsAppGateway.enviar(destinatarioTelefone, conteudo, formulario, link);
+        await this.whatsAppGateway.enviar(destinatarioTelefone, conteudo, formulario);
 
       } else {
           throw new Error("Canal de envio inválido na campanha.");
