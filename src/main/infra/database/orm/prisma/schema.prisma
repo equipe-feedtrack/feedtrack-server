@@ -220,19 +220,19 @@ model PerguntasOnFormularios {
 }
 
 model Campanha {
-  id               String       @id @default(uuid())
-  titulo           String
-  descricao        String?
-  tipoCampanha     TipoCampanha @map("tipo_campanha")
-  segmentoAlvo     SegmentoAlvo @map("segmento_alvo")
-  dataInicio       DateTime     @map("data_inicio")
-  dataFim          DateTime?    @map("data_fim")
-  templateMensagem String       @map("template_mensagem")
-  canalEnvio      CanalEnvio  @default(WHATSAPP) @map("canal_envio")
-  ativo            Boolean      @default(true)
-  dataCriacao      DateTime     @default(now()) @map("data_criacao")
-  dataAtualizacao  DateTime     @updatedAt @map("data_atualizacao")
-  dataExclusao     DateTime?    @map("data_exclusao")
+  id                String       @id @default(uuid())
+  titulo            String
+  descricao         String?
+  tipoCampanha      TipoCampanha @map("tipo_campanha")
+  segmentoAlvo      SegmentoAlvo @map("segmento_alvo")
+  dataInicio        DateTime     @map("data_inicio")
+  dataFim           DateTime?    @map("data_fim")
+  canalEnvio        String       @default("EMAIL") @map("canal_envio") 
+  templateMensagem  String       @map("template_mensagem")
+  ativo             Boolean      @default(true)
+  dataCriacao       DateTime     @default(now()) @map("data_criacao")
+  dataAtualizacao   DateTime     @updatedAt @map("data_atualizacao")
+  dataExclusao      DateTime?    @map("data_exclusao")
 
   // Relação com o Formulário
   formulario   Formulario        @relation(fields: [formularioId], references: [id], onDelete: Cascade)

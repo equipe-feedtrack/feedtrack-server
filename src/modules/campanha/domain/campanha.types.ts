@@ -23,8 +23,8 @@ export interface ICampanha {
   dataInicio: Date;
   dataFim: Date | null;
   templateMensagem: string;
+  canalEnvio: string;
   formularioId: string;
-  canalEnvio: CanalEnvio;
   ativo: boolean; // Campanha é ativa ou inativa
   dataCriacao: Date;
   dataAtualizacao: Date;
