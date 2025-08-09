@@ -7,11 +7,18 @@ export interface IEnvioRepository {
   salvar(envio: Envio): Promise<void>;
   buscarPorId(id: string): Promise<Envio | null>;
   atualizar(envio: Envio): Promise<void>;
+  salvarVarios(envios: Envio[]): Promise<void>;
+  buscarPendentesPorCliente(clienteId: string): Promise<Envio[]>;
+  buscarPendentesPorCampanha(campanhaId: string): Promise<Envio[]>;
 }
 
 // src/application/gateways/IWhatsAppGateway.ts
 export interface IWhatsAppGateway {
-  enviar(destinatario: string, conteudo: string): Promise<void>;
+  enviar(destinatario: string | null, conteudo: string, formulario: string): Promise<void>;
+}
+
+export interface IEmailGateway {
+  
 }
 
 // src/application/services/IFeedbackService.ts

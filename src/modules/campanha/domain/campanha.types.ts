@@ -12,6 +12,11 @@ export enum SegmentoAlvo {
   CLIENTES_PREMIUM = 'CLIENTES_PREMIUM',
 }
 
+export enum CanalEnvio {
+  EMAIL = "EMAIL",
+  WHATSAPP = "WHATSAPP",
+}
+
 export interface ICampanha {
   id: string;
   titulo: string;

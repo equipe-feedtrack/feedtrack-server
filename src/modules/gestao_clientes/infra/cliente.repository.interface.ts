@@ -45,6 +45,8 @@ export interface IClienteRepository {
    */
   listar(filtros?: any): Promise<Cliente[]>;
 
+  buscarClientesParaCampanha(segmento: SegmentoAlvo): Promise<Cliente[]>;
+
   /**
    * Exclui (logicamente ou fisicamente) um Cliente pelo seu ID.
    * @param id O ID do Cliente a ser excluído.

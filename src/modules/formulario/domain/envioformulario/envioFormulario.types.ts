@@ -1,16 +1,22 @@
 import { StatusFormulario } from "@prisma/client";
 
-interface EnvioProps {
+export interface IEnvio {
   id: string;
-  clienteId: string;
-  usuarioId: string;
-  formularioId: string;
-  feedbackId: string;
   status: StatusFormulario;
+  feedbackId: string | null;
+  clienteId: string;
+  formularioId: string;
+  campanhaId: string;
+  usuarioId: string;
   dataCriacao: Date;
-  dataEnvio?: Date | null;
+  dataEnvio: Date | null;
   tentativasEnvio: number;
-  ultimaMensagemErro?: string | null;
+  ultimaMensagemErro: string | null;
 }
 
-export {EnvioProps}
+export type CriarEnvioProps = Omit<
+  IEnvio,
+  'id' | 'status' | 'dataCriacao' | 'dataEnvio' | 'tentativasEnvio' | 'ultimaMensagemErro' | 'feedbackId'
+>;
+
+export type RecuperarEnvioProps = IEnvio;

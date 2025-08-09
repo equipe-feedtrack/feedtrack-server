@@ -7,6 +7,7 @@ import {
   TipoCampanha,
 } from "./campanha.types";
 import { randomUUID } from "crypto";
+import { CanalEnvio } from "./campanha.types";
 
 class Campanha extends Entity<ICampanha> implements ICampanha {
   private _titulo: string;
@@ -135,6 +136,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this.dataFim = props.dataFim ?? null;
     this.templateMensagem = props.templateMensagem;
     this.formularioId = props.formularioId;
+    this.canalEnvio = props.canalEnvio;
     this.ativo = props.ativo; // 'ativo' é sempre boolean e será tratado na fábrica
     this.dataCriacao = props.dataCriacao;
     this.dataAtualizacao = props.dataAtualizacao;

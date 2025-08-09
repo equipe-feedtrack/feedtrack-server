@@ -62,36 +62,41 @@ enum EntidadeAlvoTipo {
   ENVIO_FORMULARIO
 }
 
+enum CanalEnvio {
+  EMAIL
+  WHATSAPP
+}
+
 // --- MODELS ---
 
 model Usuario {
-  id                String    @id @default(uuid())
-  nome              String    @unique
-  email             String    @unique
-  senha             String
-  tipo              TipoUsuario
-  status            StatusUsuario
-  dataCriacao       DateTime  @default(now()) @map("data_criacao")
-  dataAtualizacao   DateTime  @updatedAt @map("data_atualizacao")
-  dataExclusao      DateTime? @map("data_exclusao")
+  id              String        @id @default(uuid())
+  nome            String        @unique
+  email           String        @unique
+  senha           String
+  tipo            TipoUsuario
+  status          StatusUsuario
+  dataCriacao     DateTime      @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime      @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime?     @map("data_exclusao")
 
   // Relações
-  funcionario       Funcionario?
-  enviosFormulario  EnvioFormulario[]
-  logsAtividade     LogAtividade[]
+  funcionario      Funcionario?
+  enviosFormulario EnvioFormulario[]
+  logsAtividade    LogAtividade[]
   //clientesAtendidos Cliente[] // Clientes sob responsabilidade deste usuário/vendedor
 
   @@map("usuarios")
 }
 
 model Funcionario {
-  id              String   @id @default(uuid())
+  id              String        @id @default(uuid())
   cargo           String
-  dataAdmissao    DateTime @map("data_admissao")
+  dataAdmissao    DateTime      @map("data_admissao")
   status          StatusUsuario @default(ATIVO)
-  dataCriacao     DateTime @default(now()) @map("data_criacao")
-  dataAtualizacao DateTime @updatedAt @map("data_atualizacao")
-  dataExclusao    DateTime? @map("data_exclusao")
+  dataCriacao     DateTime      @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime      @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime?     @map("data_exclusao")
 
   // Relação 1-para-1 com Usuario
   usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
@@ -101,51 +106,50 @@ model Funcionario {
 }
 
 model LogAtividade {
-  id               String           @id @default(uuid())
-  acao             TipoAcao
-  detalhes         String?
-  dataOcorrencia   DateTime         @default(now()) @map("data_ocorrencia")
+  id             String   @id @default(uuid())
+  acao           TipoAcao
+  detalhes       String?
+  dataOcorrencia DateTime @default(now()) @map("data_ocorrencia")
 
   // Denormalizado para facilitar consulta de logs
-  nomeUsuario      String           @map("nome_usuario")
-  tipoUsuario      TipoUsuario      @map("tipo_usuario")
+  nomeUsuario String      @map("nome_usuario")
+  tipoUsuario TipoUsuario @map("tipo_usuario")
 
   // Relação com o usuário que realizou a ação
   usuario   Usuario @relation(fields: [usuarioId], references: [id])
   usuarioId String  @map("usuario_id")
 
   // Identificação polimórfica do alvo da ação
-  entidadeAlvoId   String?          @map("entidade_alvo_id")
+  entidadeAlvoId   String?           @map("entidade_alvo_id")
   entidadeAlvoTipo EntidadeAlvoTipo? @map("entidade_alvo_tipo")
 
   @@map("logs_atividade")
 }
 
 model Cliente {
-  id              String   @id @default(uuid())
-  nome            String
-  telefone        String?
-  email           String?
-  vendedorResponsavel String  @map("vendedor_responsavel")
-  cidade          String?
-  status          StatusUsuario
-  dataCriacao     DateTime @default(now()) @map("data_criacao")
-  dataAtualizacao DateTime @updatedAt @map("data_atualizacao")
-  dataExclusao    DateTime? @map("data_exclusao")
-
+  id                  String        @id @default(uuid())
+  nome                String
+  telefone            String?
+  email               String?
+  vendedorResponsavel String        @map("vendedor_responsavel")
+  cidade              String?
+  status              StatusUsuario
+  dataCriacao         DateTime      @default(now()) @map("data_criacao")
+  dataAtualizacao     DateTime      @updatedAt @map("data_atualizacao")
+  dataExclusao        DateTime?     @map("data_exclusao")
 
   // Relações
-  produtos            ClientesOnProdutos[]
+  produtos         ClientesOnProdutos[]
   enviosFormulario EnvioFormulario[]
 
   @@map("clientes")
 }
 
 model ClientesOnProdutos {
-  cliente    Cliente  @relation(fields: [clienteId], references: [id])
-  clienteId  String   @map("cliente_id")
-  produto    Produto  @relation(fields: [produtoId], references: [id])
-  produtoId  String   @map("produto_id")
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+  clienteId String  @map("cliente_id")
+  produto   Produto @relation(fields: [produtoId], references: [id])
+  produtoId String  @map("produto_id")
 
   @@id([clienteId, produtoId])
   @@map("clientes_on_produtos")
@@ -162,7 +166,7 @@ model Produto {
   dataExclusao    DateTime? @map("data_exclusao")
 
   // Relação Um-para-Muitos (um Cliente pode ter vários Produtos)
-  clientes        ClientesOnProdutos[]
+  clientes ClientesOnProdutos[]
 
   @@map("produtos")
 }
@@ -203,13 +207,13 @@ model Formulario {
 
 // Tabela de junção explícita para a relação N-N entre Pergunta e Formulário
 model PerguntasOnFormularios {
-  pergunta    Pergunta @relation(fields: [perguntaId], references: [id])
-  perguntaId  String   @map("pergunta_id")
-  formulario  Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
-  formularioId String  @map("formulario_id")
+  pergunta     Pergunta   @relation(fields: [perguntaId], references: [id])
+  perguntaId   String     @map("pergunta_id")
+  formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+  formularioId String     @map("formulario_id")
 
   // Exemplo de campo extra na tabela de junção
-  ordemNaLista Int     @map("ordem_na_lista")
+  ordemNaLista Int @map("ordem_na_lista")
 
   @@id([perguntaId, formularioId])
   @@map("perguntas_on_formularios")
@@ -231,8 +235,9 @@ model Campanha {
   dataExclusao      DateTime?    @map("data_exclusao")
 
   // Relação com o Formulário
-  formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
-  formularioId String     @map("formulario_id")
+  formulario   Formulario        @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+  formularioId String            @map("formulario_id")
+  envios       EnvioFormulario[]
 
   @@map("campanhas")
 }
@@ -250,6 +255,8 @@ model EnvioFormulario {
   formularioId String     @map("formulario_id")
   cliente      Cliente    @relation(fields: [clienteId], references: [id])
   clienteId    String     @map("cliente_id")
+  campanha     Campanha   @relation(fields: [campanhaId], references: [id])
+  campanhaId   String     @map("campanha_id")
   usuario      Usuario    @relation(fields: [usuarioId], references: [id]) // Usuário que disparou o envio
   usuarioId    String     @map("usuario_id")
   feedback     Feedback? // Relação 1-para-1 com Feedback
@@ -258,10 +265,10 @@ model EnvioFormulario {
 }
 
 model Feedback {
-  id            String   @id @default(uuid())
-  resposta      Json
-  dataCriacao   DateTime @default(now()) @map("data_criacao")
-  dataExclusao  DateTime? @map("data_exclusao")
+  id           String    @id @default(uuid())
+  resposta     Json
+  dataCriacao  DateTime  @default(now()) @map("data_criacao")
+  dataExclusao DateTime? @map("data_exclusao")
 
   // Relação com o Formulário (para saber a estrutura das perguntas)
   formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)

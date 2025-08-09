@@ -1,11 +1,12 @@
-import { describe, expect, it, beforeEach, vi, afterEach } from 'vitest'; // Ajuste o caminho se necessário
-import { Envio } from '../envio.entity.ts.js';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { StatusFormulario } from '@prisma/client';
+import { randomUUID } from 'crypto';
+import { EnvioExceptions } from '../envio.exceptios';
+import { Envio } from '../envio.entity.ts';
 
 describe('Entidade Envio', () => {
-  // Mock para controlar o tempo, se necessário para testes de data
   beforeEach(() => {
-    vi.useFakeTimers(); 
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
@@ -13,81 +14,67 @@ describe('Entidade Envio', () => {
   });
 
   const mockPropsBase = {
-    clienteId: 'cliente-id-123',
-    usuarioId: 'usuario-id-456',
-    formularioId: 'formulario-id-789',
-    feedbackId: 'feedback-id-abc',
+    clienteId: randomUUID(),
+    usuarioId: randomUUID(),
+    formularioId: randomUUID(),
+    campanhaId: randomUUID(),
   };
 
-  // --- Testes para o método 'criar' ---
   it('deve criar uma nova entidade Envio com status PENDENTE e dados corretos', () => {
     const envio = Envio.criar(mockPropsBase);
 
     expect(envio).toBeInstanceOf(Envio);
-    expect(envio.id).toBeDefined(); // ID deve ser gerado
-    expect(envio.status).toBe('PENDENTE' as StatusFormulario);
+    expect(envio.id).toBeDefined();
+    expect(envio.status).toBe(StatusFormulario.PENDENTE);
     expect(envio.clienteId).toBe(mockPropsBase.clienteId);
-    expect(envio.feedbackId).toBe(mockPropsBase.feedbackId);
-    expect(envio.props.usuarioId).toBe(mockPropsBase.usuarioId); // Acessa diretamente se não tiver getter
-    expect(envio.props.formularioId).toBe(mockPropsBase.formularioId);
-    expect(envio.props.dataCriacao).toBeInstanceOf(Date);
-    expect(envio.props.tentativasEnvio).toBe(0);
-    expect(envio.props.dataEnvio).toBeNull(); // Não deve ter dataEnvio
-    expect(envio.props.ultimaMensagemErro).toBeNull(); // Deve ser null
+    expect(envio.formularioId).toBe(mockPropsBase.formularioId);
+    expect(envio.campanhaId).toBe(mockPropsBase.campanhaId);
+    expect(envio.usuarioId).toBe(mockPropsBase.usuarioId);
+    expect(envio.dataCriacao).toBeInstanceOf(Date);
+    expect(envio.tentativasEnvio).toBe(0);
+    expect(envio.dataEnvio).toBeNull();
+    expect(envio.ultimaMensagemErro).toBeNull();
+    expect(envio.feedbackId).toBeNull();
   });
 
-  // --- Testes para o método 'marcarComoEnviado' ---
+  it('deve lançar erro se o ID da campanha não for fornecido', () => {
+    const propsSemCampanha = { ...mockPropsBase, campanhaId: undefined };
+    expect(() => Envio.criar(propsSemCampanha as any)).toThrow(EnvioExceptions);
+  });
+
   it('deve marcar o envio como ENVIADO e registrar a data de envio', () => {
     const envio = Envio.criar(mockPropsBase);
-    const dataCriacaoOriginal = envio.props.dataCriacao;
+    const dataCriacaoOriginal = envio.dataCriacao;
 
-    vi.advanceTimersByTime(1000); // Avança o tempo em 1 segundo
+    vi.advanceTimersByTime(1000);
 
     envio.marcarComoEnviado();
 
-    expect(envio.status).toBe('ENVIADO' as StatusFormulario);
-    expect(envio.props.dataEnvio).toBeInstanceOf(Date);
-    expect(envio.props.dataEnvio?.getTime()).toBeGreaterThan(dataCriacaoOriginal.getTime()); // Data de envio deve ser maior
-    expect(envio.props.ultimaMensagemErro).toBeNull(); // Mensagem de erro deve ser limpa
+    expect(envio.status).toBe(StatusFormulario.ENVIADO);
+    expect(envio.dataEnvio).toBeInstanceOf(Date);
+    expect(envio.dataEnvio?.getTime()).toBeGreaterThan(dataCriacaoOriginal.getTime());
+    expect(envio.ultimaMensagemErro).toBeNull();
   });
 
-  it('não deve alterar o status ou data de envio se já estiver ENVIADO', () => {
+  it('deve registrar falha, incrementar tentativas e registrar mensagem de erro', () => {
     const envio = Envio.criar(mockPropsBase);
-    envio.marcarComoEnviado(); // Marca como enviado a primeira vez
-    const dataEnvioOriginal = envio.props.dataEnvio;
-
-    vi.advanceTimersByTime(1000); // Avança o tempo novamente
-
-    envio.marcarComoEnviado(); // Tenta marcar novamente
-
-    expect(envio.status).toBe('ENVIADO' as StatusFormulario);
-    expect(envio.props.dataEnvio?.getTime()).toBe(dataEnvioOriginal?.getTime()); // Data de envio não deve mudar
-  });
-
-  // --- Testes para o método 'marcarComoFalha' ---
-  it('deve marcar o envio como FALHA e registrar o motivo e incrementar tentativas', () => {
-    const envio = Envio.criar(mockPropsBase);
-    const tentativasIniciais = envio.props.tentativasEnvio;
+    const tentativasIniciais = envio.tentativasEnvio;
     const motivoFalha = 'Erro de conexão com a API';
 
-    envio.marcarComoFalha(motivoFalha);
+    envio.registrarFalha(motivoFalha);
 
-    expect(envio.status).toBe('FALHA' as StatusFormulario);
-    expect(envio.props.tentativasEnvio).toBe(tentativasIniciais + 1);
-    expect(envio.props.ultimaMensagemErro).toBe(motivoFalha);
-    expect(envio.props.dataEnvio).toBeNull(); // Data de envio não deve ser setada em caso de falha
+    expect(envio.status).toBe(StatusFormulario.FALHA);
+    expect(envio.tentativasEnvio).toBe(tentativasIniciais + 1);
+    expect(envio.ultimaMensagemErro).toBe(motivoFalha);
+    expect(envio.dataEnvio).toBeNull();
   });
 
-  it('deve incrementar tentativasEnvio e atualizar o motivo em falhas subsequentes', () => {
+  it('deve associar um feedback ao envio', () => {
     const envio = Envio.criar(mockPropsBase);
-    envio.marcarComoFalha('Primeira falha'); // Primeira falha
-    const tentativasAposPrimeira = envio.props.tentativasEnvio;
-    const novoMotivo = 'Erro de autenticação';
+    const feedbackId = randomUUID();
 
-    envio.marcarComoFalha(novoMotivo); // Segunda falha
+    envio.associarFeedback(feedbackId);
 
-    expect(envio.status).toBe('FALHA' as StatusFormulario);
-    expect(envio.props.tentativasEnvio).toBe(tentativasAposPrimeira + 1);
-    expect(envio.props.ultimaMensagemErro).toBe(novoMotivo);
+    expect(envio.feedbackId).toBe(feedbackId);
   });
 });

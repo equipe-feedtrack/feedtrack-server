@@ -2,33 +2,33 @@ export interface PerguntaResponseDTO {
   /**
    * O ID único da pergunta.
    */
-  _id: string;
+  id: string;
 
   /**
    * O texto da pergunta.
    */
-  _texto: string;
+  texto: string;
 
   /**
    * O tipo da pergunta ('nota', 'texto', etc.).
    */
-  _tipo: string;
+  tipo: string;
 
-  _ativo: boolean;
+  ativo: boolean;
 
   /**
    * As opções da pergunta, se houver.
    */
-  _opcoes?: string[];
+  opcoes?: string[];
 
   /**
    * A data de criação da pergunta no formato ISO string.
    * @example "2025-07-20T17:30:00.000Z"
    */
-  _dataCriacao: string;
+  dataCriacao: string;
 
   /**
    * A data da última atualização.
    */
-  _dataAtualizacao: string;
+  dataAtualizacao: string;
 }
