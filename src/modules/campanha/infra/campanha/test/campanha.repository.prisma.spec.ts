@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { beforeEach, describe, expect, it, afterAll } from 'vitest';
 import { CampanhaRepositoryPrisma } from '../campanha.repository.prisma';
 import { Campanha } from '@modules/campanha/domain/campanha.entity';
-import { SegmentoAlvo, TipoCampanha } from '@modules/campanha/domain/campanha.types';
+import { CanalEnvio, SegmentoAlvo, TipoCampanha } from '@modules/campanha/domain/campanha.types';
 
 const prisma = new PrismaClient();
 const repository = new CampanhaRepositoryPrisma(prisma);
@@ -66,6 +66,7 @@ describe('CampanhaRepositoryPrisma (Integration Tests)', () => {
       dataInicio: new Date('2025-01-01T00:00:00Z'),
       templateMensagem: 'Bem-vindo, {{nome}}!',
       formularioId: FORMULARIO_ID_1,
+      canalEnvio: CanalEnvio.WHATSAPP
     });
 
     // QUANDO: o repositório insere a campanha
@@ -120,7 +121,8 @@ describe('CampanhaRepositoryPrisma (Integration Tests)', () => {
         dataFim: null,
         dataInicio: new Date(),
         templateMensagem: 'Promo!',
-        formularioId: FORMULARIO_ID_2
+        formularioId: FORMULARIO_ID_2,
+        canalEnvio: CanalEnvio.WHATSAPP
     });
     await repository.inserir(campanhaExtra);
 

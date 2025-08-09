@@ -17,6 +17,10 @@ export interface IWhatsAppGateway {
   enviar(destinatario: string | null, conteudo: string, formulario: string): Promise<void>;
 }
 
+export interface IEmailGateway {
+  
+}
+
 // src/application/services/IFeedbackService.ts
 export interface IFeedbackService {
   iniciarColeta(formularioId: string, clienteId: string): Promise<string>; // Retorna o feedbackId

@@ -2,7 +2,6 @@
 
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { EnvioController } from '../controllers/envio.controller';
 import { DispararEnvioEmMassaUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case';
 import { DispararEnvioIndividualUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case';
 import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/use-cases/envio/retentarEnviosPendentes.use-case';
@@ -11,6 +10,7 @@ import { ClienteRepositoryPrisma } from '@modules/gestao_clientes/infra/cliente.
 import { FormularioRepositoryPrisma } from '../infra/formulario/formulario.repository.prisma';
 import { CampanhaRepositoryPrisma } from '@modules/campanha/infra/campanha/campanha.repository.prisma';
 import { WhatsAppApiGateway } from '../infra/envio/gateways/WhatsAppApiGateway';
+import { EnvioController } from './controller/envio.controller';
 
 // Repositórios e Casos de Uso (simulação, você precisará ajustar para o seu projeto)
 const prisma = new PrismaClient();

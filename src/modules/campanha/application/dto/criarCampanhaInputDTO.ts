@@ -1,4 +1,4 @@
-import { SegmentoAlvo, TipoCampanha } from "@modules/campanha/domain/campanha.types";
+import { CanalEnvio, SegmentoAlvo, TipoCampanha } from "@modules/campanha/domain/campanha.types";
 
 export interface CriarCampanhaInputDTO {
   titulo: string;
@@ -9,4 +9,5 @@ export interface CriarCampanhaInputDTO {
   dataFim: Date | null;
   templateMensagem: string;
   formularioId: string;
+  canalEnvio: CanalEnvio;
 }
