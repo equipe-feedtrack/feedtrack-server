@@ -1,5 +1,4 @@
 import { Campanha } from "@modules/campanha/domain/campanha.entity";
-import { ICampanha } from "@modules/campanha/domain/campanha.types";
 
 export interface ICampanhaRepository {
   /**
