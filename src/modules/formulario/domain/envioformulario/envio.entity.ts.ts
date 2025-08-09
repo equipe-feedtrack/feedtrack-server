@@ -1,65 +1,102 @@
-import { randomUUID } from 'crypto';
-import { EnvioProps } from './envioFormulario.types';
-import { StatusFormulario } from '@prisma/client';
+import { StatusFormulario } from "@prisma/client";
+import { EnvioExceptions, EnvioInvalidoCampanha, EnvioInvalidoCliente, EnvioInvalidoFeedback, EnvioInvalidoFormulario, EnvioInvalidoUsuario } from "./envio.exceptios";
+import { IEnvio } from "./envioFormulario.types";
+import { Entity } from "@shared/domain/entity";
+import { randomUUID } from "crypto";
 
-class Envio {
-  public readonly props: EnvioProps;
+export class Envio extends Entity<IEnvio> implements IEnvio {
+  private _status: StatusFormulario;
+  private _feedbackId: string | null;
+  private _clienteId: string;
+  private _formularioId: string;
+  private _campanhaId: string; // Adicionado para vincular o envio à campanha
+  private _usuarioId: string;
+  private _dataCriacao: Date;
+  private _dataEnvio: Date | null;
+  private _tentativasEnvio: number;
+  private _ultimaMensagemErro: string | null;
 
-  public get id(): string { return this.props.id; }
-  public get status(): StatusFormulario { return this.props.status; }
-  public get feedbackId(): string { return this.props.feedbackId; }
-  public get clienteId(): string { return this.props.clienteId; }
-  public get formularioId(): string { return this.props.formularioId; } // <-- Getters existentes
-  public get usuarioId(): string { return this.props.usuarioId; }     // <-- Getters existentes
-  public get dataCriacao(): Date { return this.props.dataCriacao; }    // <-- ADICIONE/CONFIRME ESTE GETTER
-  public get dataEnvio(): Date | null | undefined { return this.props.dataEnvio; }
-  public get tentativasEnvio(): number { return this.props.tentativasEnvio; } // <-- ADICIONE/CONFIRME ESTE GETTER
-  public get ultimaMensagemErro(): string | null | undefined { return this.props.ultimaMensagemErro; }
-  
-  private constructor(props: EnvioProps) {
-    this.props = props;
+  // Getters
+  get status(): StatusFormulario { return this._status; }
+  get feedbackId(): string | null { return this._feedbackId; }
+  get clienteId(): string { return this._clienteId; }
+  get formularioId(): string { return this._formularioId; }
+  get campanhaId(): string { return this._campanhaId; } // Getter para o ID da campanha
+  get usuarioId(): string { return this._usuarioId; }
+  get dataCriacao(): Date { return this._dataCriacao; }
+  get dataEnvio(): Date | null { return this._dataEnvio; }
+  get tentativasEnvio(): number { return this._tentativasEnvio; }
+  get ultimaMensagemErro(): string | null { return this._ultimaMensagemErro; }
+
+  // Construtor privado
+  private constructor(props: IEnvio, id?: string) {
+    super(id);
+    this._status = props.status;
+    this._feedbackId = props.feedbackId;
+    this._clienteId = props.clienteId;
+    this._formularioId = props.formularioId;
+    this._campanhaId = props.campanhaId;
+    this._usuarioId = props.usuarioId;
+    this._dataCriacao = props.dataCriacao;
+    this._dataEnvio = props.dataEnvio;
+    this._tentativasEnvio = props.tentativasEnvio;
+    this._ultimaMensagemErro = props.ultimaMensagemErro;
+
+    this.validarInvariantes();
   }
 
-  public static criar(props: { clienteId: string; usuarioId: string; formularioId: string; feedbackId: string }): Envio {
-    const envioProps: EnvioProps = {
-      id: randomUUID(),
+  public static criar(props: Omit<IEnvio, 'id' | 'status' | 'dataCriacao' | 'dataEnvio' | 'tentativasEnvio' | 'ultimaMensagemErro' | 'feedbackId'>, id?: string): Envio {
+    const propsCompletas: IEnvio = {
       ...props,
-      status: 'PENDENTE',
+      id: id || randomUUID(),
+      status: StatusFormulario.PENDENTE,
       dataCriacao: new Date(),
       dataEnvio: null,
-      ultimaMensagemErro: null,
       tentativasEnvio: 0,
+      ultimaMensagemErro: null,
+      feedbackId: null,
     };
-    return new Envio(envioProps);
+    return new Envio(propsCompletas);
   }
 
-  public static recuperar(props: EnvioProps): Envio {
-  if (!props.id || props.id.trim() === '') { throw new Error("ID é obrigatório para recuperar um Envio."); }
-  if (!props.formularioId || props.formularioId.trim() === '') { throw new Error("ID do formulário é obrigatório para recuperar um Envio."); }
-  if (!props.clienteId || props.clienteId.trim() === '') { throw new Error("ID do cliente é obrigatório para recuperar um Envio."); }
-  if (!props.usuarioId || props.usuarioId.trim() === '') { throw new Error("ID do usuário é obrigatório para recuperar um Envio."); }
-  if (!props.feedbackId || props.feedbackId.trim() === '') { throw new Error("ID do feedback é obrigatório para recuperar um Envio."); }
-  if (!props.status) { throw new Error("Status é obrigatório para recuperar um Envio."); }
-  if (!props.dataCriacao || !(props.dataCriacao instanceof Date) || isNaN(props.dataCriacao.getTime())) { throw new Error("Data de criação é obrigatória e válida para recuperar um Envio."); }
-  // tentativasEnvio é number, pode ter default 0, mas se vier null/undefined aqui, pode precisar de validação
-  if (typeof props.tentativasEnvio !== 'number' || props.tentativasEnvio < 0) { throw new Error("Tentativas de envio inválidas para recuperar um Envio."); }
+  public static recuperar(props: IEnvio, id: string): Envio {
+    if (!id) {
+      throw new EnvioExceptions
+    }
+    return new Envio(props, id);
+  }
 
-  return new Envio(props);
-}
+  private validarInvariantes(): void {
+    if (!this.clienteId) {
+      throw new EnvioInvalidoCliente
+    }
+    if (!this.formularioId) {
+      throw new EnvioInvalidoFormulario
+    }
+    if (!this.campanhaId) {
+      throw new EnvioInvalidoCampanha
+    }
+    if (!this.usuarioId) {
+      throw new EnvioInvalidoUsuario
+    }
+  }
 
   public marcarComoEnviado(): void {
-    if (this.props.status === 'ENVIADO') return; // Evita múltiplas marcações
-    this.props.status = 'ENVIADO';
-    this.props.dataEnvio = new Date();
-    this.props.ultimaMensagemErro = null;
+    this._status = StatusFormulario.ENVIADO;
+    this._dataEnvio = new Date();
+    this._ultimaMensagemErro = null;
   }
 
-  public marcarComoFalha(motivo: string): void {
-    this.props.status = 'FALHA';
-    this.props.tentativasEnvio += 1;
-    this.props.ultimaMensagemErro = motivo;
+  public registrarFalha(mensagemErro: string): void {
+    this._status = StatusFormulario.FALHA;
+    this._tentativasEnvio += 1;
+    this._ultimaMensagemErro = mensagemErro;
   }
 
+  public associarFeedback(feedbackId: string): void {
+    if (!feedbackId) {
+      throw new EnvioInvalidoFeedback
+    }
+    this._feedbackId = feedbackId;
+  }
 }
-
-export { Envio }

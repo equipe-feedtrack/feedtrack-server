@@ -1,6 +1,4 @@
-// src/modules/campanha/application/use-cases/dto/campanha/CampanhaResponseDTO.ts
-
-import { SegmentoAlvo, TipoCampanha } from "@modules/campanha/domain/campanha.types";
+import { CanalEnvio, SegmentoAlvo, TipoCampanha } from "@modules/campanha/domain/campanha.types";
 
 export interface CampanhaResponseDTO {
   id: string;
@@ -12,6 +10,7 @@ export interface CampanhaResponseDTO {
   dataFim: string | null; // String ISO
   templateMensagem: string;
   formularioId: string;
+  canalEnvio: CanalEnvio;
   ativo: boolean;
   dataCriacao: string; // String ISO
   dataAtualizacao: string; // String ISO

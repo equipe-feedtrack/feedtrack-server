@@ -12,6 +12,11 @@ export enum SegmentoAlvo {
   CLIENTES_PREMIUM = 'CLIENTES_PREMIUM',
 }
 
+export enum CanalEnvio {
+  EMAIL = "EMAIL",
+  WHATSAPP = "WHATSAPP",
+}
+
 export interface ICampanha {
   id: string;
   titulo: string;
@@ -22,6 +27,7 @@ export interface ICampanha {
   dataFim: Date | null;
   templateMensagem: string;
   formularioId: string;
+  canalEnvio: CanalEnvio
   ativo: boolean; // Campanha é ativa ou inativa
   dataCriacao: Date;
   dataAtualizacao: Date;

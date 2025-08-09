@@ -1,5 +1,5 @@
 import { Entity } from "@shared/domain/entity";
-import { CriarCampanhaProps, ICampanha, RecuperarCampanhaProps, SegmentoAlvo, TipoCampanha } from "./campanha.types";
+import { CanalEnvio, CriarCampanhaProps, ICampanha, RecuperarCampanhaProps, SegmentoAlvo, TipoCampanha } from "./campanha.types";
 import { randomUUID } from "crypto";
 
 class Campanha extends Entity<ICampanha> implements ICampanha {
@@ -11,6 +11,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   private _dataFim: Date | null;
   private _templateMensagem: string;
   private _formularioId: string;
+  private _canalEnvio: CanalEnvio;
   private _ativo: boolean;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
@@ -25,6 +26,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   get dataFim(): Date | null  { return this._dataFim; }
   get templateMensagem(): string { return this._templateMensagem; }
   get formularioId(): string { return this._formularioId; }
+  get canalEnvio(): CanalEnvio { return this._canalEnvio; }
   get ativo(): boolean { return this._ativo; }
   get dataCriacao(): Date { return this._dataCriacao; }
   get dataAtualizacao(): Date { return this._dataAtualizacao; }
@@ -61,6 +63,13 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
    }
     this._formularioId = value;
   }
+
+  private set canalEnvio(value: CanalEnvio) {
+    if (!Object.values(CanalEnvio).includes(value)) {
+      throw new Error("Canal de envio inválido.");
+    }
+    this._canalEnvio = value;
+  }
   private set ativo(value: boolean) { this._ativo = value; }
   private set dataCriacao(value: Date) { this._dataCriacao = value; }
   private set dataAtualizacao(value: Date) { this._dataAtualizacao = value; }
@@ -78,6 +87,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this.dataFim = props.dataFim ?? null;
     this.templateMensagem = props.templateMensagem;
     this.formularioId = props.formularioId;
+    this.canalEnvio = props.canalEnvio;
     this.ativo = props.ativo; // 'ativo' é sempre boolean e será tratado na fábrica
     this.dataCriacao = props.dataCriacao;
     this.dataAtualizacao = props.dataAtualizacao;
@@ -106,6 +116,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
         dataFim: props.dataFim ?? null, // Default null se não fornecido na criação
         templateMensagem: props.templateMensagem,
         formularioId: props.formularioId,
+        canalEnvio: props.canalEnvio,
         ativo: false, // Nova campanha é ativa por padrão
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),

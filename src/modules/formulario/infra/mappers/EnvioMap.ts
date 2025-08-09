@@ -1,34 +1,28 @@
-import { EnvioResponseDTO } from '@modules/formulario/application/dto/envio/iniciarEnvioDTO';
+// src/modules/formulario/infra/mappers/envio.map.ts
+
+import { EnvioFormulario as EnvioPrisma, Prisma, StatusFormulario } from '@prisma/client';
 import { Envio } from '@modules/formulario/domain/envioformulario/envio.entity.ts';
-import { EnvioProps } from '@modules/formulario/domain/envioformulario/envioFormulario.types';
-import {
-  EnvioFormulario as EnvioPrisma,
-  StatusFormulario as StatusFormularioPrisma,
-  Prisma,
-} from '@prisma/client';
-
-
+import { IEnvio } from '@modules/formulario/domain/envioformulario/envioFormulario.types';
 
 export class EnvioMap {
-
   /**
-   * Converte o dado bruto do Prisma para a Entidade de Domínio Envio.
+   * Converte um objeto do Prisma para a Entidade de Domínio Envio.
    */
   public static toDomain(raw: EnvioPrisma): Envio {
-    const envioProps: EnvioProps = {
+    const envioProps: IEnvio = {
       id: raw.id,
       status: raw.status,
-      feedbackId: raw.feedbackId,
+      feedbackId: null, // Esta propriedade agora existe e é mapeada
       clienteId: raw.clienteId,
       formularioId: raw.formularioId,
+      campanhaId: raw.campanhaId,
       usuarioId: raw.usuarioId,
       dataCriacao: raw.dataCriacao,
       dataEnvio: raw.dataEnvio,
       tentativasEnvio: raw.tentativasEnvio,
       ultimaMensagemErro: raw.ultimaMensagemErro,
     };
-
-    return Envio.recuperar(envioProps);
+    return Envio.recuperar(envioProps, raw.id);
   }
 
   /**
@@ -43,36 +37,10 @@ export class EnvioMap {
       tentativasEnvio: envio.tentativasEnvio,
       ultimaMensagemErro: envio.ultimaMensagemErro,
       // Conecta as relações com as outras entidades
-      cliente: {
-        connect: { id: envio.clienteId },
-      },
-      formulario: {
-        connect: { id: envio.formularioId },
-      },
-      usuario: {
-        connect: { id: envio.usuarioId },
-      },
-      feedback: {
-        connect: { id: envio.feedbackId },
-      },
-    };
-  }
-
-  /**
-   * Converte a entidade Envio para um DTO de resposta da API.
-   */
-  public static toResponseDTO(envio: Envio): EnvioResponseDTO {
-    return {
-      id: envio.id,
-      status: envio.status,
-      feedbackId: envio.feedbackId,
-      clienteId: envio.clienteId,
-      formularioId: envio.formularioId,
-      usuarioId: envio.usuarioId,
-      dataCriacao: envio.dataCriacao.toISOString(),
-      dataEnvio: envio.dataEnvio ? envio.dataEnvio.toISOString() : null,
-      tentativasEnvio: envio.tentativasEnvio,
-      ultimaMensagemErro: envio.ultimaMensagemErro,
+      cliente: { connect: { id: envio.clienteId } },
+      formulario: { connect: { id: envio.formularioId } },
+      campanha: { connect: { id: envio.campanhaId } },
+      usuario: { connect: { id: envio.usuarioId } },
     };
   }
 }

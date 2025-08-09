@@ -18,6 +18,7 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
 
   async enviar(destinatario: string, conteudo: string): Promise<void> {
     console.log(`[WhatsAppApiGateway] Preparando para enviar mensagem para: ${destinatario}`);
+    
 
     try {
       // Monta o corpo da requisição conforme a documentação da API que você usar
