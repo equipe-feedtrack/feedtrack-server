@@ -5,9 +5,16 @@ import { Cliente } from '../domain/cliente.entity';
 import { IClienteRepository } from './cliente.repository.interface';
 import { ClienteMap } from './mappers/cliente.map';
 
+
 export class ClienteRepositoryPrisma extends PrismaRepository implements IClienteRepository {
   constructor(prismaClient: PrismaClient) {
     super(prismaClient);
+  }
+  buscarClientesParaCampanha(segmento: SegmentoAlvo): Promise<Cliente[]> {
+    throw new Error('Method not implemented.');
+  }
+  deletar?(id: string): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
 
   // ... métodos inserir e atualizar ...
