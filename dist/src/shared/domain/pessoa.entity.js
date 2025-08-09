@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Pessoa = void 0;
+const crypto_1 = require("crypto");
 class Pessoa {
     get nome() {
         return this._nome;
@@ -18,34 +19,17 @@ class Pessoa {
         return this._telefone;
     }
     set telefone(telefone) {
-        this._telefone = telefone;
+        this._telefone = typeof telefone === 'string' && telefone.trim() !== '' ? telefone.trim() : null;
     }
     constructor(props) {
         const { nome, email, telefone } = props;
-        // Validação do nome
-        if (!nome || nome.trim() === '') {
-            throw new Error("Nome é obrigatório.");
-        }
-        this.nome = nome.trim();
-        // Validação do e-mail
-        if (email !== undefined && email !== null) {
-            const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!regexEmail.test(email)) {
-                throw new Error("Email inválido.");
-            }
-            this.email = email;
-        }
-        else {
-            this.email = "";
-        }
-        // Validação do telefone
-        if (telefone !== undefined && telefone !== null) {
-            const regexTelefone = /^[\d\s()+-]{8,24}$/;
-            if (!regexTelefone.test(telefone)) {
-                throw new Error("Telefone inválido.");
-            }
-            this.telefone = telefone;
-        }
+        this.nome = nome;
+        this.telefone = telefone;
+        this.email = email;
+    }
+    static criar(props) {
+        const id = (0, crypto_1.randomUUID)(); // Gera um ID único para a nova Pessoa
+        return new Pessoa({ ...props, id });
     }
     dados() {
         return {
@@ -53,6 +37,18 @@ class Pessoa {
             email: this._email,
             telefone: this._telefone
         };
+    }
+    static recuperar(props) {
+        return new Pessoa(props);
+    }
+    atualizarNome(novoNome) {
+        this.nome = novoNome; // Reutiliza o setter
+    }
+    atualizarEmail(novoEmail) {
+        this.email = novoEmail; // Reutiliza o setter
+    }
+    atualizarTelefone(novoTelefone) {
+        this.telefone = novoTelefone; // Reutiliza o setter
     }
 }
 exports.Pessoa = Pessoa;

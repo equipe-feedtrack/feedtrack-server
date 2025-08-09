@@ -10,6 +10,7 @@ export interface IEnvioRepository {
   salvarVarios(envios: Envio[]): Promise<void>;
   buscarPendentesPorCliente(clienteId: string): Promise<Envio[]>;
   buscarPendentesPorCampanha(campanhaId: string): Promise<Envio[]>;
+  buscarPendentes(): Promise<Envio[]>;
 }
 
 // src/application/gateways/IWhatsAppGateway.ts

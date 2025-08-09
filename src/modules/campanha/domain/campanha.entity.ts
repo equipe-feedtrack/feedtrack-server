@@ -1,6 +1,7 @@
 import { Entity } from "@shared/domain/entity";
-import { CanalEnvio, CriarCampanhaProps, ICampanha, RecuperarCampanhaProps, SegmentoAlvo, TipoCampanha } from "./campanha.types";
+import {CriarCampanhaProps, ICampanha, RecuperarCampanhaProps, SegmentoAlvo, TipoCampanha } from "./campanha.types";
 import { randomUUID } from "crypto";
+import { CanalEnvio } from "@prisma/client";
 
 class Campanha extends Entity<ICampanha> implements ICampanha {
   private _titulo: string;
@@ -63,13 +64,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
    }
     this._formularioId = value;
   }
-
-  private set canalEnvio(value: CanalEnvio) {
-    if (!Object.values(CanalEnvio).includes(value)) {
-      throw new Error("Canal de envio inválido.");
-    }
-    this._canalEnvio = value;
-  }
+  private set canalEnvio(value: CanalEnvio) {this._canalEnvio = value;}
   private set ativo(value: boolean) { this._ativo = value; }
   private set dataCriacao(value: Date) { this._dataCriacao = value; }
   private set dataAtualizacao(value: Date) { this._dataAtualizacao = value; }
@@ -117,7 +112,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
         templateMensagem: props.templateMensagem,
         formularioId: props.formularioId,
         canalEnvio: props.canalEnvio,
-        ativo: false, // Nova campanha é ativa por padrão
+        ativo: true, // Nova campanha é ativa por padrão
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
         dataExclusao: null,

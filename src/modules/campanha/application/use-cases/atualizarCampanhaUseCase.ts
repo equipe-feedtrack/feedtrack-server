@@ -3,6 +3,7 @@ import { AtualizarCampanhaInputDTO } from "../dto/atualizarCampanhaInputDTO";
 import { CampanhaResponseDTO } from "../dto/CampanhaResponseDTO";
 import { IUseCase } from "@shared/application/use-case/usecase.interface";
 import { CampanhaMap } from "@modules/campanha/infra/mappers/campanha.map";
+import { CampanhaNaoEncontradaException } from "../exceptions/campanha.exception";
 
 export class AtualizarCampanhaUseCase implements IUseCase<AtualizarCampanhaInputDTO, CampanhaResponseDTO> {
   private readonly _campanhaRepository: ICampanhaRepository;
@@ -15,7 +16,7 @@ export class AtualizarCampanhaUseCase implements IUseCase<AtualizarCampanhaInput
     // 1. Recuperar a entidade
     const campanha = await this._campanhaRepository.recuperarPorUuid(input.id);
     if (!campanha) {
-      throw new Error(`Campanha com ID ${input.id} não encontrada.`);
+      throw new CampanhaNaoEncontradaException();
     }
 
 

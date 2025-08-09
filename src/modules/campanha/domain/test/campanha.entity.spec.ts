@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Campanha } from "../campanha.entity";
 import { RecuperarCampanhaProps, SegmentoAlvo, TipoCampanha } from "../campanha.types";
+import { CanalEnvio } from "@prisma/client";
 
 describe('Entidade Campanha', () => {
   beforeEach(() => {
@@ -21,6 +22,7 @@ describe('Entidade Campanha', () => {
     dataFim: new Date('2025-03-31T23:59:59Z'),
     templateMensagem: 'Olá, {{cliente_nome}}! Aproveite nossa promoção de verão: ...',
     formularioId: 'form-id-campanha-1',
+    canalEnvio: CanalEnvio.EMAIL,
   };
 
   // --- Testes para o método 'criar' ---
@@ -84,6 +86,7 @@ describe('Entidade Campanha', () => {
       dataFim: null,
       templateMensagem: 'Template antigo',
       formularioId: '1da68d4a-5c24-4f81-a7e8-e5f3b7c2a1d9',
+      canalEnvio: CanalEnvio.WHATSAPP,
       ativo: false, // Pode ser inativa
       dataCriacao: new Date('2024-01-01T00:00:00Z'),
       dataAtualizacao: new Date('2024-01-01T00:00:00Z'),

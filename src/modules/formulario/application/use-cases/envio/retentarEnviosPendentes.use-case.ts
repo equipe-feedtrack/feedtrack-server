@@ -1,3 +1,4 @@
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
 import { IEnvioRepository } from "@modules/formulario/infra/envio/IEnvioRepository";
 
 /**
@@ -17,7 +18,7 @@ export class RetentarEnviosPendentesUseCase {
 
     console.log(`Retentando ${enviosPendentes.length} envios pendentes.`);
 
-    const operacoes = enviosPendentes.map(async envio => {
+    const operacoes = enviosPendentes.map(async (envio: Envio) => {
       try {
         console.log(`Simulando retentativa de envio para ${envio.clienteId}`);
         // Lógica de retentativa aqui

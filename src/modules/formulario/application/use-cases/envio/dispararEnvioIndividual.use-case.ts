@@ -6,6 +6,12 @@ import { IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/en
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
 import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
 
+async function enviarPorEmail(email: string, conteudo: string, formulario: string): Promise<void> {
+    console.log(`Enviando e-mail para ${email} com conteúdo: ${conteudo} e formulário: ${formulario}`);
+    // Simulate email sending
+    return Promise.resolve();
+}
+
 export class DispararEnvioIndividualUseCase {
   constructor(
     private readonly envioRepository: IEnvioRepository,

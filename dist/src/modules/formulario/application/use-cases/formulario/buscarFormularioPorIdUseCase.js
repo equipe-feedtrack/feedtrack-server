@@ -1,19 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuscarFormularioPorIdUseCase = void 0;
-const formulario_map_1 = require("@modules/formulario/mappers/formulario.map");
-const use_case_exception_1 = require("@shared/application/use-case/use-case.exception");
+const formulario_map_1 = require("@modules/formulario/infra/mappers/formulario.map");
 class BuscarFormularioPorIdUseCase {
     constructor(formularioRepository) {
-        this.formularioRepository = formularioRepository;
+        this._formularioRepository = formularioRepository;
     }
     async execute(id) {
-        // 1. Busca a entidade no repositório, incluindo suas perguntas.
-        const formulario = await this.formularioRepository.recuperarPorUuid(id);
+        const formulario = await this._formularioRepository.recuperarPorUuid(id);
         if (!formulario) {
-            throw new use_case_exception_1.FormularioInexistente;
+            return null;
         }
-        // 2. Usa o Mapper para converter a entidade em um DTO de resposta detalhado.
         return formulario_map_1.FormularioMap.toResponseDTO(formulario);
     }
 }

@@ -4,6 +4,7 @@ import { BuscarCampanhaPorIdUseCase } from "@modules/campanha/application/use-ca
 import { CriarCampanhaUseCase } from "@modules/campanha/application/use-cases/criarCampanhaUseCase";
 import { DeletarCampanhaUseCase } from "@modules/campanha/application/use-cases/deletarCampanhaUseCase";
 import { ListarCampanhasUseCase } from "@modules/campanha/application/use-cases/listarCampanhaUseCase";
+import { CampanhaNaoEncontradaException } from '@modules/campanha/application/exceptions/campanha.exception';
 
 /**
  * Controller responsável por gerir as requisições HTTP para o recurso de Campanhas.
@@ -55,12 +56,15 @@ export class CampanhaController {
       const campanhaDTO = await this._buscarCampanhaPorIdUseCase.execute(id);
 
       if (!campanhaDTO) {
-        res.status(404).json({ message: 'Campanha não encontrada.' });
-        return;
+        throw new CampanhaNaoEncontradaException();
       }
 
       res.status(200).json(campanhaDTO);
     } catch (error: any) {
+        if (error instanceof CampanhaNaoEncontradaException) {
+            res.status(404).json({ message: error.message });
+            return;
+        }
       next(error);
     }
   };
@@ -77,7 +81,7 @@ export class CampanhaController {
       const campanhaAtualizadaDTO = await this._atualizarCampanhaUseCase.execute(inputDTO);
       res.status(200).json(campanhaAtualizadaDTO);
     } catch (error: any) {
-      if (error ) {
+      if (error instanceof CampanhaNaoEncontradaException) {
         res.status(404).json({ message: error.message });
         return;
       }
@@ -95,7 +99,7 @@ export class CampanhaController {
       await this._deletarCampanhaUseCase.execute(id);
       res.status(204).send();
     } catch (error: any) {
-      if (error) {
+      if (error instanceof CampanhaNaoEncontradaException) {
         res.status(404).json({ message: error.message });
         return;
       }

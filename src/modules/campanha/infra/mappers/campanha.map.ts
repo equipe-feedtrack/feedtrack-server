@@ -2,11 +2,12 @@ import {
   Campanha as CampanhaPrisma,
   TipoCampanha as TipoCampanhaPrisma,
   SegmentoAlvo as SegmentoAlvoPrisma,
+  CanalEnvio as CanalEnvioPrisma,
   Prisma,
 } from '@prisma/client';
 
 import { Campanha } from '@modules/campanha/domain/campanha.entity';
-import { ICampanha, TipoCampanha, SegmentoAlvo, CanalEnvio } from '@modules/campanha/domain/campanha.types';
+import { ICampanha, TipoCampanha, SegmentoAlvo } from '@modules/campanha/domain/campanha.types';
 import { CampanhaResponseDTO } from '@modules/campanha/application/dto/CampanhaResponseDTO';
 
 // Define um tipo para o objeto CampanhaPrisma que pode ser usado nas conversões.
@@ -45,7 +46,7 @@ export class CampanhaMap {
       dataFim: raw.dataFim,
       templateMensagem: raw.templateMensagem,
       formularioId: raw.formularioId,
-      canalEnvio: raw.canalEnvio as CanalEnvio,
+      canalEnvio: raw.canalEnvio,
       ativo: raw.ativo,
       dataCriacao: raw.dataCriacao,
       dataAtualizacao: raw.dataAtualizacao,

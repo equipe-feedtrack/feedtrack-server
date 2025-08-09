@@ -2,26 +2,29 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CriarFormularioUseCase = void 0;
 const formulario_entity_1 = require("@modules/formulario/domain/formulario/formulario.entity");
+const formulario_map_1 = require("@modules/formulario/infra/mappers/formulario.map");
 class CriarFormularioUseCase {
     constructor(formularioRepository, perguntaRepository) {
-        this.formularioRepository = formularioRepository;
-        this.perguntaRepository = perguntaRepository;
+        this._formularioRepository = formularioRepository;
+        this._perguntaRepository = perguntaRepository;
     }
-    async execute(dto) {
-        // 1. Busca as entidades de Pergunta com base nos IDs recebidos
-        const perguntas = await this.perguntaRepository.buscarMuitosPorId(dto.perguntasIds);
-        if (perguntas.length !== dto.perguntasIds.length) {
-            throw new Error("Uma ou mais perguntas não foram encontradas.");
+    async execute(input) {
+        // 1. Validação e Recuperação das Perguntas
+        const perguntasRecuperadas = await this._perguntaRepository.buscarMuitosPorId(input.idsPerguntas);
+        if (perguntasRecuperadas.length !== input.idsPerguntas.length) {
+            throw new Error("Uma ou mais IDs de perguntas fornecidas são inválidas.");
         }
-        // 2. Cria a entidade Formulário com as perguntas encontradas
+        // 2. Criação da Entidade de Domínio
         const formulario = formulario_entity_1.Formulario.criar({
-            titulo: dto.titulo,
-            descricao: dto.descricao,
-            perguntas: perguntas,
+            titulo: input.titulo,
+            descricao: input.descricao,
+            ativo: input.ativo,
+            perguntas: perguntasRecuperadas,
         });
-        // 3. Salva o formulário, e o repositório se encarrega de conectar as perguntas
-        await this.formularioRepository.inserir(formulario);
-        return formulario.id;
+        // 3. Persistência no Banco de Dados
+        await this._formularioRepository.inserir(formulario);
+        // 4. Retorno do DTO de Saída
+        return formulario_map_1.FormularioMap.toResponseDTO(formulario);
     }
 }
 exports.CriarFormularioUseCase = CriarFormularioUseCase;

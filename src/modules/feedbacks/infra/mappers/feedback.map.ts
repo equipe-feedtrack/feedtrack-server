@@ -45,7 +45,7 @@ export class FeedbackMap {
       id: feedback.id,
       formularioId: feedback.formularioId,
       envioId: feedback.envioId, // Adicionado para consistência
-      resposta: feedback.respostas,
+      respostas: feedback.respostas,
       dataCriacao: feedback.dataCriacao.toISOString(),
       dataExclusao: feedback.dataExclusao ? feedback.dataExclusao.toISOString() : undefined,
     };

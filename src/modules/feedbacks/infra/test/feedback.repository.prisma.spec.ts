@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { PrismaClient, Feedback as FeedbackPrisma } from "@prisma/client";
+import { PrismaClient, Feedback as FeedbackPrisma, Prisma } from "@prisma/client";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { TipoPergunta } from "@shared/domain/data.types";
@@ -21,6 +21,10 @@ vi.mock("@prisma/client", () => {
   };
   return {
     PrismaClient: vi.fn(() => mockPrisma),
+    Prisma: {
+      JsonNull: {},
+      DbNull: {},
+    }
   };
 });
 
@@ -57,7 +61,7 @@ describe("FeedbackRepositoryPrisma", () => {
       id: feedbackEntity.id,
       formularioId: feedbackEntity.formularioId,
       envioId: feedbackEntity.envioId,
-      resposta: feedbackEntity.respostas,
+      resposta: JSON.parse(JSON.stringify(feedbackEntity.respostas)),
       dataCriacao: feedbackEntity.dataCriacao,
       dataExclusao: feedbackEntity.dataExclusao,
     } as FeedbackPrisma);
@@ -91,13 +95,13 @@ describe("FeedbackRepositoryPrisma", () => {
         perguntaId: randomUUID(),
         tipo: TipoPergunta.TEXTO,
         resposta_texto: "Teste de busca",
-        data_resposta: new Date(),
+        data_resposta: new Date().toISOString(),
       }],
       dataCriacao: new Date(),
       dataExclusao: null,
     };
 
-    vi.mocked(prisma.feedback.findUnique).mockResolvedValue(mockDbResponse as FeedbackPrisma);
+    vi.mocked(prisma.feedback.findUnique).mockResolvedValue(mockDbResponse as unknown as FeedbackPrisma);
 
     const result = await repo.recuperarPorUuid(feedbackId);
 
