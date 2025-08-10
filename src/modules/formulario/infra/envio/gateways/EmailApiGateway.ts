@@ -10,7 +10,7 @@ dotenv.config();
  */
 export class EmailGateway implements IEmailGateway {
   private transporter;
-
+  private readonly feedbackUrl: string;
   constructor() {
     this.transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -21,6 +21,7 @@ export class EmailGateway implements IEmailGateway {
         pass: process.env.EMAIL_PASS,
       },
     });
+    this.feedbackUrl = process.env.FEEDBACK_URL || 'http://localhost:3000/feedback'; // VINCULAR O LINK REAL QUE IRÁ GERAR A PÁGINA DE FEEDBACK'
   }
 
   /**
@@ -30,11 +31,11 @@ export class EmailGateway implements IEmailGateway {
    * @param formularioId O ID do formulário a ser anexado ao link.
    * @param link O link base para o formulário.
    */
-  async enviar(destinatario: string, conteudo: string, formularioId: string, link: string): Promise<void> {
+  async enviar(destinatario: string, conteudo: string, campanhaId: string ): Promise<void> {
     console.log(`[EmailGateway] Preparando para enviar e-mail para: ${destinatario}`);
 
     try {
-      const linkCompleto = `${link}/${formularioId}`;
+      const linkCompleto = `${this.feedbackUrl}/${campanhaId}`;
       const mensagemCompleta = `${conteudo}\n\nResponda aqui: ${linkCompleto}`;
       
       const mailOptions = {

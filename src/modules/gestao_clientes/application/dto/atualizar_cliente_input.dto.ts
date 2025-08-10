@@ -10,6 +10,6 @@ export interface AtualizarClienteInputDTO {
   cidade: string ;
   vendedorResponsavel: string;
   status?: StatusCliente;
-  idsProdutosParaAdicionar?: string[];
-  idsProdutosParaRemover?: string[];
+  idsProdutosParaAdicionar: string[];
+  idsProdutosParaRemover: string[];
 }

@@ -1,8 +1,13 @@
-import { DispararEnvioEmMassaUseCase } from "@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case";
-import { DispararEnvioIndividualUseCase } from "@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case";
-import { RetentarEnviosPendentesUseCase } from "@modules/formulario/application/use-cases/envio/retentarEnviosPendentes.use-case";
-import { NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
+import { DispararEnvioEmMassaUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case';
+import { DispararEnvioIndividualUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case';
+import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/use-cases/envio/retentarEnviosPendentes.use-case';
 
+
+/**
+ * @description O `EnvioController` gerencia a lógica de tratamento de requisições
+ * HTTP para o envio de formulários, utilizando o framework Express.
+ */
 export class EnvioController {
   constructor(
     private readonly dispararEnvioIndividualUseCase: DispararEnvioIndividualUseCase,
@@ -44,7 +49,9 @@ export class EnvioController {
    */
   public retentarPendentes = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      await this.retentarEnviosPendentesUseCase.execute();
+      const { clienteId, campanhaId } = req.body;
+      // Passa os parâmetros opcionais para o use-case
+      await this.retentarEnviosPendentesUseCase.execute({ clienteId, campanhaId });
       res.status(200).json({ message: 'Retentativa de envios pendentes concluída.' });
     } catch (error) {
       next(error);
