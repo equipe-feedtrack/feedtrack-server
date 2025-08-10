@@ -72,44 +72,100 @@ const envioRouter = Router();
 /**
  * @swagger
  * /envio/individual:
- * post:
- * summary: Dispara um envio de formulário para um cliente específico
- * tags: [Envios]
- * requestBody:
- * required: true
- * content:
- * application/json:
- * schema:
- * type: object
- * required:
- * - clienteId
- * - campanhaId
- * - usuarioId
- * properties:
- * clienteId:
- * type: string
- * description: ID do cliente para quem o formulário será enviado.
- * campanhaId:
- * type: string
- * description: ID da campanha associada ao envio.
- * usuarioId:
- * type: string
- * description: ID do usuário que está disparando o envio.
- * responses:
- * 200:
- * description: Envio individual disparado com sucesso.
- * 400:
- * description: Dados de entrada inválidos.
- * 500:
- * description: Erro interno do servidor.
+ *   post:
+ *     summary: Dispara um envio de formulário para um cliente específico
+ *     tags: [Envios]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - clienteId
+ *               - campanhaId
+ *               - usuarioId
+ *             properties:
+ *               clienteId:
+ *                 type: string
+ *                 description: ID do cliente para quem o formulário será enviado.
+ *               campanhaId:
+ *                 type: string
+ *                 description: ID da campanha associada ao envio.
+ *               usuarioId:
+ *                 type: string
+ *                 description: ID do usuário que está disparando o envio.
+ *     responses:
+ *       200:
+ *         description: Envio individual disparado com sucesso.
+ *       400:
+ *         description: Dados de entrada inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
  */
 // Rota para disparo individual
 envioRouter.post('/envio/individual', envioController.dispararIndividual);
 
 // Rota para disparo em massa
+/**
+ * @swagger
+ * /envio/massa:
+ *   post:
+ *     summary: Dispara envios de formulário em massa para todos os clientes de uma campanha
+ *     tags: [Envios]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - campanhaId
+ *               - usuarioId
+ *             properties:
+ *               campanhaId:
+ *                 type: string
+ *                 description: ID da campanha para o disparo em massa.
+ *               usuarioId:
+ *                 type: string
+ *                 description: ID do usuário que está disparando o envio.
+ *     responses:
+ *       200:
+ *         description: Envios em massa disparados com sucesso.
+ *       400:
+ *         description: Dados de entrada inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 envioRouter.post('/envio/massa', envioController.dispararEmMassa);
 
 // Rota para retentativa de envios
+/**
+ * @swagger
+ * /envio/retentar:
+ *   post:
+ *     summary: Retenta o envio de formulários que falharam anteriormente
+ *     tags: [Envios]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - campanhaId
+ *             properties:
+ *               campanhaId:
+ *                 type: string
+ *                 description: ID da campanha para a qual a retentativa será executada.
+ *     responses:
+ *       200:
+ *         description: Retentativa de envios disparada com sucesso.
+ *       400:
+ *         description: Dados de entrada inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
 envioRouter.post('/envio/retentar', envioController.retentarPendentes);
 
 export { envioRouter };
