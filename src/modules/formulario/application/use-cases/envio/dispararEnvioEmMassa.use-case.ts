@@ -2,6 +2,7 @@ import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.r
 import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
 import { IEmailGateway, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
+import { CanalEnvio } from "@prisma/client";
 
 interface DisparoEmMassaConfig {
   quantidade: number;
@@ -18,11 +19,7 @@ export class DispararEnvioEmMassaUseCase {
     private readonly clienteRepository: IClienteRepository,
     private readonly campanhaRepository: ICampanhaRepository,
     private readonly whatsAppGateway: IWhatsAppGateway,
-<<<<<<< HEAD
     private readonly EmailGateway: IEmailGateway,
-=======
-    private readonly emailGateway: IEmailGateway,
->>>>>>> yago
   ) {}
 
   public async execute(campanhaId: string, config: DisparoEmMassaConfig): Promise<void> {
@@ -55,6 +52,9 @@ export class DispararEnvioEmMassaUseCase {
           // Lógica de envio por e-mail ou WhatsApp com base na Campanha
          const conteudo = campanha.templateMensagem;
          const campanhaId = envio.campanhaId;
+         const formularioId = envio.formularioId;
+         const clienteId = envio.clienteId;
+         
          const clienteParaEnvio = clientes.find(c => c.id === envio.clienteId);
           if (!clienteParaEnvio) { 
             envio.registrarFalha(`Cliente com ID ${envio.clienteId} não encontrado na lista de clientes da campanha.`);
@@ -62,13 +62,9 @@ export class DispararEnvioEmMassaUseCase {
           }
 
           if (campanha.canalEnvio === CanalEnvio.EMAIL) {
-<<<<<<< HEAD
-              await this.EmailGateway.enviar(clienteParaEnvio.pessoa.email, conteudo, campanhaId);
-=======
-              await this.emailGateway(clienteParaEnvio.pessoa.email, conteudo, formulario);
->>>>>>> yago
+              await this.EmailGateway.enviar(clienteParaEnvio.pessoa.email, conteudo, formularioId, clienteId);
           } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-              await this.whatsAppGateway.enviar(clienteParaEnvio.pessoa.telefone, conteudo, campanhaId);
+              await this.whatsAppGateway.enviar(clienteParaEnvio.pessoa.telefone, conteudo, formularioId, clienteId );
           } else {
               throw new Error("Canal de envio inválido na campanha.");
           }

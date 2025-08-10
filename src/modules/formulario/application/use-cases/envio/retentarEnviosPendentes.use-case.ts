@@ -1,14 +1,8 @@
-<<<<<<< HEAD
 import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.repository.interface";
 import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
 import { IEmailGateway, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
 import { CanalEnvio } from "@prisma/client";
-=======
-import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
-import { IEnvioRepository } from "@modules/formulario/infra/envio/IEnvioRepository";
-
->>>>>>> yago
 /**
  * @description Use Case para retentar o envio de formulários que estão com o status PENDENTE ou FALHA.
  * Este use case é ideal para ser executado por um scheduler (job).
@@ -40,11 +34,7 @@ export class RetentarEnviosPendentesUseCase {
 
     console.log(`Retentando ${enviosPendentes.length} envios pendentes.`);
 
-<<<<<<< HEAD
     const operacoes = enviosPendentes.map(async (envio) => {
-=======
-    const operacoes = enviosPendentes.map(async (envio: Envio) => {
->>>>>>> yago
       try {
         const campanha = await this.campanhaRepository.recuperarPorUuid(envio.campanhaId);
         if (!campanha) {
@@ -59,9 +49,9 @@ export class RetentarEnviosPendentesUseCase {
         }
 
         if (campanha.canalEnvio === CanalEnvio.EMAIL) {
-          await this.emailGateway.enviar(cliente.pessoa.email, campanha.templateMensagem, envio.formularioId);
+          await this.emailGateway.enviar(cliente.pessoa.email, campanha.templateMensagem, envio.formularioId, envio.clienteId);
         } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-          await this.whatsappGateway.enviar(cliente.pessoa.telefone, campanha.templateMensagem, envio.formularioId);
+          await this.whatsappGateway.enviar(cliente.pessoa.telefone, campanha.templateMensagem, envio.formularioId, envio.clienteId);
         } else {
           envio.registrarFalha('Canal de envio inválido na campanha.');
           return;

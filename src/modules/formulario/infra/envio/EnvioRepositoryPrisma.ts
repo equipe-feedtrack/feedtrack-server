@@ -72,14 +72,6 @@ if (!usuarioExiste) {
     return rawFeedbacks.map(EnvioMap.toDomain);
   }
   
-  async buscarPendentes(): Promise<Envio[]> {
-    const rawEnvios = await this.prisma.envioFormulario.findMany({
-      where: {
-        status:  'PENDENTE',
-      },
-    });
-    return rawEnvios.map(EnvioMap.toDomain);
-  }
   
   atualizar(envio: Envio): Promise<void> {
     throw new Error("Method not implemented.");
