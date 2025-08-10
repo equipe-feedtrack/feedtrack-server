@@ -16,7 +16,7 @@ export interface IEnvioRepository {
 
 // src/application/gateways/IWhatsAppGateway.ts
 export interface IWhatsAppGateway {
-  enviar(destinatario: string | null, conteudo: string, clienteId: string, formularioId: string): Promise<void>;
+  enviar(destinatario: string | null, conteudo: string, formularioId: string, clienteId:string): Promise<void>;
 }
 
 export interface IEmailGateway {

@@ -1,4 +1,4 @@
-import { CanalEnvio } from "@prisma/client";
+import { CanalEnvio } from '@prisma/client';
 
 export enum TipoCampanha {
   POS_COMPRA = 'POS_COMPRA',
@@ -14,6 +14,8 @@ export enum SegmentoAlvo {
   CLIENTES_PREMIUM = 'CLIENTES_PREMIUM',
 }
 
+
+
 export interface ICampanha {
   id: string;
   titulo: string;
@@ -23,7 +25,7 @@ export interface ICampanha {
   dataInicio: Date;
   dataFim: Date | null;
   templateMensagem: string;
-  canalEnvio: string;
+  canalEnvio: CanalEnvio; // Canal de envio da campanha
   formularioId: string;
   ativo: boolean; // Campanha é ativa ou inativa
   dataCriacao: Date;

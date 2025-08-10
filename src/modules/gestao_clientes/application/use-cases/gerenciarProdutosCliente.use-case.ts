@@ -29,10 +29,10 @@ export class GerenciarProdutosClienteUseCase {
     // 3. Executa a lógica de domínio com base na ação
     switch (action) {
       case 'adicionar':
-        cliente.adicionarProduto(produto);
+        cliente.adicionarProduto(produto.id);
         break;
       case 'remover':
-        cliente.removerProduto(produto);
+        cliente.removerProduto(produto.id);
         break;
       case 'editar':
         if (!novoProdutoId) {
@@ -42,7 +42,7 @@ export class GerenciarProdutosClienteUseCase {
         if (!novoProduto) {
            throw new Error(`Novo produto com ID ${novoProdutoId} não encontrado.`);
         }
-        cliente.editarProduto(produto, novoProduto);
+        cliente.editarProduto(produto.id, novoProduto.id);
         break;
       default:
         throw new Error(`Ação '${action}' inválida.`);

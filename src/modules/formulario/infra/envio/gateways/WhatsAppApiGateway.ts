@@ -31,7 +31,7 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
    * @param conteudo O conteúdo da mensagem (ex: template).
    * @param link O link base para o formulário.
    */
-  public async enviar(destinatario: string, conteudo: string): Promise<void> {
+  public async enviar(destinatario: string, conteudo: string, formularioId: string, clienteId: string): Promise<void> {
     console.log(`[WhatsAppApiGateway] Preparando para enviar mensagem para: ${destinatario}`);
     const link = `${this.feedbackUrl}`;
     const linkCompleto = `${link}`
@@ -43,7 +43,7 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
       // Monta o corpo da requisição conforme a documentação da API que você usar
       const payload = {
         "chatId": `${destinatario}@c.us`, // Exemplo para o formato de chat ID
-        "message": mensagemCompleta,
+        "text": mensagemCompleta,
         "session": "default"
       };
 
