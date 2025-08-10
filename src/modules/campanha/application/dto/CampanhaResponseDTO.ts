@@ -8,7 +8,7 @@ export interface CampanhaResponseDTO {
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
   dataInicio: string; // String ISO
-  canalEnvio: string;
+  canalEnvio: CanalEnvio;
   dataFim: string | null; // String ISO
   templateMensagem: string;
   formularioId: string;

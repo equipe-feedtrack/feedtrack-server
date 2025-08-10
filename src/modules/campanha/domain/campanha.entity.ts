@@ -8,14 +8,13 @@ import {
 } from "./campanha.types";
 import { randomUUID } from "crypto";
 import { CanalEnvio } from "./campanha.types";
-
 class Campanha extends Entity<ICampanha> implements ICampanha {
   private _titulo: string;
   private _descricao?: string;
   private _tipoCampanha: TipoCampanha;
   private _segmentoAlvo: SegmentoAlvo;
   private _dataInicio: Date;
-  private _canalEnvio: string;
+  private _canalEnvio: CanalEnvio;
   private _dataFim: Date | null;
   private _templateMensagem: string;
   private _formularioId: string;
@@ -62,7 +61,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     return this._dataExclusao;
   }
 
-  get canalEnvio(): string {
+  get canalEnvio(): CanalEnvio {
     return this._canalEnvio;
   }
 
@@ -121,7 +120,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this._dataExclusao = value;
   }
 
-  private set canalEnvio(value: string) {
+  private set canalEnvio(value: CanalEnvio) {
     this._canalEnvio = value;
   }
 
