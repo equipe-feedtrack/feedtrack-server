@@ -1,3 +1,4 @@
 node_modules
 .env
 # Keep environment variables out of version control
+src/main/infra/database/orm/prisma/dev.db
