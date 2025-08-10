@@ -1,11 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PerguntaRepositoryPrisma = void 0;
-const pergunta_map_1 = require("../../mappers/pergunta.map");
+const pergunta_map_1 = require("../mappers/pergunta.map");
+/**
+ * Repositório de Pergunta implementado com o Prisma.
+ * É responsável por persistir e recuperar a entidade de domínio Pergunta.
+ */
 class PerguntaRepositoryPrisma {
-    // Recebemos o prisma via injeção de dependência, o que é ótimo.
     constructor(prisma) {
         this.prisma = prisma;
+    }
+    async listar(filtros) {
+        const perguntasPrisma = await this.prisma.pergunta.findMany({
+            where: {
+                ativo: filtros?.ativo, // Filtro opcional por status 'ativo'
+            }
+        });
+        return perguntasPrisma.map(p => pergunta_map_1.PerguntaMap.toDomain(p));
     }
     async recuperarPorUuid(id) {
         const perguntaPrisma = await this.prisma.pergunta.findUnique({
@@ -13,54 +24,49 @@ class PerguntaRepositoryPrisma {
         });
         if (!perguntaPrisma)
             return null;
-        // Apenas chamamos o Mapper. Ele faz todo o trabalho de tradução.
+        // O Mapper converte o modelo de dados do Prisma para a entidade de domínio.
         return pergunta_map_1.PerguntaMap.toDomain(perguntaPrisma);
     }
-    async inserir(pergunta) {
-        const dadosParaPersistencia = pergunta_map_1.PerguntaMap.toPersistence(pergunta);
-        await this.prisma.pergunta.upsert({
-            where: { id: pergunta.id },
-            // Para o 'update', omitimos 'opcoes' se for null para evitar erros.
-            update: {
-                texto: dadosParaPersistencia.texto,
-                tipo: dadosParaPersistencia.tipo,
-                opcoes: dadosParaPersistencia.opcoes ?? undefined, // Omitir se for null
-                data_atualizacao: dadosParaPersistencia.data_atualizacao,
-                data_exclusao: dadosParaPersistencia.data_exclusao,
-            },
-            // Para o 'create', garantimos que todos os campos obrigatórios estejam presentes e com os tipos corretos.
-            create: {
-                id: dadosParaPersistencia.id,
-                texto: dadosParaPersistencia.texto,
-                tipo: dadosParaPersistencia.tipo,
-                opcoes: dadosParaPersistencia.opcoes ?? null, // 'null' é um valor JSON válido na criação
-                data_criacao: dadosParaPersistencia.data_criacao ?? new Date(),
-                data_atualizacao: dadosParaPersistencia.data_atualizacao ?? new Date(),
-                data_exclusao: dadosParaPersistencia.data_exclusao,
-            },
-        });
-    }
     async buscarMuitosPorId(ids) {
+        const filteredIds = ids.filter((id) => !!id); // filtra só strings válidas
         const perguntasPrisma = await this.prisma.pergunta.findMany({
             where: {
                 id: {
-                    in: ids, // Usa o filtro 'in' para encontrar todos os IDs na lista
+                    in: filteredIds,
                 },
             },
         });
-        return perguntasPrisma.map(pergunta_map_1.PerguntaMap.toDomain);
+        return perguntasPrisma.map(p => pergunta_map_1.PerguntaMap.toDomain(p));
     }
-    recuperarTodos() {
-        throw new Error("Method not implemented.");
+    async inserir(pergunta) {
+        const dadosParaPersistencia = pergunta_map_1.PerguntaMap.toPersistence(pergunta);
+        await this.prisma.pergunta.create({
+            data: dadosParaPersistencia,
+        });
     }
-    existe(uuid) {
-        throw new Error("Method not implemented.");
+    async atualizar(pergunta) {
+        const dadosParaPersistencia = pergunta_map_1.PerguntaMap.toPersistence(pergunta);
+        await this.prisma.pergunta.update({
+            where: { id: pergunta.id },
+            data: dadosParaPersistencia,
+        });
     }
-    atualizar(uuid, entity) {
-        throw new Error("Method not implemented.");
+    async existe(id) {
+        const count = await this.prisma.pergunta.count({
+            where: { id },
+        });
+        return count > 0;
     }
-    deletar(uuid) {
-        throw new Error("Method not implemented.");
+    async deletar(id) {
+        // Antes de deletar a pergunta, removemos todas as suas associações
+        // na tabela de junção para evitar erros de restrição de chave estrangeira.
+        await this.prisma.perguntasOnFormularios.deleteMany({
+            where: { perguntaId: id },
+        });
+        // Agora podemos deletar a pergunta com segurança.
+        await this.prisma.pergunta.delete({
+            where: { id },
+        });
     }
 }
 exports.PerguntaRepositoryPrisma = PerguntaRepositoryPrisma;

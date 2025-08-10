@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Campanha } from '@modules/campanha/domain/campanha.entity';
-import { Campanha as CampanhaPrisma } from '@prisma/client';
-import { CanalEnvio, SegmentoAlvo, TipoCampanha } from '@modules/campanha/domain/campanha.types';
+import { Campanha as CampanhaPrisma, CanalEnvio } from '@prisma/client';
+import { SegmentoAlvo, TipoCampanha } from '@modules/campanha/domain/campanha.types';
 import { CampanhaMap } from '../campanha.map';
 
 describe('CampanhaMap', () => {
@@ -26,6 +26,10 @@ describe('CampanhaMap', () => {
     dataFim: dataFixaFim,
     templateMensagem: 'Template de mensagem para clientes novos.',
     formularioId: 'form-uuid-01',
+<<<<<<< HEAD
+    canalEnvio: CanalEnvio.EMAIL,
+=======
+>>>>>>> feat-yago
     ativo: true,
     dataCriacao: dataFixaCriacao,
     dataAtualizacao: dataFixaAtualizacao,
@@ -42,7 +46,7 @@ describe('CampanhaMap', () => {
     dataFim: null,
     templateMensagem: 'Template simples.',
     formularioId: 'form-uuid-02',
-    canalEnvio: CanalEnvio.WHATSAPP,
+    canalEnvio: CanalEnvio.EMAIL,
     ativo: true,
     dataCriacao: dataFixaCriacao,
     dataAtualizacao: dataFixaAtualizacao,
@@ -59,7 +63,7 @@ describe('CampanhaMap', () => {
     dataFim: null,
     templateMensagem: 'Template de promoção.',
     formularioId: 'form-uuid-03',
-    canalEnvio: CanalEnvio.WHATSAPP,
+    canalEnvio: CanalEnvio.EMAIL,
     ativo: false,
     dataCriacao: dataFixaCriacao,
     dataAtualizacao: dataFixaExclusao,
@@ -135,6 +139,7 @@ describe('CampanhaMap', () => {
         dataInicio: mockCampanhaDomain.dataInicio,
         dataFim: mockCampanhaDomain.dataFim,
         templateMensagem: mockCampanhaDomain.templateMensagem,
+        canalEnvio: mockCampanhaDomain.canalEnvio,
         ativo: mockCampanhaDomain.ativo,
         dataCriacao: mockCampanhaDomain.dataCriacao,
         dataAtualizacao: mockCampanhaDomain.dataAtualizacao,

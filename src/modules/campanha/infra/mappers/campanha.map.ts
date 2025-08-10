@@ -2,6 +2,7 @@ import {
   Campanha as CampanhaPrisma,
   TipoCampanha as TipoCampanhaPrisma,
   SegmentoAlvo as SegmentoAlvoPrisma,
+  CanalEnvio as CanalEnvioPrisma,
   Prisma,
 } from '@prisma/client';
 

@@ -36,3 +36,4 @@ export interface ICampanha {
 
 export type CriarCampanhaProps = Omit<ICampanha, 'id' | 'ativo' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>;
 export type RecuperarCampanhaProps = ICampanha;
+export { CanalEnvio };
