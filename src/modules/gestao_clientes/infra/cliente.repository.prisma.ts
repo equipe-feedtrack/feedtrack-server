@@ -10,6 +10,23 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
     super(prismaClient);
   }
 
+
+  async buscarClientesParaCampanha(segmento: SegmentoAlvo): Promise<Cliente[]> {
+    const clientesRaw = await this._datasource.cliente.findMany({
+      where: { status: 'ATIVO' },
+      include: {
+        produtos: {
+          include: {
+            produto: true
+          }
+        }
+      }
+    });
+
+    return clientesRaw.map(ClienteMap.toDomain);
+  }
+
+
   // ... métodos inserir e atualizar ...
   async inserir(cliente: Cliente): Promise<void> {
     const dadosParaPersistencia = ClienteMap.toPersistence(cliente);
@@ -31,10 +48,10 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
   async recuperarPorUuid(id: string): Promise<Cliente | null> {
     const clientePrisma = await this._datasource.cliente.findUnique({
       where: { id },
-      include: { 
+      include: {
         produtos: {
           include: {
-            produto: true 
+            produto: true
           }
         }
       },
@@ -55,7 +72,7 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
       data: {
         ...dadosEscalares,
         produtos: {
-          deleteMany: {}, 
+          deleteMany: {},
           create: cliente.produtos.map(p => ({
             produto: {
               connect: { id: p.id }
@@ -70,27 +87,27 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
     const whereClause: any = {};
     // ... sua lógica de switch para os filtros ...
     switch (segmento) {
-        case SegmentoAlvo.TODOS_CLIENTES:
-          break;
-        case SegmentoAlvo.NOVOS_CLIENTES:
-          const trintaDiasAtras = new Date();
-          trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
-          whereClause.dataCriacao = { gte: trintaDiasAtras };
-          whereClause.status = StatusUsuario.ATIVO;
-          break;
-        case SegmentoAlvo.CLIENTES_REGULARES:
-          const dataLimiteRegulares = new Date();
-          dataLimiteRegulares.setDate(dataLimiteRegulares.getDate() - 30);
-          whereClause.dataCriacao = { lt: dataLimiteRegulares };
-          whereClause.status = StatusUsuario.ATIVO;
-          break;
-        case SegmentoAlvo.CLIENTES_PREMIUM:
-          whereClause.status = StatusUsuario.ATIVO;
-          break;
-        default:
-          whereClause.status = StatusUsuario.ATIVO;
-          break;
-      }
+      case SegmentoAlvo.TODOS_CLIENTES:
+        break;
+      case SegmentoAlvo.NOVOS_CLIENTES:
+        const trintaDiasAtras = new Date();
+        trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
+        whereClause.dataCriacao = { gte: trintaDiasAtras };
+        whereClause.status = StatusUsuario.ATIVO;
+        break;
+      case SegmentoAlvo.CLIENTES_REGULARES:
+        const dataLimiteRegulares = new Date();
+        dataLimiteRegulares.setDate(dataLimiteRegulares.getDate() - 30);
+        whereClause.dataCriacao = { lt: dataLimiteRegulares };
+        whereClause.status = StatusUsuario.ATIVO;
+        break;
+      case SegmentoAlvo.CLIENTES_PREMIUM:
+        whereClause.status = StatusUsuario.ATIVO;
+        break;
+      default:
+        whereClause.status = StatusUsuario.ATIVO;
+        break;
+    }
 
     const clientesPrisma = await this._datasource.cliente.findMany({
       where: whereClause,
@@ -125,7 +142,7 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
         }
       },
     });
-    
+
     // ✅ CORREÇÃO: Usando a função anônima para manter o contexto do 'this'
     return clientesPrisma.map(cliente => ClienteMap.toDomain(cliente));
   }
