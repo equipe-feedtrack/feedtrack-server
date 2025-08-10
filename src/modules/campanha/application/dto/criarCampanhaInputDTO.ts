@@ -1,5 +1,5 @@
 import { SegmentoAlvo, TipoCampanha } from "@modules/campanha/domain/campanha.types";
-import { CanalEnvio } from "@prisma/client";
+import { CanalEnvio } from '@prisma/client';
 
 export interface CriarCampanhaInputDTO {
   titulo: string;

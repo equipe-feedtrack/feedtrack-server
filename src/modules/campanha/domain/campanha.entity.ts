@@ -7,7 +7,7 @@ import {
   TipoCampanha,
 } from "./campanha.types";
 import { randomUUID } from "crypto";
-import { CanalEnvio } from "./campanha.types";
+import { CanalEnvio } from "@prisma/client";
 class Campanha extends Entity<ICampanha> implements ICampanha {
   private _titulo: string;
   private _descricao?: string;

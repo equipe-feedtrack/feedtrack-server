@@ -7,7 +7,7 @@ export interface IEnvio {
   clienteId: string;
   formularioId: string;
   campanhaId: string;
-  usuarioId: string;
+  usuarioId: string ;
   dataCriacao: Date;
   dataEnvio: Date | null;
   tentativasEnvio: number;
