@@ -39,7 +39,7 @@ describe("FeedbackMap", () => {
         id: feedbackId,
         formularioId,
         envioId,
-        resposta: feedbackData.respostas as any,
+        respostas: feedbackData.respostas as any,
         dataCriacao: feedbackEntity.dataCriacao,
         dataExclusao: null,
     };
@@ -48,7 +48,7 @@ describe("FeedbackMap", () => {
         // Simulando a recuperação de um objeto JSON do banco, com datas como strings
         const rawDataWithIsoString = {
             ...feedbackPrisma,
-            respostas: (feedbackPrisma.resposta as any).map((r: any) => ({
+            respostas: (feedbackPrisma.respostas as any).map((r: any) => ({
                 ...r,
                 data_resposta: r.data_resposta.toISOString(),
             })),
@@ -57,7 +57,7 @@ describe("FeedbackMap", () => {
         // Convertendo as strings de data de volta para objetos Date
         const domainEntity = FeedbackMap.toDomain({
             ...rawDataWithIsoString,
-            resposta: (rawDataWithIsoString.respostas as any).map((r: any) => ({
+            respostas: (rawDataWithIsoString.respostas as any).map((r: any) => ({
                 ...r,
                 data_resposta: new Date(r.data_resposta),
             })),
@@ -78,8 +78,8 @@ describe("FeedbackMap", () => {
         expect(persistenceData.id).toBe(feedbackId);
         expect(persistenceData.formularioId).toBe(formularioId);
         expect(persistenceData.envioId).toBe(envioId);
-        expect(persistenceData.resposta).toHaveLength(2);
-        expect((persistenceData.resposta as any)[0].perguntaId).toBe(feedbackData.respostas[0].perguntaId);
+        expect(persistenceData.respostas).toHaveLength(2);
+        expect((persistenceData.respostas as any)[0].perguntaId).toBe(feedbackData.respostas[0].perguntaId);
         expect(persistenceData.dataCriacao).toEqual(feedbackEntity.dataCriacao);
         expect(persistenceData.dataExclusao).toBeNull();
     });

@@ -18,7 +18,7 @@ await this.prisma.feedback.upsert({
   where: { envioId: feedback.envioId }, // Usa o campo único envioId
   create: dadosParaPersistencia,
   update: {
-    resposta: dadosParaPersistencia.resposta,
+    respostas: dadosParaPersistencia.respostas,
     dataExclusao: dadosParaPersistencia.dataExclusao,
   },
 });

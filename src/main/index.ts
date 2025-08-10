@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import dotenv from "dotenv";
 import { createHTTPServer } from "./presentation/http/server";
 

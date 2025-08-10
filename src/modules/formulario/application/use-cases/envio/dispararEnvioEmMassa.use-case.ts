@@ -1,4 +1,3 @@
-import { CanalEnvio } from "@modules/campanha/domain/campanha.types";
 import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.repository.interface";
 import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
 import { IEmailGateway, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
@@ -19,7 +18,11 @@ export class DispararEnvioEmMassaUseCase {
     private readonly clienteRepository: IClienteRepository,
     private readonly campanhaRepository: ICampanhaRepository,
     private readonly whatsAppGateway: IWhatsAppGateway,
+<<<<<<< HEAD
     private readonly EmailGateway: IEmailGateway,
+=======
+    private readonly emailGateway: IEmailGateway,
+>>>>>>> yago
   ) {}
 
   public async execute(campanhaId: string, config: DisparoEmMassaConfig): Promise<void> {
@@ -59,7 +62,11 @@ export class DispararEnvioEmMassaUseCase {
           }
 
           if (campanha.canalEnvio === CanalEnvio.EMAIL) {
+<<<<<<< HEAD
               await this.EmailGateway.enviar(clienteParaEnvio.pessoa.email, conteudo, campanhaId);
+=======
+              await this.emailGateway(clienteParaEnvio.pessoa.email, conteudo, formulario);
+>>>>>>> yago
           } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
               await this.whatsAppGateway.enviar(clienteParaEnvio.pessoa.telefone, conteudo, campanhaId);
           } else {

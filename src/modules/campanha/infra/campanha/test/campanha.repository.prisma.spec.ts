@@ -16,10 +16,17 @@ describe('CampanhaRepositoryPrisma (Integration Tests)', () => {
   const CAMPANHA_ID_1 = 'e58c787b-9b42-4cf4-a2c6-7a718b2f38a5';
 
   beforeEach(async () => {
-    // Limpeza do Banco ANTES DE CADA TESTE (na ordem correta)
-    await prisma.campanha.deleteMany({});
-    await prisma.perguntasOnFormularios.deleteMany({});
-    await prisma.formulario.deleteMany({});
+      // Limpeza na ordem inversa das dependências
+    await prisma.feedback.deleteMany();
+    await prisma.envioFormulario.deleteMany();
+    // Continue com as outras tabelas-filhas
+    // ...
+
+    // Deleta as tabelas-pai
+    await prisma.campanha.deleteMany();
+    await prisma.formulario.deleteMany();
+    await prisma.cliente.deleteMany();
+    await prisma.usuario.deleteMany();
 
     // Criação dos Dados Base (Formulários)
     await prisma.formulario.createMany({

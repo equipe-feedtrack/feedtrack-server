@@ -1,52 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FormularioRepositoryPrisma = void 0;
-const formulario_map_1 = require("../../mappers/formulario.map");
+const formulario_map_1 = require("../mappers/formulario.map");
 class FormularioRepositoryPrisma {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async recuperarPorUuid(id) {
-        const formularioDb = await this.prisma.formulario.findUnique({
-            where: { id },
-            include: { perguntas: true }, // Sempre inclua as partes do agregado
-        });
-        if (!formularioDb)
-            return null;
-        // A complexidade da tradução fica 100% no Mapper
-        return formulario_map_1.FormularioMap.toDomain(formularioDb);
-    }
-    async listar(filtros) {
-        const formulariosDb = await this.prisma.formulario.findMany({
-            where: {
-                ativo: filtros?.ativo, // Filtro opcional por status
-            },
-            include: { perguntas: true },
-        });
-        return formulariosDb.map(formulario_map_1.FormularioMap.toDomain);
-    }
     async inserir(formulario) {
         const dadosFormulario = formulario_map_1.FormularioMap.toPersistence(formulario);
-        // 2. CORREÇÃO AQUI:
-        // Usamos o PerguntaMap.toPersistence para converter cada entidade 'Pergunta'
-        // para o formato de dados que o Prisma espera (com snake_case).
-        const perguntasConnect = formulario.perguntas.map(p => ({ id: p.id }));
-        await this.prisma.formulario.upsert({
-            where: { id: formulario.id },
-            create: {
+        await this.prisma.formulario.create({
+            data: {
                 ...dadosFormulario,
                 perguntas: {
-                    // Ao criar, conecta o formulário às perguntas existentes pelos seus IDs
-                    connect: perguntasConnect,
-                },
-            },
-            update: {
-                texto: dadosFormulario.texto,
-                descricao: dadosFormulario.descricao,
-                ativo: dadosFormulario.ativo,
-                perguntas: {
-                    // Ao atualizar, 'set' substitui a lista de conexões pela nova
-                    set: perguntasConnect,
+                    create: formulario.perguntas.map((p, index) => ({
+                        ordemNaLista: index, // Fornece o valor para o campo obrigatório.
+                        pergunta: {
+                            connect: { id: p.id },
+                        },
+                    })),
                 },
             },
         });
@@ -54,14 +25,72 @@ class FormularioRepositoryPrisma {
     recuperarTodos() {
         throw new Error("Method not implemented.");
     }
-    existe(uuid) {
-        throw new Error("Method not implemented.");
+    async recuperarPorUuid(id) {
+        const formularioDb = await this.prisma.formulario.findUnique({
+            where: { id },
+            // ✅ CORREÇÃO: Para uma relação N-N explícita, o include precisa ser aninhado
+            // para buscar os dados da Pergunta através da tabela de junção.
+            include: {
+                perguntas: {
+                    include: {
+                        pergunta: true,
+                    },
+                },
+            },
+        });
+        if (!formularioDb)
+            return null;
+        // O Mapper lida com a conversão da estrutura aninhada para o domínio.
+        return formulario_map_1.FormularioMap.toDomain(formularioDb);
     }
-    atualizar(uuid, entity) {
-        throw new Error("Method not implemented.");
+    async listar(filtros) {
+        const formulariosDb = await this.prisma.formulario.findMany({
+            where: {
+                ativo: filtros?.ativo,
+            },
+            include: {
+                perguntas: {
+                    include: {
+                        pergunta: true,
+                    },
+                },
+            },
+        });
+        return formulariosDb.map(form => formulario_map_1.FormularioMap.toDomain(form));
     }
-    deletar(uuid) {
-        throw new Error("Method not implemented.");
+    async atualizar(formulario) {
+        const dadosFormulario = formulario_map_1.FormularioMap.toPersistence(formulario);
+        const { id, ...dadosEscalares } = dadosFormulario;
+        await this.prisma.formulario.update({
+            where: { id: formulario.id },
+            data: {
+                ...dadosEscalares,
+                perguntas: {
+                    deleteMany: {},
+                    create: formulario.perguntas.map((p, index) => ({
+                        ordemNaLista: index,
+                        pergunta: {
+                            connect: { id: p.id }
+                        }
+                    }))
+                }
+            }
+        });
+    }
+    async existe(id) {
+        const count = await this.prisma.formulario.count({
+            where: { id },
+        });
+        return count > 0;
+    }
+    async deletar(id) {
+        // Garante que as entradas na tabela de junção sejam deletadas primeiro.
+        await this.prisma.perguntasOnFormularios.deleteMany({
+            where: { formularioId: id }
+        });
+        await this.prisma.formulario.delete({
+            where: { id },
+        });
     }
 }
 exports.FormularioRepositoryPrisma = FormularioRepositoryPrisma;

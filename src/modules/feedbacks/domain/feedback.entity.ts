@@ -19,13 +19,13 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   get dataExclusao(): Date | null { return this._dataExclusao; }
 
   // Setters privados
-  private set formularioId(value: string) {
+  private set formularioId(value: string | null) {
     if (!value || value.trim() === '') {
       throw new Error("ID do formulário é obrigatório para o feedback.");
     }
     this._formularioId = value;
   }
-  private set envioId(value: string) {
+  private set envioId(value: string | null) {
     if (!value || value.trim() === '') {
       throw new Error("ID do envio é obrigatório para o feedback.");
     }
