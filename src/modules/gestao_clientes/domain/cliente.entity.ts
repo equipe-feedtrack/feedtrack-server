@@ -166,19 +166,19 @@ class Cliente extends Entity<ICliente> {
         this.dataAtualizacao = new Date();
     }
 
-  public adicionarProduto(produto: Produto): void {
-    if (!produto || !produto.id) {
+  public adicionarProduto(produto: string): void {
+    if (!produto || !produto) {
       throw  ClienteExceptions.ClienteProdutoIdObrigatorio;
     }
-    if (this.produtos.some(p => p.id === produto.id)) {
+    if (this.produtos.some(p => p.id === produto)) {
       throw  ClienteExceptions.ClienteProdutoJaTem;
     }
-    this.produtos.push(produto);
+    this.produtos.push();
   }
 
  
-  public removerProduto(produto: Produto): void {
-    const produtoIndex = this._produtos.findIndex(p => p.id === produto.id);
+  public removerProduto(produto: string): void {
+    const produtoIndex = this._produtos.findIndex(p => p.id === produto);
     if (produtoIndex === -1) {
       throw ClienteExceptions.ClienteNaoPossuiProduto;
     }
@@ -190,7 +190,7 @@ class Cliente extends Entity<ICliente> {
    * @param produtoIdAntigo O ID do produto a ser substituído.
    * @param produtoNovo O objeto do novo produto.
    */
-  public editarProduto(produtoIdAntigo: Produto, produtoNovo: Produto): void {
+  public editarProduto(produtoIdAntigo: string, produtoNovo: string): void {
     this.removerProduto(produtoIdAntigo);
     this.adicionarProduto(produtoNovo);
   }

@@ -119,6 +119,15 @@ if (!usuarioExiste) {
     return rawEnvios.map(EnvioMap.toDomain);
   }
 
+  async buscarPendentes(): Promise<Envio[]> {
+    const rawEnvios = await this.prisma.envioFormulario.findMany({
+      where: {
+        status: 'PENDENTE',
+      },
+    });
+    return rawEnvios.map(EnvioMap.toDomain);
+  }
+
   /**
    * Salva múltiplas entidades de Envio em uma única transação.
    *

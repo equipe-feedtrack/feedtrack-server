@@ -1,4 +1,5 @@
-import { CanalEnvio, SegmentoAlvo, TipoCampanha } from "@modules/campanha/domain/campanha.types";
+import { SegmentoAlvo, TipoCampanha } from "@modules/campanha/domain/campanha.types";
+import { CanalEnvio } from "@prisma/client";
 
 export interface CampanhaResponseDTO {
   id: string;

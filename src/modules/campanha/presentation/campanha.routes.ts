@@ -8,6 +8,9 @@ import { BuscarCampanhaPorIdUseCase } from '../application/use-cases/buscarCampa
 import { AtualizarCampanhaUseCase } from '../application/use-cases/atualizarCampanhaUseCase';
 import { DeletarCampanhaUseCase } from '../application/use-cases/deletarCampanhaUseCase';
 import { CampanhaController } from './controller/campanha.controller';
+import { validationMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
+import { CriarCampanhaValidationDTO } from './validation/CriarCampanha.dto';
+import { AtualizarCampanhaValidationDTO } from './validation/AtualizarCampanha.dto';
 
 
 // ====================================================================
@@ -54,91 +57,20 @@ const campanhaRouter = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - titulo
- *               - tipoCampanha
- *               - segmentoAlvo
- *               - dataInicio
- *               - templateMensagem
- *               - formularioId
- *             properties:
- *               titulo:
- *                 type: string
- *                 description: Título da campanha.
- *               descricao:
- *                 type: string
- *                 description: Descrição da campanha (opcional).
- *               tipoCampanha:
- *                 type: string
- *                 enum: [POS_COMPRA, AUTOMATICO, PROMOCIONAL, SATISFACAO]
- *                 description: Tipo da campanha.
- *               segmentoAlvo:
- *                 type: string
- *                 enum: [TODOS_CLIENTES, CLIENTES_REGULARES, NOVOS_CLIENTES, CLIENTES_PREMIUM]
- *                 description: Segmento de clientes alvo.
- *               dataInicio:
- *                 type: string
- *                 format: date-time
- *                 description: Data de início da campanha (ISO 8601).
- *               dataFim:
- *                 type: string
- *                 format: date-time
- *                 nullable: true
- *                 description: Data de fim da campanha (ISO 8601, opcional).
- *               templateMensagem:
- *                 type: string
- *                 description: Template da mensagem da campanha.
- *               formularioId:
- *                 type: string
- *                 description: ID do formulário associado à campanha.
+ *             $ref: '#/components/schemas/CriarCampanhaValidationDTO'
  *     responses:
  *       201:
  *         description: Campanha criada com sucesso.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                 titulo:
- *                   type: string
- *                 descricao:
- *                   type: string
- *                 tipoCampanha:
- *                   type: string
- *                 segmentoAlvo:
- *                   type: string
- *                 dataInicio:
- *                   type: string
- *                   format: date-time
- *                 dataFim:
- *                   type: string
- *                   format: date-time
- *                   nullable: true
- *                 templateMensagem:
- *                   type: string
- *                 formularioId:
- *                   type: string
- *                 ativo:
- *                   type: boolean
- *                 dataCriacao:
- *                   type: string
- *                   format: date-time
- *                 dataAtualizacao:
- *                   type: string
- *                   format: date-time
- *                 dataExclusao:
- *                   type: string
- *                   format: date-time
- *                   nullable: true
+ *               $ref: '#/components/schemas/CampanhaResponseDTO'
  *       400:
  *         description: Dados inválidos.
  *       500:
  *         description: Erro interno do servidor.
  */
-campanhaRouter.post('/campanha',  campanhaController.criar);
+campanhaRouter.post('/campanha', validationMiddleware(CriarCampanhaValidationDTO), campanhaController.criar);
 
 /**
  * @swagger
@@ -154,41 +86,7 @@ campanhaRouter.post('/campanha',  campanhaController.criar);
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                   titulo:
- *                     type: string
- *                   descricao:
- *                     type: string
- *                   tipoCampanha:
- *                     type: string
- *                   segmentoAlvo:
- *                     type: string
- *                   dataInicio:
- *                     type: string
- *                     format: date-time
- *                   dataFim:
- *                     type: string
- *                     format: date-time
- *                     nullable: true
- *                   templateMensagem:
- *                     type: string
- *                   formularioId:
- *                     type: string
- *                   ativo:
- *                     type: boolean
- *                   dataCriacao:
- *                     type: string
- *                     format: date-time
- *                   dataAtualizacao:
- *                     type: string
- *                     format: date-time
- *                   dataExclusao:
- *                     type: string
- *                     format: date-time
- *                     nullable: true
+ *                 $ref: '#/components/schemas/CampanhaResponseDTO'
  *       500:
  *         description: Erro interno do servidor.
  */
@@ -213,41 +111,7 @@ campanhaRouter.get('/campanhas',  campanhaController.listar);
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                 titulo:
- *                   type: string
- *                 descricao:
- *                   type: string
- *                 tipoCampanha:
- *                   type: string
- *                 segmentoAlvo:
- *                   type: string
- *                 dataInicio:
- *                   type: string
- *                   format: date-time
- *                 dataFim:
- *                   type: string
- *                   format: date-time
- *                   nullable: true
- *                 templateMensagem:
- *                   type: string
- *                 formularioId:
- *                   type: string
- *                 ativo:
- *                   type: boolean
- *                 dataCriacao:
- *                   type: string
- *                   format: date-time
- *                 dataAtualizacao:
- *                   type: string
- *                   format: date-time
- *                 dataExclusao:
- *                   type: string
- *                   format: date-time
- *                   nullable: true
+ *               $ref: '#/components/schemas/CampanhaResponseDTO'
  *       404:
  *         description: Campanha não encontrada.
  *       500:
@@ -273,64 +137,14 @@ campanhaRouter.get('/campanha/:id', campanhaController.buscarPorId);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               templateMensagem:
- *                 type: string
- *                 description: Novo template da mensagem (opcional).
- *               dataInicio:
- *                 type: string
- *                 format: date-time
- *                 description: Nova data de início (ISO 8601, opcional).
- *               dataFim:
- *                 type: string
- *                 format: date-time
- *                 nullable: true
- *                 description: Nova data de fim (ISO 8601, opcional).
- *               ativo:
- *                 type: boolean
- *                 description: Status de ativação da campanha (true para ativa, false para inativa).
+ *             $ref: '#/components/schemas/AtualizarCampanhaValidationDTO'
  *     responses:
  *       200:
  *         description: Campanha atualizada com sucesso.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                 titulo:
- *                   type: string
- *                 descricao:
- *                   type: string
- *                 tipoCampanha:
- *                   type: string
- *                 segmentoAlvo:
- *                   type: string
- *                 dataInicio:
- *                   type: string
- *                   format: date-time
- *                 dataFim:
- *                   type: string
- *                   format: date-time
- *                   nullable: true
- *                 templateMensagem:
- *                   type: string
- *                 formularioId:
- *                   type: string
- *                 ativo:
- *                   type: boolean
- *                 dataCriacao:
- *                   type: string
- *                   format: date-time
- *                 dataAtualizacao:
- *                   type: string
- *                   format: date-time
- *                 dataExclusao:
- *                   type: string
- *                   format: date-time
- *                   nullable: true
+ *               $ref: '#/components/schemas/CampanhaResponseDTO'
  *       400:
  *         description: Dados inválidos.
  *       404:
@@ -338,7 +152,7 @@ campanhaRouter.get('/campanha/:id', campanhaController.buscarPorId);
  *       500:
  *         description: Erro interno do servidor.
  */
-campanhaRouter.put('/atualizar-campanha/:id', campanhaController.atualizar);
+campanhaRouter.put('/atualizar-campanha/:id', validationMiddleware(AtualizarCampanhaValidationDTO), campanhaController.atualizar);
 
 /**
  * @swagger
