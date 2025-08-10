@@ -56,26 +56,26 @@ export class AtualizarClienteUseCase implements IUseCase<AtualizarClienteInputDT
     }
     // Adicionar lógica para reativar se necessário.
 
-    // 3. Gerencia a relação com Produtos.
-    // Adiciona novos produtos, se fornecidos.
-    if (input.idsProdutosParaAdicionar.length) {
-        for (const produtoId of input.idsProdutosParaAdicionar) {
-            const produto = await this._produtoRepository.recuperarPorUuid(produtoId);
-            if (produto) {
-                cliente.adicionarProduto(produto);
-            }
-        }
-    }
+    // // 3. Gerencia a relação com Produtos.
+    // // Adiciona novos produtos, se fornecidos.
+    // if (!input.idsProdutosParaAdicionar.length) {
+    //     for (const produtoId of input.idsProdutosParaAdicionar) {
+    //         const produto = await this._produtoRepository.recuperarPorUuid(produtoId);
+    //         if (produto) {
+    //             cliente.adicionarProduto(produto);
+    //         }
+    //     }
+    // }
     // Remove produtos, se fornecidos.
- if (input.idsProdutosParaRemover && input.idsProdutosParaRemover.length > 0) {
-      for (const produtoId of input.idsProdutosParaRemover) {
-        // Busca o objeto Produto completo antes de remover
-        const produtoARemover = await this._produtoRepository.recuperarPorUuid(produtoId);
-        if (produtoARemover) {
-          cliente.removerProduto(produtoARemover); // Passando o objeto completo
-        }
-      }
-    }
+//  if (input.idsProdutosParaRemover && input.idsProdutosParaRemover.length > 0) {
+//       for (const produtoId of input.idsProdutosParaRemover) {
+//         // Busca o objeto Produto completo antes de remover
+//         const produtoARemover = await this._produtoRepository.recuperarPorUuid(produtoId);
+//         if (produtoARemover) {
+//           cliente.removerProduto(produtoARemover); // Passando o objeto completo
+//         }
+//       }
+//     }
 
     // 4. Persistir a entidade atualizada no banco de dados.
     await this._clienteRepository.atualizar(cliente);

@@ -1,4 +1,4 @@
-import { FeedbackResponseDTO } from "@modules/feedbacks/application/dto/FeedbackResponseDTO";
+import { FeedbackResponseDTO } from "@modules/feedbacks/application/dto/criarFeedbackDTO";
 import { Feedback } from "@modules/feedbacks/domain/feedback.entity";
 import { RecuperarFeedbackProps } from "@modules/feedbacks/domain/feedback.types";
 import { Feedback as FeedbackPrisma, Prisma } from '@prisma/client';

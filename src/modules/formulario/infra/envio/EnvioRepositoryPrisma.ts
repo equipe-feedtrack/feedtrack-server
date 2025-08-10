@@ -16,6 +16,16 @@ export class EnvioRepositoryPrisma implements IEnvioRepository {
   */
  async salvar(envio: Envio): Promise<void> {
    const dadosParaPersistencia = EnvioMap.toPersistence(envio);
+   console.log('Dados para persistência:', envio.id);
+
+   const usuarioExiste = await this.prisma.usuario.findUnique({
+  where: { id: envio.usuarioId }
+});
+
+if (!usuarioExiste) {
+  throw new Error(`Usuário com ID ${envio.usuarioId} não encontrado.`);
+}
+
    
    await this.prisma.envioFormulario.upsert({
      where: { id: envio.id },

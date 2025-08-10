@@ -14,16 +14,15 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
   async salvar(feedback: Feedback): Promise<void> {
     const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
 
-    await this.prisma.feedback.upsert({
-      where: { id: feedback.id },
-      create: dadosParaPersistencia,
-      update: {
-        // A entidade de Feedback tem poucos campos mutáveis.
-        // Focamos naqueles que podem ser alterados, como a exclusão lógica.
-        resposta: dadosParaPersistencia.resposta,
-        dataExclusao: dadosParaPersistencia.dataExclusao,
-      },
-    });
+await this.prisma.feedback.upsert({
+  where: { envioId: feedback.envioId }, // Usa o campo único envioId
+  create: dadosParaPersistencia,
+  update: {
+    resposta: dadosParaPersistencia.resposta,
+    dataExclusao: dadosParaPersistencia.dataExclusao,
+  },
+});
+
   }
 
   /**

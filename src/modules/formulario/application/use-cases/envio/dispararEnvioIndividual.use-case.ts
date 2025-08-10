@@ -13,7 +13,7 @@ export class DispararEnvioIndividualUseCase {
     private readonly campanhaRepository: ICampanhaRepository,
     private readonly formularioRepository: IFormularioRepository<Formulario>,
     private readonly whatsAppGateway: IWhatsAppGateway,
-     private readonly EmailGateway: IEmailGateway,
+    private readonly EmailGateway: IEmailGateway,
   ) {}
 
   public async execute(input: { clienteId: string, campanhaId: string, usuarioId: string }): Promise<void> {
@@ -43,19 +43,25 @@ export class DispararEnvioIndividualUseCase {
         const destinatarioTelefone = cliente.pessoa.telefone;
         const destinatarioEmail = cliente.pessoa.email;
         const conteudo = campanha.templateMensagem;
-        const campanhaId = envio.campanhaId;
+        const clienteId = envio.clienteId;
+        const formularioId = envio.formularioId;
+
+
 
       if (campanha.canalEnvio === CanalEnvio.EMAIL) {
         if (!destinatarioEmail) {
             throw new Error("E-mail do cliente não fornecido.");
         }
-        await this.EmailGateway.enviar(destinatarioEmail, conteudo, campanhaId);
+        console.log("[Email: ]",campanha.canalEnvio);
+        await this.EmailGateway.enviar(destinatarioEmail, conteudo, formularioId, clienteId);
 
-      } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
+      }
+       if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
         if (!destinatarioTelefone) {
             throw new Error("Telefone do cliente não fornecido.");
         }
-        await this.whatsAppGateway.enviar(destinatarioTelefone, conteudo, campanhaId);
+        // console.log(campanha.canalEnvio);
+        await this.whatsAppGateway.enviar(destinatarioTelefone, conteudo, formularioId, clienteId);
 
       } else {
         throw new Error("Canal de envio inválido na campanha.");

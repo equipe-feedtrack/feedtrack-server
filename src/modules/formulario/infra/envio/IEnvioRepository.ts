@@ -15,11 +15,11 @@ export interface IEnvioRepository {
 
 // src/application/gateways/IWhatsAppGateway.ts
 export interface IWhatsAppGateway {
-  enviar(destinatario: string | null, conteudo: string, campanhaId: string): Promise<void>;
+  enviar(destinatario: string | null, conteudo: string, clienteId: string, formularioId: string): Promise<void>;
 }
 
 export interface IEmailGateway {
-  enviar(destinatario: string | null, conteudo: string, campanhaId: string ): Promise<void>;
+  enviar(destinatario: string | null, conteudo: string, clienteId: string, formularioId: string ): Promise<void>;
 }
 
 // src/application/services/IFeedbackService.ts

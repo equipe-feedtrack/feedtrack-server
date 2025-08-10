@@ -37,8 +37,8 @@ const dispararEnvioIndividualUseCase = new DispararEnvioIndividualUseCase(
   clienteRepository,
   campanhaRepository,
   formularioRepository,
-  emailGateway, // Injetando o gateway de e-mail
-  whatsappGateway // Injetando o gateway de WhatsApp
+  whatsappGateway, // Injetando o gateway de WhatsApp
+  emailGateway // Injetando o gateway de e-mail
 );
 const dispararEnvioEmMassaUseCase = new DispararEnvioEmMassaUseCase(
   envioRepository,
