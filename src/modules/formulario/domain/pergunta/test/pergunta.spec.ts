@@ -13,65 +13,65 @@ import { RecuperarPerguntaProps } from '../pergunta.types';
 describe('Entidade Pergunta: Criar Pergunta', () => {
   it('deve criar uma pergunta do tipo nota com sucesso e opções padrão', () => {
     const pergunta = Pergunta.criar({
-      _texto: 'Qual a sua nota para o atendimento?',
-      _tipo: 'nota',
-      _opcoes: undefined, // Testando opções undefined para tipo nota
+      texto: 'Qual a sua nota para o atendimento?',
+      tipo: 'nota',
+      opcoes: undefined, // Testando opções undefined para tipo nota
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
-    expect(pergunta._id).toBeDefined();
-    expect(pergunta._texto).toBe('Qual a sua nota para o atendimento?');
-    expect(pergunta._tipo).toBe('nota');
-    expect(pergunta._opcoes).toEqual(['1', '2', '3', '4', '5']); // Opções padrão para 'nota'
-    expect(pergunta._dataCriacao).toBeInstanceOf(Date);
-    expect(pergunta._dataAtualizacao).toBeInstanceOf(Date);
-    expect(pergunta._dataExclusao).toBeNull();
+    expect(pergunta.id).toBeDefined();
+    expect(pergunta.texto).toBe('Qual a sua nota para o atendimento?');
+    expect(pergunta.tipo).toBe('nota');
+    expect(pergunta.opcoes).toEqual(['1', '2', '3', '4', '5']); // Opções padrão para 'nota'
+    expect(pergunta.dataCriacao).toBeInstanceOf(Date);
+    expect(pergunta.dataAtualizacao).toBeInstanceOf(Date);
+    expect(pergunta.dataExclusao).toBeNull();
   });
 
   it('deve criar uma pergunta do tipo nota com sucesso e opções customizadas', () => {
     const pergunta = Pergunta.criar({
-      _texto: 'Classifique de 1 a 3',
-      _tipo: 'nota',
-      _opcoes: ['1', '2', '3'], // Opções customizadas
+      texto: 'Classifique de 1 a 3',
+      tipo: 'nota',
+      opcoes: ['1', '2', '3'], // Opções customizadas
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
-        expect(pergunta._tipo).toBe('nota');
-    expect(pergunta._opcoes).toEqual(['1', '2', '3']);
+        expect(pergunta.tipo).toBe('nota');
+    expect(pergunta.opcoes).toEqual(['1', '2', '3']);
   });
 
   it('deve criar uma pergunta do tipo texto corretamente', () => {
     const pergunta = Pergunta.criar({
-      _texto: 'O que você achou do tênis Corre 4?',
-      _tipo: 'texto',
-      _opcoes: undefined,
+      texto: 'O que você achou do tênis Corre 4?',
+      tipo: 'texto',
+      opcoes: undefined,
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
-        expect(pergunta._texto).toBe('O que você achou do tênis Corre 4?');
-    expect(pergunta._tipo).toBe('texto');
-    expect(pergunta._opcoes).toBeUndefined(); // Tipo texto não deve ter opções
+        expect(pergunta.texto).toBe('O que você achou do tênis Corre 4?');
+    expect(pergunta.tipo).toBe('texto');
+    expect(pergunta.opcoes).toBeUndefined(); // Tipo texto não deve ter opções
   });
 
   it('deve criar uma pergunta do tipo multipla_escolha com opções válidas', () => {
     const pergunta = Pergunta.criar({
-      _texto: 'Qual o seu nível de satisfação?',
-      _tipo: 'multipla_escolha',
-      _opcoes: ['ruim', 'bom', 'excelente']
+      texto: 'Qual o seu nível de satisfação?',
+      tipo: 'multipla_escolha',
+      opcoes: ['ruim', 'bom', 'excelente']
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
-        expect(pergunta._texto).toBe('Qual o seu nível de satisfação?');
-    expect(pergunta._tipo).toBe('multipla_escolha');
-    expect(pergunta._opcoes).toEqual(['ruim', 'bom', 'excelente']);
+        expect(pergunta.texto).toBe('Qual o seu nível de satisfação?');
+    expect(pergunta.tipo).toBe('multipla_escolha');
+    expect(pergunta.opcoes).toEqual(['ruim', 'bom', 'excelente']);
   });
 
   it('deve lançar exceção se o texto estiver vazio', () => {
     expect(() =>
       Pergunta.criar({
-        _texto: '',
-        _tipo: 'texto',
-        _opcoes: undefined,
+        texto: '',
+        tipo: 'texto',
+        opcoes: undefined,
       }),
     ).toThrow(PerguntaTextoVazioException);
   });
@@ -79,9 +79,9 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
   it('deve lançar exceção se o tipo for inválido', () => {
     expect(() =>
       Pergunta.criar({
-              _texto: 'Texto',
-        _tipo: 'escolha_unica' as any, // Forçando tipo inválido para teste
-        _opcoes: undefined,
+              texto: 'Texto',
+        tipo: 'escolha_unica' as any, // Forçando tipo inválido para teste
+        opcoes: undefined,
       }),
     ).toThrow(TipoPerguntaInvalidoException);
   });
@@ -89,9 +89,9 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
   it('deve lançar exceção se o tipo for multipla_escolha com menos de 2 opções', () => {
     expect(() =>
       Pergunta.criar({
-              _texto: 'Escolha uma opção',
-        _tipo: 'multipla_escolha',
-        _opcoes: ['Sim'],
+              texto: 'Escolha uma opção',
+        tipo: 'multipla_escolha',
+        opcoes: ['Sim'],
       }),
     ).toThrow(QuantidadeMinimaOpcoesException);
   });
@@ -99,9 +99,9 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
   it('deve lançar exceção se houver opções duplicadas para multipla_escolha', () => {
     expect(() =>
       Pergunta.criar({
-              _texto: 'Escolha uma opção',
-        _tipo: 'multipla_escolha',
-        _opcoes: ['Sim', 'Não', 'Sim'],
+              texto: 'Escolha uma opção',
+        tipo: 'multipla_escolha',
+        opcoes: ['Sim', 'Não', 'Sim'],
       }),
     ).toThrow(OpcaoDuplicadaException);
   });
@@ -109,9 +109,9 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
   it('deve lançar exceção se o tipo for texto e tiver opções', () => {
     expect(() =>
       Pergunta.criar({
-              _texto: 'Qual seu nome?',
-        _tipo: 'texto',
-        _opcoes: ['João', 'Maria'],
+              texto: 'Qual seu nome?',
+        tipo: 'texto',
+        opcoes: ['João', 'Maria'],
       }),
     ).toThrow(ValidacaoPerguntaException); // "Perguntas do tipo texto não devem ter opções."
   });
@@ -119,9 +119,9 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
   it('deve lançar exceção se o tipo for nota e as opções não forem numéricas', () => {
     expect(() =>
       Pergunta.criar({
-              _texto: 'Sua avaliação?',
-        _tipo: 'nota',
-        _opcoes: ['bom', 'ruim'],
+              texto: 'Sua avaliação?',
+        tipo: 'nota',
+        opcoes: ['bom', 'ruim'],
       }),
     ).toThrow(ValidacaoPerguntaException); // "Opções de nota devem ser apenas números."
   });
@@ -130,35 +130,35 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
 describe('Entidade Pergunta: Recuperar Pergunta', () => {
   it('deve recuperar uma pergunta do tipo nota com sucesso', () => {
     const perguntaValida: RecuperarPerguntaProps = {
-      _id: '89eebea5-2314-47bf-8510-e1ddf69503a9',
-      _texto: 'Qual a sua nota?',
-      _tipo: 'nota',
-      _opcoes: ['1', '2', '3', '4', '5'],
-      _ativo: true,
-      _dataCriacao: new Date(),
-      _dataAtualizacao: new Date(),
-      _dataExclusao: null,
+      id: '89eebea5-2314-47bf-8510-e1ddf69503a9',
+      texto: 'Qual a sua nota?',
+      tipo: 'nota',
+      opcoes: ['1', '2', '3', '4', '5'],
+      ativo: true,
+      dataCriacao: new Date(),
+      dataAtualizacao: new Date(),
+      dataExclusao: null,
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
 
     expect(pergunta).toBeInstanceOf(Pergunta);
-    expect(pergunta._id).toBe(perguntaValida._id);
-    expect(pergunta._texto).toBe('Qual a sua nota?');
-    expect(pergunta._tipo).toBe('nota');
-    expect(pergunta._opcoes).toEqual(['1', '2', '3', '4', '5']); 
-    expect(pergunta._ativo).toBe(true);
+    expect(pergunta.id).toBe(perguntaValida.id);
+    expect(pergunta.texto).toBe('Qual a sua nota?');
+    expect(pergunta.tipo).toBe('nota');
+    expect(pergunta.opcoes).toEqual(['1', '2', '3', '4', '5']); 
+    expect(pergunta.ativo).toBe(true);
   });
 
   it('não deve recuperar uma pergunta com ID inválido (UUID inválido)', () => {
     const perguntaInvalida: RecuperarPerguntaProps = {
-      _id: '1234', // ID inválido
-      _texto: 'Qual a sua nota?',
-      _tipo: 'nota',
-      _ativo: true,
-      _dataCriacao: new Date(),
-      _dataAtualizacao: new Date(),
-      _dataExclusao: null,
+      id: '1234', // ID inválido
+      texto: 'Qual a sua nota?',
+      tipo: 'nota',
+      ativo: true,
+      dataCriacao: new Date(),
+      dataAtualizacao: new Date(),
+      dataExclusao: null,
     };
 
     // Assumindo que a validação de UUID ocorre na classe base Entity ou na construção do ID
@@ -167,43 +167,43 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
 
   it('deve recuperar uma pergunta do tipo texto sem opções', () => {
     const perguntaValida: RecuperarPerguntaProps = {
-      _id: '89eebea5-2314-47bf-8510-e1ddf69503a9',
-      _texto: 'Descreva sua experiência com o produto.',
-      _tipo: 'texto',
-      _ativo: true,
-      _dataCriacao: new Date(),
-      _dataAtualizacao: new Date(),
-      _dataExclusao: null,
+      id: '89eebea5-2314-47bf-8510-e1ddf69503a9',
+      texto: 'Descreva sua experiência com o produto.',
+      tipo: 'texto',
+      ativo: true,
+      dataCriacao: new Date(),
+      dataAtualizacao: new Date(),
+      dataExclusao: null,
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
 
     expect(pergunta).toBeInstanceOf(Pergunta);
-        expect(pergunta._texto).toBe('Descreva sua experiência com o produto.');
-    expect(pergunta._tipo).toBe('texto');
-    expect(pergunta._opcoes).toBeUndefined();
-    expect(pergunta._ativo).toBe(true);
+        expect(pergunta.texto).toBe('Descreva sua experiência com o produto.');
+    expect(pergunta.tipo).toBe('texto');
+    expect(pergunta.opcoes).toBeUndefined();
+    expect(pergunta.ativo).toBe(true);
   });
 
   it('deve recuperar uma pergunta do tipo multipla_escolha com opções', () => {
     const perguntaValida: RecuperarPerguntaProps = {
-      _id: '89eebea5-2314-47bf-8510-e1ddf69503a9',
-      _texto: 'Qual é a sua cor favorita?',
-      _tipo: 'multipla_escolha',
-      _opcoes: ['Azul', 'Verde', 'Vermelho'],
-      _ativo: true,
-      _dataCriacao: new Date(),
-      _dataAtualizacao: new Date(),
-      _dataExclusao: null,
+      id: '89eebea5-2314-47bf-8510-e1ddf69503a9',
+      texto: 'Qual é a sua cor favorita?',
+      tipo: 'multipla_escolha',
+      opcoes: ['Azul', 'Verde', 'Vermelho'],
+      ativo: true,
+      dataCriacao: new Date(),
+      dataAtualizacao: new Date(),
+      dataExclusao: null,
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
 
     expect(pergunta).toBeInstanceOf(Pergunta);
-    expect(pergunta._texto).toBe('Qual é a sua cor favorita?');
-    expect(pergunta._tipo).toBe('multipla_escolha');
-    expect(pergunta._opcoes).toEqual(['Azul', 'Verde', 'Vermelho']);
-    expect(pergunta._ativo).toBe(true);
+    expect(pergunta.texto).toBe('Qual é a sua cor favorita?');
+    expect(pergunta.tipo).toBe('multipla_escolha');
+    expect(pergunta.opcoes).toEqual(['Azul', 'Verde', 'Vermelho']);
+    expect(pergunta.ativo).toBe(true);
   });
 
   it('deve lançar exceção se recuperar uma pergunta do tipo multipla_escolha com opções vazias', () => {

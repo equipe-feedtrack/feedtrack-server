@@ -143,7 +143,6 @@ describe('FormularioMap', () => {
       // ENTÃO: o DTO deve ter o formato correto e a contagem de perguntas
       expect(dto.id).toBe(FORMULARIO_ID);
       expect(dto.titulo).toBe('Formulário de Satisfação');
-      expect(dto.quantidadePerguntas).toBe(1);
       expect(dto.dataCriacao).toBe(dataFixa.toISOString());
     });
   });

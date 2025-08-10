@@ -31,7 +31,7 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
 
   beforeEach(async () => {
     // 1. Limpeza do Banco ANTES DE CADA TESTE
-    // A ordem importa: delete primeiro os registros da tabela de junção.
+    // A ordem importa: delete primeiro os registros da tabela de junção.;
     await prisma.clientesOnProdutos.deleteMany({});
     await prisma.cliente.deleteMany({});
     await prisma.produto.deleteMany({});

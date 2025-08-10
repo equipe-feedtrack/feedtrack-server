@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { PrismaClient, StatusFormulario, EnvioFormulario as EnvioPrisma } from '@prisma/client';
-import { EnvioRepositoryPrisma } from '../envio/EnvioRepositoryPrisma';
 import { Envio } from '@modules/formulario/domain/envioformulario/envio.entity.ts';
-
+import { EnvioRepositoryPrisma } from '../envio/EnvioRepositoryPrisma';
 
 // Mock do PrismaClient para isolar os testes do banco de dados real
 vi.mock('@prisma/client', () => {
@@ -55,7 +54,7 @@ describe('EnvioRepositoryPrisma', () => {
         await repo.salvar(envioEntity);
 
         expect(prisma.envioFormulario.upsert).toHaveBeenCalledWith({
-            where: { id: envioId },
+            where: { id: envioEntity.id },
             create: {
                 id: envioId,
                 status: StatusFormulario.PENDENTE,
