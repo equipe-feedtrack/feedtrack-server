@@ -15,7 +15,7 @@ export class FeedbackMap {
       id: raw.id,
       formularioId: raw.formularioId,
       envioId: raw.envioId, // Adicionado para consistência
-      respostas: raw.resposta as Record<string, any>[],
+      respostas: raw.respostas as Record<string, any>[],
       dataCriacao: raw.dataCriacao,
       dataExclusao: raw.dataExclusao ?? null,
     };
@@ -31,7 +31,7 @@ export class FeedbackMap {
       id: feedback.id,
       formularioId: feedback.formularioId,
       envioId: feedback.envioId, // Adicionado para consistência
-      resposta: feedback.respostas as Prisma.InputJsonValue,
+      respostas: feedback.respostas as Prisma.InputJsonValue,
       dataCriacao: feedback.dataCriacao,
       dataExclusao: feedback.dataExclusao ?? null,
     };

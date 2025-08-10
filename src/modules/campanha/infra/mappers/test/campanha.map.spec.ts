@@ -21,11 +21,15 @@ describe('CampanhaMap', () => {
     descricao: 'Descrição do teste',
     tipoCampanha: TipoCampanha.POS_COMPRA,
     segmentoAlvo: SegmentoAlvo.NOVOS_CLIENTES,
+    canalEnvio: CanalEnvio.WHATSAPP,
     dataInicio: dataFixaInicio,
     dataFim: dataFixaFim,
     templateMensagem: 'Template de mensagem para clientes novos.',
     formularioId: 'form-uuid-01',
+<<<<<<< HEAD
     canalEnvio: CanalEnvio.EMAIL,
+=======
+>>>>>>> feat-yago
     ativo: true,
     dataCriacao: dataFixaCriacao,
     dataAtualizacao: dataFixaAtualizacao,
@@ -131,6 +135,7 @@ describe('CampanhaMap', () => {
         descricao: mockCampanhaDomain.descricao,
         tipoCampanha: mockCampanhaDomain.tipoCampanha,
         segmentoAlvo: mockCampanhaDomain.segmentoAlvo,
+        canalEnvio: mockCampanhaDomain.canalEnvio,
         dataInicio: mockCampanhaDomain.dataInicio,
         dataFim: mockCampanhaDomain.dataFim,
         templateMensagem: mockCampanhaDomain.templateMensagem,

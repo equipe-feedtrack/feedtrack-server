@@ -169,7 +169,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
       canalEnvio: props.canalEnvio || "EMAIL", // Default canal de envio, pode ser ajustado conforme necessário
       templateMensagem: props.templateMensagem,
       formularioId: props.formularioId,
-      ativo: false, // Nova campanha é ativa por padrão
+      ativo: true, // Nova campanha é ativa por padrão
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,

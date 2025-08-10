@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,8 +6,6 @@ datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
-
-// --- ENUMS (Padronizados para PascalCase) ---
 
 enum StatusUsuario {
   ATIVO
@@ -70,37 +65,34 @@ enum CanalEnvio {
 // --- MODELS ---
 
 model Usuario {
-  id              String        @id @default(uuid())
-  nome            String        @unique
-  email           String        @unique
+  id              String         @id @default(uuid())
+  nome            String         @unique
+  email           String         @unique
   senha           String
   tipo            TipoUsuario
   status          StatusUsuario
-  dataCriacao     DateTime      @default(now()) @map("data_criacao")
-  dataAtualizacao DateTime      @updatedAt @map("data_atualizacao")
-  dataExclusao    DateTime?     @map("data_exclusao")
+  dataCriacao     DateTime       @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime       @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime?      @map("data_exclusao")
 
-  // Relações
-  funcionario      Funcionario?
+  funcionario     Funcionario? // Remover @relation(onDelete: Cascade)
   enviosFormulario EnvioFormulario[]
-  logsAtividade    LogAtividade[]
-  //clientesAtendidos Cliente[] // Clientes sob responsabilidade deste usuário/vendedor
+  logsAtividade   LogAtividade[]
 
   @@map("usuarios")
 }
 
 model Funcionario {
-  id              String        @id @default(uuid())
+  id              String         @id @default(uuid())
   cargo           String
-  dataAdmissao    DateTime      @map("data_admissao")
-  status          StatusUsuario @default(ATIVO)
-  dataCriacao     DateTime      @default(now()) @map("data_criacao")
-  dataAtualizacao DateTime      @updatedAt @map("data_atualizacao")
-  dataExclusao    DateTime?     @map("data_exclusao")
+  dataAdmissao    DateTime       @map("data_admissao")
+  status          StatusUsuario  @default(ATIVO)
+  dataCriacao     DateTime       @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime       @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime?      @map("data_exclusao")
 
-  // Relação 1-para-1 com Usuario
-  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  usuarioId String  @unique @map("usuario_id")
+  usuario         Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId       String         @unique @map("usuario_id")
 
   @@map("funcionarios")
 }
@@ -146,9 +138,9 @@ model Cliente {
 }
 
 model ClientesOnProdutos {
-  cliente   Cliente @relation(fields: [clienteId], references: [id])
+  cliente   Cliente @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   clienteId String  @map("cliente_id")
-  produto   Produto @relation(fields: [produtoId], references: [id])
+  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
   produtoId String  @map("produto_id")
 
   @@id([clienteId, produtoId])
@@ -207,7 +199,8 @@ model Formulario {
 
 // Tabela de junção explícita para a relação N-N entre Pergunta e Formulário
 model PerguntasOnFormularios {
-  pergunta     Pergunta   @relation(fields: [perguntaId], references: [id])
+  id           String     @id @default(uuid())
+  pergunta     Pergunta   @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
   perguntaId   String     @map("pergunta_id")
   formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
   formularioId String     @map("formulario_id")
@@ -215,29 +208,30 @@ model PerguntasOnFormularios {
   // Exemplo de campo extra na tabela de junção
   ordemNaLista Int @map("ordem_na_lista")
 
-  @@id([perguntaId, formularioId])
   @@map("perguntas_on_formularios")
 }
 
 model Campanha {
-  id                String       @id @default(uuid())
-  titulo            String
-  descricao         String?
-  tipoCampanha      TipoCampanha @map("tipo_campanha")
-  segmentoAlvo      SegmentoAlvo @map("segmento_alvo")
-  dataInicio        DateTime     @map("data_inicio")
-  dataFim           DateTime?    @map("data_fim")
-  canalEnvio        String       @default("EMAIL") @map("canal_envio") 
-  templateMensagem  String       @map("template_mensagem")
-  ativo             Boolean      @default(true)
-  dataCriacao       DateTime     @default(now()) @map("data_criacao")
-  dataAtualizacao   DateTime     @updatedAt @map("data_atualizacao")
-  dataExclusao      DateTime?    @map("data_exclusao")
+  id               String       @id @default(uuid())
+  titulo           String
+  descricao        String?
+  tipoCampanha     TipoCampanha @map("tipo_campanha")
+  segmentoAlvo     SegmentoAlvo @map("segmento_alvo")
+  canalEnvio       CanalEnvio   @default(EMAIL) @map("canal_envio")
+  dataInicio       DateTime     @map("data_inicio")
+  dataFim          DateTime?    @map("data_fim")
+  templateMensagem String       @map("template_mensagem")
+  ativo            Boolean      @default(true)
+  dataCriacao      DateTime     @default(now()) @map("data_criacao")
+  dataAtualizacao  DateTime     @updatedAt @map("data_atualizacao")
+  dataExclusao     DateTime?    @map("data_exclusao")
 
   // Relação com o Formulário
-  formulario   Formulario        @relation(fields: [formularioId], references: [id], onDelete: Cascade)
-  formularioId String            @map("formulario_id")
-  envios       EnvioFormulario[]
+  formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
+  formularioId String?     @map("formulario_id")
+
+  // Relação 1-para-Muitos com EnvioFormulario
+  envios EnvioFormulario[]
 
   @@map("campanhas")
 }
@@ -251,32 +245,32 @@ model EnvioFormulario {
   dataEnvio          DateTime?        @map("data_envio")
 
   // Relações
-  formulario   Formulario @relation(fields: [formularioId], references: [id])
-  formularioId String     @map("formulario_id")
-  cliente      Cliente    @relation(fields: [clienteId], references: [id])
-  clienteId    String     @map("cliente_id")
-  campanha     Campanha   @relation(fields: [campanhaId], references: [id])
-  campanhaId   String     @map("campanha_id")
-  usuario      Usuario    @relation(fields: [usuarioId], references: [id]) // Usuário que disparou o envio
-  usuarioId    String     @map("usuario_id")
-  feedback     Feedback? // Relação 1-para-1 com Feedback
+  formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
+  formularioId String?     @map("formulario_id")
+  cliente      Cliente?    @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  clienteId    String?     @map("cliente_id")
+  campanha     Campanha?   @relation(fields: [campanhaId], references: [id], onDelete: SetNull)
+  campanhaId   String?     @map("campanha_id")
+  usuario      Usuario?    @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  usuarioId    String?     @map("usuario_id")
+  feedback     Feedback?   @relation(name: "EnvioFormularioToFeedback")
 
   @@map("envios_formulario")
 }
 
 model Feedback {
   id           String    @id @default(uuid())
-  resposta     Json
+  respostas    Json
   dataCriacao  DateTime  @default(now()) @map("data_criacao")
   dataExclusao DateTime? @map("data_exclusao")
 
   // Relação com o Formulário (para saber a estrutura das perguntas)
-  formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
-  formularioId String     @map("formulario_id")
+  formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
+  formularioId String?     @map("formulario_id")
 
   // Relação 1-para-1 com EnvioFormulario
-  envio   EnvioFormulario @relation(fields: [envioId], references: [id])
-  envioId String          @unique @map("envio_id")
+  envio   EnvioFormulario? @relation(name: "EnvioFormularioToFeedback", fields: [envioId], references: [id], onDelete: SetNull)
+  envioId String?          @unique @map("envio_id")
 
   @@map("feedbacks")
 }

@@ -1,7 +1,7 @@
 interface IFeedback {
   id: string;
-  formularioId: string;
-  envioId: string; // Adicionado para consistência com a entidade
+  formularioId: string | null; // Pode ser null se não estiver associado a um formulário
+  envioId: string | null; // Adicionado para consistência com a entidade
   respostas: Record<string, any>[];
   dataCriacao: Date;
   dataExclusao?: Date | null;

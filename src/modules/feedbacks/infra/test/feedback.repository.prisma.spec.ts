@@ -61,7 +61,11 @@ describe("FeedbackRepositoryPrisma", () => {
       id: feedbackEntity.id,
       formularioId: feedbackEntity.formularioId,
       envioId: feedbackEntity.envioId,
+<<<<<<< HEAD
       resposta: JSON.parse(JSON.stringify(feedbackEntity.respostas)),
+=======
+      respostas: feedbackEntity.respostas,
+>>>>>>> feat-yago
       dataCriacao: feedbackEntity.dataCriacao,
       dataExclusao: feedbackEntity.dataExclusao,
     } as FeedbackPrisma);
@@ -69,17 +73,17 @@ describe("FeedbackRepositoryPrisma", () => {
     await repo.salvar(feedbackEntity);
 
     expect(prisma.feedback.upsert).toHaveBeenCalledWith({
-      where: { id: feedbackEntity.id },
+        where: { envioId: feedbackEntity.envioId },
       create: expect.objectContaining({
         id: feedbackId,
         formularioId,
         envioId,
-        resposta: feedbackEntity.respostas,
+        respostas: feedbackEntity.respostas,
         dataCriacao: expect.any(Date),
         dataExclusao: null,
       }),
       update: expect.objectContaining({
-        resposta: feedbackEntity.respostas,
+        respostas: feedbackEntity.respostas,
         dataExclusao: null,
       }),
     });
@@ -91,7 +95,7 @@ describe("FeedbackRepositoryPrisma", () => {
       id: feedbackId,
       formularioId: randomUUID(),
       envioId: randomUUID(),
-      resposta: [{
+      respostas: [{
         perguntaId: randomUUID(),
         tipo: TipoPergunta.TEXTO,
         resposta_texto: "Teste de busca",
@@ -101,7 +105,11 @@ describe("FeedbackRepositoryPrisma", () => {
       dataExclusao: null,
     };
 
+<<<<<<< HEAD
     vi.mocked(prisma.feedback.findUnique).mockResolvedValue(mockDbResponse as unknown as FeedbackPrisma);
+=======
+    vi.mocked(prisma.feedback.findUnique).mockResolvedValue(mockDbResponse);
+>>>>>>> feat-yago
 
     const result = await repo.recuperarPorUuid(feedbackId);
 

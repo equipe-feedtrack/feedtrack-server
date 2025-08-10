@@ -49,9 +49,9 @@ export class CriarFeedbackDTO implements CriarFeedbackProps {
 
 export interface FeedbackResponseDTO {
   id: string;
-  formularioId: string;
-  envioId: string;
-  resposta: Record<string, any>[]; // Array de respostas
+  formularioId: string | null;
+  envioId: string | null;
+  respostas: Record<string, any>[]; // Array de respostas
   dataCriacao: string; // ISO string
   dataExclusao?: string; // ISO string ou undefined
 }

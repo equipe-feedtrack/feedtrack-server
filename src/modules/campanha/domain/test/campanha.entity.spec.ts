@@ -18,6 +18,7 @@ describe('Entidade Campanha', () => {
     descricao: 'Promoção para novos clientes de verão',
     tipoCampanha: TipoCampanha.PROMOCIONAL,
     segmentoAlvo: SegmentoAlvo.NOVOS_CLIENTES,
+    canalEnvio: CanalEnvio.EMAIL,
     dataInicio: new Date('2025-01-01T00:00:00Z'),
     dataFim: new Date('2025-03-31T23:59:59Z'),
     templateMensagem: 'Olá, {{cliente_nome}}! Aproveite nossa promoção de verão: ...',
@@ -48,6 +49,7 @@ describe('Entidade Campanha', () => {
   it('deve criar uma campanha sem descrição e sem data fim', () => {
     const campanha = Campanha.criar({
       ...baseProps,
+      canalEnvio: 'email',
       descricao: undefined,
       dataFim: null,
     });
@@ -82,6 +84,7 @@ describe('Entidade Campanha', () => {
       descricao: 'Descrição antiga',
       tipoCampanha: TipoCampanha.SATISFACAO,
       segmentoAlvo: SegmentoAlvo.TODOS_CLIENTES,
+      canalEnvio: CanalEnvio.EMAIL,
       dataInicio: new Date('2024-01-01T00:00:00Z'),
       dataFim: null,
       templateMensagem: 'Template antigo',
