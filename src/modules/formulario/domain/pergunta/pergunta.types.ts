@@ -1,12 +1,20 @@
-
 interface IPergunta {
-    id: number;
+    id: string;
     texto: string;
-    tipo: 'nota' | 'texto' | 'multipla_escolha';
-    opcoes?: string[];
-    ordem: number;
+    tipo: string;
+    ativo: boolean;
+    opcoes?: string[] | null;
+    dataCriacao: Date;
+    dataAtualizacao: Date;
+    dataExclusao: Date | null;
   }
 
-  type CriarPerguntaProps =  Omit<IPergunta, 'id'>[];
+ type CriarPerguntaProps = Omit<IPergunta, 'id' | 'ativo' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao' | 'formularios'>;
 
-  export {IPergunta, CriarPerguntaProps}
+ type RecuperarPerguntaProps = Omit<IPergunta, 'opcoes'>  & { opcoes?: string[] } & {id: string;};
+
+  export {
+    IPergunta,
+    CriarPerguntaProps,
+    RecuperarPerguntaProps
+  }

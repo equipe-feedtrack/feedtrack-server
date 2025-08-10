@@ -1,18 +1,19 @@
 import { Pergunta } from "../pergunta/pergunta.entity";
 
-
 interface IFormulario {
-
-  formularioId: number;
+  id?: string;
   titulo: string;
   descricao?: string;
-  modeloPadrao: boolean;
-  ativo: boolean;
-  dataCriacao: Date;
-  perguntas?: Pergunta[];
-  modeloBaseId?: number; // Referência ao modelo base, se houver
+  perguntas: Pergunta[];
+  ativo?: boolean;
+  dataCriacao?: Date;
+  dataAtualizacao?: Date;
+  dataExclusao?: Date | null;
 }
 
-type CriarFormularioProps =  Omit<IFormulario, 'formularioId'>[];
+type CriarFormularioProps =  Omit<IFormulario, 'id'>;
 
-export{IFormulario, CriarFormularioProps}
+type RecuperarFormularioProps = Required<IFormulario>;
+
+export { CriarFormularioProps, IFormulario, RecuperarFormularioProps };
+
