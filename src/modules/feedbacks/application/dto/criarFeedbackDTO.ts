@@ -46,3 +46,12 @@ export class CriarFeedbackDTO implements CriarFeedbackProps {
     this.respostas = data.respostas.map((r: any) => new RespostaDTO(r));
   }
 }
+
+export interface FeedbackResponseDTO {
+  id: string;
+  formularioId: string;
+  envioId: string;
+  resposta: Record<string, any>[]; // Array de respostas
+  dataCriacao: string; // ISO string
+  dataExclusao?: string; // ISO string ou undefined
+}

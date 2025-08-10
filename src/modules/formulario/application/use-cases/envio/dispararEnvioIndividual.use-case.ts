@@ -1,10 +1,10 @@
-import { CanalEnvio } from "@modules/campanha/domain/campanha.types";
 import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.repository.interface";
 import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
-import { IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
+import { IEmailGateway, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
 import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
+import { CanalEnvio } from "@prisma/client";
 
 export class DispararEnvioIndividualUseCase {
   constructor(
@@ -13,6 +13,7 @@ export class DispararEnvioIndividualUseCase {
     private readonly campanhaRepository: ICampanhaRepository,
     private readonly formularioRepository: IFormularioRepository<Formulario>,
     private readonly whatsAppGateway: IWhatsAppGateway,
+    private readonly EmailGateway: IEmailGateway,
   ) {}
 
   public async execute(input: { clienteId: string, campanhaId: string, usuarioId: string }): Promise<void> {
@@ -42,17 +43,30 @@ export class DispararEnvioIndividualUseCase {
         const destinatarioTelefone = cliente.pessoa.telefone;
         const destinatarioEmail = cliente.pessoa.email;
         const conteudo = campanha.templateMensagem;
-        const formulario = envio.formularioId;
+        const clienteId = envio.clienteId;
+        const formularioId = envio.formularioId;
+
+
 
       if (campanha.canalEnvio === CanalEnvio.EMAIL) {
-          await enviarPorEmail(destinatarioEmail, conteudo, formulario);
+        if (!destinatarioEmail) {
+            throw new Error("E-mail do cliente não fornecido.");
+        }
+        console.log("[Email: ]",campanha.canalEnvio);
+        await this.EmailGateway.enviar(destinatarioEmail, conteudo, formularioId, clienteId);
 
-      } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-        await this.whatsAppGateway.enviar(destinatarioTelefone, conteudo, formulario);
+      }
+       if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
+        if (!destinatarioTelefone) {
+            throw new Error("Telefone do cliente não fornecido.");
+        }
+        // console.log(campanha.canalEnvio);
+        await this.whatsAppGateway.enviar(destinatarioTelefone, conteudo, formularioId, clienteId);
 
       } else {
-          throw new Error("Canal de envio inválido na campanha.");
+        throw new Error("Canal de envio inválido na campanha.");
       }
+      
       envio.marcarComoEnviado();
     } catch (error: any) {
       envio.registrarFalha(error.message);

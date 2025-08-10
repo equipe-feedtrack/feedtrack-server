@@ -10,6 +10,7 @@ async function bootstrap() {
   const port = Number(process.env.PORT) || 3006;
 
   console.log(`[${api_name}] 🚀 Inicializando a API....`);
+  
 
   const httpServer = await createHTTPServer();
 
