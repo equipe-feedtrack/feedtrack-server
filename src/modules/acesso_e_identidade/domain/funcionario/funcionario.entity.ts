@@ -20,7 +20,6 @@ export namespace FuncionarioExceptions {
 }
 
 class Funcionario extends Entity<IFuncionario> implements IFuncionario {
-  private _pessoa: Pessoa;
   private _usuarioId: string; // Referência ao ID do Usuario
   private _cargo: string;
   private _dataAdmissao: Date;
@@ -30,7 +29,6 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
   private _dataExclusao: Date | null;
 
   // Getters
-  public get pessoa(): Pessoa { return this._pessoa; }
   public get usuarioId(): string { return this._usuarioId; }
   public get cargo(): string { return this._cargo; }
   public get dataAdmissao(): Date { return this._dataAdmissao; }
@@ -39,14 +37,6 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
   public get dataAtualizacao(): Date { return this._dataAtualizacao; }
   public get dataExclusao(): Date | null { return this._dataExclusao; }
 
-  // Setters privados (com validações)
-  private set pessoa(pessoa: Pessoa) {
-    if (!pessoa || !pessoa.nome || pessoa.nome.trim() === '') {
-      throw new Error("Dados da pessoa (nome) são obrigatórios para o funcionário."); // Exceção específica
-    }
-    // Adicione mais validações de Pessoa aqui se necessário (ex: Pessoa deve ter email/telefone para Funcionario)
-    this._pessoa = pessoa;
-  }
 
   private set usuarioId(id: string) {
     if (!id || id.trim() === '') {
@@ -76,7 +66,6 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
 
   constructor(funcionario: IFuncionario) {
     super(funcionario.id);
-    this.pessoa = funcionario.pessoa; 
     this.usuarioId = funcionario.usuarioId; 
     this.cargo = funcionario.cargo;
     this.dataAdmissao = funcionario.dataAdmissao;
@@ -96,9 +85,6 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
   // Métodos de Fábrica (Static Factory Methods)
   public static criarFuncionario(props: CriarFuncionarioProps, id?: string): Funcionario {
     // Validações essenciais antes de construir o objeto completo
-    if (!props.pessoa || !props.pessoa.nome || props.pessoa.nome.trim() === '') {
-      throw new Error("Nome da pessoa é obrigatório para criar funcionário.");
-    }
     if (!props.usuarioId || props.usuarioId.trim() === '') {
       throw new Error("ID de usuário é obrigatório para criar funcionário.");
     }
@@ -109,9 +95,10 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
       throw new FuncionarioExceptions.DataAdmissaoInvalidaException();
     }
 
+    
+
     const funcionarioCompleto: IFuncionario = {
       id: id || randomUUID(), // ID é gerado aqui se não for fornecido
-      pessoa: Pessoa.criar(props.pessoa), // Cria uma entidade Pessoa
       usuarioId: props.usuarioId,
       cargo: props.cargo,
       dataAdmissao: props.dataAdmissao,
@@ -125,7 +112,7 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
 
   public static recuperar(props: RecuperarFuncionarioProps): Funcionario {
     // O Prisma/Mapper deve garantir que todos os campos de IFuncionario estejam presentes e válidos
-    if (!props.id || !props.pessoa || !props.usuarioId || !props.cargo || !props.dataAdmissao || !props.status || !props.dataCriacao || !props.dataAtualizacao) {
+    if (!props.id || !props.usuarioId || !props.cargo || !props.dataAdmissao || !props.status || !props.dataCriacao || !props.dataAtualizacao) {
       throw new Error("Dados incompletos para recuperar Funcionário."); // Exceção de recuperação
     }
     // Adicione mais validações ao recuperar se o construtor for mais flexível

@@ -26,10 +26,6 @@ describe('CampanhaMap', () => {
     dataFim: dataFixaFim,
     templateMensagem: 'Template de mensagem para clientes novos.',
     formularioId: 'form-uuid-01',
-<<<<<<< HEAD
-    canalEnvio: CanalEnvio.EMAIL,
-=======
->>>>>>> feat-yago
     ativo: true,
     dataCriacao: dataFixaCriacao,
     dataAtualizacao: dataFixaAtualizacao,
@@ -139,7 +135,6 @@ describe('CampanhaMap', () => {
         dataInicio: mockCampanhaDomain.dataInicio,
         dataFim: mockCampanhaDomain.dataFim,
         templateMensagem: mockCampanhaDomain.templateMensagem,
-        canalEnvio: mockCampanhaDomain.canalEnvio,
         ativo: mockCampanhaDomain.ativo,
         dataCriacao: mockCampanhaDomain.dataCriacao,
         dataAtualizacao: mockCampanhaDomain.dataAtualizacao,

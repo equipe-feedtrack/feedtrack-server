@@ -7,10 +7,5 @@
  * @template TOutput O tipo de dado de saída (Output DTO) que o caso de uso retornará.
  */
 export interface IUseCase<TInput, TOutput> {
-  /**
-   * Executa a lógica do caso de uso.
-   * @param input Os dados de entrada necessários para a operação.
-   * @returns Uma promessa que resolve com os dados de saída da operação.
-   */
   execute(input: TInput): Promise<TOutput>;
 }

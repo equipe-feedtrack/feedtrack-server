@@ -4,7 +4,6 @@ import { randomUUID } from "crypto"; // Para gerar IDs
 import { CriarUsuarioProps, IUsuario, RecuperarUsuarioProps, StatusUsuario, TipoUsuario } from "./usuario.types";
 
 class Usuario extends Entity<IUsuario> implements IUsuario {
-  private _pessoa: Pessoa;
   private _nomeUsuario: string; // Renomeado para evitar conflito
   private _senhaHash: string; // Armazena o hash da senha
   private _tipo: TipoUsuario;
@@ -14,7 +13,6 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
   private _dataExclusao: Date | null;
 
   // Getters (apenas o que deve ser exposto)
-  public get pessoa(): Pessoa { return this._pessoa; }
   public get nomeUsuario(): string { return this._nomeUsuario; }
   public get senhaHash(): string { return this._senhaHash; }
   public get tipo(): TipoUsuario { return this._tipo; }
@@ -24,14 +22,6 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
   public get dataExclusao(): Date | null { return this._dataExclusao; }
 
   // Setters privados (com validações)
-  private set pessoa(pessoa: Pessoa) {
-    // Validações essenciais para Pessoa (ex: nome, email, telefone obrigatórios)
-    if (!pessoa || !pessoa.nome || pessoa.nome.trim() === '') {
-      throw new Error("Nome da pessoa é obrigatório para o usuário."); // Exceção específica
-    }
-    // Assumindo que a entidade Pessoa já valida telefone, email.
-    this._pessoa = pessoa;
-  }
   private set nomeUsuario(username: string) {
     if (!username || username.trim() === '') {
       throw new Error("Nome de usuário é obrigatório."); // Exceção específica
@@ -55,7 +45,6 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
 
   private constructor(user: IUsuario) {
     super(user.id); // ID agora é obrigatório em IUsuario
-    this.pessoa = user.pessoa; // Usa o setter para validar Pessoa
     this.nomeUsuario = user.nomeUsuario; // Usa o setter para validar nome de usuário
     this.senhaHash = user.senhaHash; // Usa o setter para validar senha
     this.tipo = user.tipo; // Usa o setter para validar tipo
@@ -69,10 +58,7 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
 
   // Métodos de Fábrica (Static Factory Methods)
   public static criarUsuario(props: CriarUsuarioProps, id?: string): Usuario {
-    // Validações iniciais antes de construir o objeto completo
-    if (!props.pessoa || !props.pessoa.nome || !props.pessoa.telefone) { // Telefone da pessoa é obrigatório para Cliente, mas para Usuário?
-      throw new Error("Dados da pessoa (nome, telefone) são obrigatórios para o usuário."); // Exceção específica
-    }
+
     if (!props.nomeUsuario || props.nomeUsuario.trim() === '') {
       throw new Error("Nome de usuário é obrigatório.");
     }
@@ -86,7 +72,6 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
 
     const usuarioCompleto: IUsuario = {
       id: id || randomUUID(), // ID é gerado aqui se não for fornecido
-      pessoa: Pessoa.criar(props.pessoa), // Cria uma entidade Pessoa aqui
       nomeUsuario: props.nomeUsuario,
       senhaHash: senhaHasheada,
       tipo: props.tipo,
@@ -100,7 +85,7 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
 
   public static recuperar(props: RecuperarUsuarioProps): Usuario {
     // O Prisma/Mapper deve garantir que todos os campos de IUsuario estejam presentes
-    if (!props.id || !props.pessoa || !props.nomeUsuario || !props.senhaHash || !props.tipo || !props.status || !props.dataCriacao || !props.dataAtualizacao) {
+    if (!props.id || !props.nomeUsuario || !props.senhaHash || !props.tipo || !props.status || !props.dataCriacao || !props.dataAtualizacao) {
       throw new Error("Dados incompletos para recuperar Usuário."); // Exceção de recuperação
     }
     return new Usuario(props);
