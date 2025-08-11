@@ -6,7 +6,7 @@ import { StatusUsuario } from "../usuario/usuario.types"; // Reutiliza o StatusU
 
 export interface IFuncionario extends IDatasControle { // Herda as datas de controle
   id: string; // ID é obrigatório para uma entidade
-  pessoa: Pessoa; // Entidade Pessoa (com nome, email, telefone)
+  
   usuarioId: string; // FK para Usuario (obrigatório, pois um funcionário SEMPRE é um usuário)
   cargo: string;
   dataAdmissao: Date; // Renomeado para dataAdmissao (camelCase)
