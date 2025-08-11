@@ -94,7 +94,7 @@ class Pergunta extends Entity<IPergunta> implements IPergunta{
     this.opcoes = pergunta.opcoes;
   }
   
-  private static validar(tipo: string, opcoes?: string[] | undefined | null ): String [] | undefined | null{
+  private static validar(tipo: string, opcoes?: string[] | undefined | null ): string [] | undefined | null{
         switch (tipo) {
       case 'texto':
         if (opcoes !== undefined) {
@@ -164,6 +164,14 @@ class Pergunta extends Entity<IPergunta> implements IPergunta{
    // Atualiza a data de modificação
    this.dataAtualizacao = new Date();
   }
+
+public atualizarTipo(novoTipo: string, novasOpcoes?: string[]): void {
+  const opcoesValidadas = Pergunta.validar(novoTipo, novasOpcoes);
+  this.tipo = novoTipo;
+  this.opcoes = novoTipo === 'nota' ? opcoesValidadas : undefined;
+  this.dataAtualizacao = new Date();
+}
+
 
   public inativar(): void {
     // 1. Regra de negócio: Impede que uma pergunta já inativa seja inativada novamente.
