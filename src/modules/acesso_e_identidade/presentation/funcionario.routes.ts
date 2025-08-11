@@ -51,7 +51,7 @@ console.log("funcionarioRouter initialized.");
  *         description: Erro interno do servidor.
  */
 funcionarioRouter.post(
-  '/funcionarios', 
+  '/funcionario', 
   validationMiddleware(CriarFuncionarioValidationDTO), 
   async (req, res, next) => {
     try {

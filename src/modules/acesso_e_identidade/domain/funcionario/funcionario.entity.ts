@@ -91,9 +91,9 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
     if (!props.cargo || props.cargo.trim() === '') {
       throw new FuncionarioExceptions.CargoObrigatorioException();
     }
-    if (props.dataAdmissao.getTime() > new Date().getTime()) {
-      throw new FuncionarioExceptions.DataAdmissaoInvalidaException();
-    }
+
+
+
 
     
 
@@ -101,7 +101,7 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
       id: id || randomUUID(), // ID é gerado aqui se não for fornecido
       usuarioId: props.usuarioId,
       cargo: props.cargo,
-      dataAdmissao: props.dataAdmissao,
+      dataAdmissao: new Date(), // Garante que seja uma data válida
       status: StatusUsuario.ATIVO,
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),

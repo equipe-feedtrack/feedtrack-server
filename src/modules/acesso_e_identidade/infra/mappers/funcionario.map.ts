@@ -19,9 +19,7 @@ export class FuncionarioMap {
 public static toPersistence(funcionario: Funcionario): any {
   return {
     id: funcionario.id,
-    usuario: {
-      connect: { usuarioId: funcionario.usuarioId },
-    },
+    usuarioId: funcionario.usuarioId, // Mapeia a senha do funcionário
     cargo: funcionario.cargo,
     data_admissao: funcionario.dataAdmissao,
     status: funcionario.status,

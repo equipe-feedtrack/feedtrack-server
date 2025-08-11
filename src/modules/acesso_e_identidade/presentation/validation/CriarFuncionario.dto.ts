@@ -6,15 +6,10 @@ export class CriarFuncionarioValidationDTO {
   @IsNotEmpty()
   cargo: string;
 
-  @IsDateString()
-  @IsNotEmpty()
-  dataAdmissao: Date;
-
   @IsUUID()
   @IsNotEmpty()
   usuarioId: string;
 
-  @IsString()
-  @IsNotEmpty()
-  pessoaId: string;
+  
+
 }

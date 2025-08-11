@@ -26,7 +26,7 @@ export class FuncionarioRepositoryPrisma implements IFuncionarioRepository {
 
   async buscarPorUsuarioId(usuarioId: string): Promise<Funcionario | null> {
     const funcionario = await this.prisma.funcionario.findUnique({
-      where: { usuarioId: usuarioId },
+      where: { id: usuarioId },
     });
     if (!funcionario) {
       return null;
