@@ -83,14 +83,14 @@ model Usuario {
 model Funcionario {
   id              String        @id @default(uuid())
   cargo           String
-  dataAdmissao    DateTime      @map("data_admissao")
+  dataAdmissao    DateTime?     @default(now()) @map("data_admissao")
   status          StatusUsuario @default(ATIVO)
   dataCriacao     DateTime      @default(now()) @map("data_criacao")
   dataAtualizacao DateTime      @updatedAt @map("data_atualizacao")
   dataExclusao    DateTime?     @map("data_exclusao")
 
-  usuario         Usuario       @relation("UsuarioFuncionario", fields: [id], references: [id], onDelete: Cascade)
   usuarioId       String        @unique @map("usuario_id")
+  usuario         Usuario       @relation("UsuarioFuncionario", fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@map("funcionarios")
 }

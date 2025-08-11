@@ -22,7 +22,7 @@ export namespace FuncionarioExceptions {
 class Funcionario extends Entity<IFuncionario> implements IFuncionario {
   private _usuarioId: string; // Referência ao ID do Usuario
   private _cargo: string;
-  private _dataAdmissao: Date;
+  private _dataAdmissao: Date | null; // Data de admissão (pode ser nula se não for obrigatório)
   private _status: StatusUsuario; // Status do funcionário
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
@@ -31,7 +31,7 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
   // Getters
   public get usuarioId(): string { return this._usuarioId; }
   public get cargo(): string { return this._cargo; }
-  public get dataAdmissao(): Date { return this._dataAdmissao; }
+  public get dataAdmissao(): Date | null { return this._dataAdmissao; }
   public get status(): StatusUsuario { return this._status; }
   public get dataCriacao(): Date { return this._dataCriacao; }
   public get dataAtualizacao(): Date { return this._dataAtualizacao; }
@@ -52,12 +52,14 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
     this._cargo = value.trim();
   }
 
-  private set dataAdmissao(value: Date) {
-    if (value.getTime() > new Date().getTime()) {
-      throw new FuncionarioExceptions.DataAdmissaoInvalidaException();
-    }
-    this._dataAdmissao = value;
+private set dataAdmissao(value: Date | null | undefined) {
+  if (value != null && value.getTime() > new Date().getTime()) {
+    throw new FuncionarioExceptions.DataAdmissaoInvalidaException();
   }
+  this._dataAdmissao = value ?? null;
+}
+
+
 
   private set status(value: StatusUsuario) { this._status = value; }
   private set dataCriacao(value: Date) { this._dataCriacao = value; }
@@ -68,7 +70,7 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
     super(funcionario.id);
     this.usuarioId = funcionario.usuarioId; 
     this.cargo = funcionario.cargo;
-    this.dataAdmissao = funcionario.dataAdmissao;
+    this.dataAdmissao = funcionario.dataAdmissao ;
     this.status = funcionario.status; 
     this.dataCriacao = funcionario.dataCriacao;
     this.dataAtualizacao = funcionario.dataAtualizacao;
@@ -93,15 +95,13 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
     }
 
 
-
-
     
 
     const funcionarioCompleto: IFuncionario = {
       id: id || randomUUID(), // ID é gerado aqui se não for fornecido
       usuarioId: props.usuarioId,
       cargo: props.cargo,
-      dataAdmissao: new Date(), // Garante que seja uma data válida
+      dataAdmissao: props.dataAdmissao,
       status: StatusUsuario.ATIVO,
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
@@ -112,7 +112,7 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
 
   public static recuperar(props: RecuperarFuncionarioProps): Funcionario {
     // O Prisma/Mapper deve garantir que todos os campos de IFuncionario estejam presentes e válidos
-    if (!props.id || !props.usuarioId || !props.cargo || !props.dataAdmissao || !props.status || !props.dataCriacao || !props.dataAtualizacao) {
+    if (!props.id || !props.usuarioId || !props.cargo || !props.dataAdmissao === undefined || !props.status || !props.dataCriacao || !props.dataAtualizacao || props.dataExclusao === undefined) {
       throw new Error("Dados incompletos para recuperar Funcionário."); // Exceção de recuperação
     }
     // Adicione mais validações ao recuperar se o construtor for mais flexível

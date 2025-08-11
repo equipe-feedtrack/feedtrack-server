@@ -7,7 +7,7 @@ export interface IFuncionario extends IDatasControle { // Herda as datas de cont
   id: string; // ID é obrigatório para uma entidade
   usuarioId: string; // FK para Usuario (obrigatório, pois um funcionário SEMPRE é um usuário)
   cargo: string;
-  dataAdmissao: Date; // Renomeado para dataAdmissao (camelCase)
+  dataAdmissao: Date | null; // Renomeado para dataAdmissao (camelCase)
   status: StatusUsuario; // Reutiliza o status de usuário
 }
 

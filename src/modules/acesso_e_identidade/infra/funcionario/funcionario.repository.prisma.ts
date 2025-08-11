@@ -6,13 +6,17 @@ import { FuncionarioMap } from '../mappers/funcionario.map';
 export class FuncionarioRepositoryPrisma implements IFuncionarioRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async inserir(funcionario: Funcionario): Promise<Funcionario> {
-    const funcionarioPrisma = FuncionarioMap.toPersistence(funcionario);
-    const novoFuncionario = await this.prisma.funcionario.create({
-      data: funcionarioPrisma,
-    });
-    return FuncionarioMap.toDomain(novoFuncionario);
-  }
+async inserir(funcionario: Funcionario): Promise<Funcionario> {
+const funcionarioPrisma = FuncionarioMap.toPersistence(funcionario);
+
+console.log('Inserindo funcionário:', funcionarioPrisma);
+
+const novoFuncionario = await this.prisma.funcionario.create({
+  data: funcionarioPrisma, // passe o objeto completo, sem remover o id
+});
+  return FuncionarioMap.toDomain(novoFuncionario);
+}
+
 
   async buscarPorId(id: string): Promise<Funcionario | null> {
     const funcionario = await this.prisma.funcionario.findUnique({
