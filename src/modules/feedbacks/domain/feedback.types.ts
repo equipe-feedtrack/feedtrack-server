@@ -5,6 +5,9 @@ interface IFeedback {
   respostas: Record<string, any>[];
   dataCriacao: Date;
   dataExclusao?: Date | null;
+  clienteNome?: string | null;
+  produtoNome?: string | null;
+  funcionarioNome?: string | null;
 }
 
 /**
@@ -12,6 +15,12 @@ interface IFeedback {
  * Não exige `id`, `dataCriacao` nem `dataExclusao` pois são definidos pela entidade.
  */
 type CriarFeedbackProps = Omit<IFeedback, "id" | "dataCriacao" | "dataExclusao">;
+
+/**
+ * Dados necessários para criar um novo feedback manual.
+ */
+type CriarFeedbackManualProps = Pick<IFeedback, "clienteNome" | "produtoNome" | "funcionarioNome" | "respostas">;
+
 
 /**
  * Usado para reidratar o Feedback a partir de dados persistidos (banco).
@@ -24,4 +33,5 @@ export {
   IFeedback,
   CriarFeedbackProps,
   RecuperarFeedbackProps,
+  CriarFeedbackManualProps
 };

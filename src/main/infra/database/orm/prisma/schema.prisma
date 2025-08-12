@@ -258,10 +258,13 @@ model EnvioFormulario {
 }
 
 model Feedback {
-  id           String    @id @default(uuid())
-  respostas    Json
-  dataCriacao  DateTime  @default(now()) @map("data_criacao")
-  dataExclusao DateTime? @map("data_exclusao")
+  id               String    @id @default(uuid())
+  respostas        Json
+  dataCriacao      DateTime  @default(now()) @map("data_criacao")
+  dataExclusao     DateTime? @map("data_exclusao")
+  cliente_nome     String?
+  produto_nome     String?
+  funcionario_nome String?
 
   // Relação com o Formulário (para saber a estrutura das perguntas)
   formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)

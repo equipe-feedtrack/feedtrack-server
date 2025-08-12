@@ -9,6 +9,7 @@ import { ExcluirLogicamenteFeedbackUseCase } from '../application/use-cases/excl
 import { FeedbackController } from './controller/feedback.controller';
 import { BuscarTodosFeedbacksUseCase } from '../application/use-cases/buscarTodosFeedbacksUseCase';
 import path from 'path';
+import { CriarFeedbackManualUseCase } from '../application/use-cases/criarFeedbackManualUseCase';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -22,6 +23,7 @@ const criarFeedbackUseCase = new CriarFeedbackUseCase(feedbackRepository);
 const buscarFeedbackPorEnvioUseCase = new BuscarFeedbackPorEnvioUseCase(feedbackRepository);
 const excluirLogicamenteFeedbackUseCase = new ExcluirLogicamenteFeedbackUseCase(feedbackRepository);
 const buscarTodosFeedbacksUseCase = new BuscarTodosFeedbacksUseCase(feedbackRepository);
+const criarFeedbackManualUseCase = new CriarFeedbackManualUseCase(feedbackRepository);
 
 // O controlador é criado, recebendo os casos de uso como dependências.
 const feedbackController = new FeedbackController(
@@ -29,6 +31,7 @@ const feedbackController = new FeedbackController(
   buscarFeedbackPorEnvioUseCase,
   excluirLogicamenteFeedbackUseCase,
   buscarTodosFeedbacksUseCase,
+  criarFeedbackManualUseCase
 );
 
 
@@ -77,6 +80,47 @@ const feedbackController = new FeedbackController(
  *         description: Erro interno do servidor.
  */
 router.post('/feedback', feedbackController.criar);
+
+/**
+ * @swagger
+ * /feedback/manual:
+ *   post:
+ *     summary: Cria um novo feedback manual
+ *     tags: [Feedbacks]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - clienteNome
+ *               - produtoNome
+ *               - respostas
+ *             properties:
+ *               clienteNome:
+ *                 type: string
+ *                 description: Nome do cliente.
+ *               produtoNome:
+ *                 type: string
+ *                 description: Nome do produto.
+ *               funcionarioNome:
+ *                 type: string
+ *                 description: Nome do funcionário que atendeu (opcional).
+ *               respostas:
+ *                 type: array
+ *                 description: Array de respostas do feedback.
+ *                 items:
+ *                   type: object
+ *     responses:
+ *       201:
+ *         description: Feedback criado com sucesso.
+ *       400:
+ *         description: Dados inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+router.post('/feedback/manual', feedbackController.criarManual);
 
 /**
  * @swagger

@@ -38,6 +38,11 @@ const novoFuncionario = await this.prisma.funcionario.create({
     return FuncionarioMap.toDomain(funcionario);
   }
 
+  async buscarTodos(): Promise<Funcionario[]> {
+    const funcionarios = await this.prisma.funcionario.findMany();
+    return funcionarios.map(FuncionarioMap.toDomain);
+  }
+
   async alterar(funcionario: Funcionario): Promise<Funcionario> {
     const funcionarioPrisma = FuncionarioMap.toPersistence(funcionario);
     const funcionarioAtualizado = await this.prisma.funcionario.update({

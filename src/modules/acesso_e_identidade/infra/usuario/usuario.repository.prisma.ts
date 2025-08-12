@@ -34,6 +34,11 @@ export class UsuarioRepositoryPrisma implements IUsuarioRepository {
     return UsuarioMap.toDomain(usuario);
   }
 
+  async buscarTodos(): Promise<Usuario[]> {
+    const usuarios = await this.prisma.usuario.findMany();
+    return usuarios.map(UsuarioMap.toDomain);
+  }
+
   async alterar(usuario: Usuario): Promise<Usuario> {
     const usuarioPrisma = UsuarioMap.toPersistence(usuario);
     const usuarioAtualizado = await this.prisma.usuario.update({

@@ -54,4 +54,7 @@ export interface FeedbackResponseDTO {
   respostas: Record<string, any>[]; // Array de respostas
   dataCriacao: string; // ISO string
   dataExclusao?: string; // ISO string ou undefined
+  clienteNome?: string | null;
+  produtoNome?: string | null;
+  funcionarioNome?: string | null;
 }

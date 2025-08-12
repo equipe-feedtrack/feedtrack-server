@@ -14,10 +14,13 @@ export class FeedbackMap {
     const props: RecuperarFeedbackProps = {
       id: raw.id,
       formularioId: raw.formularioId,
-      envioId: raw.envioId, // Adicionado para consistência
+      envioId: raw.envioId ?? null, // Adicionado para consistência
       respostas: raw.respostas as Record<string, any>[],
       dataCriacao: raw.dataCriacao,
       dataExclusao: raw.dataExclusao ?? null,
+      clienteNome: raw.cliente_nome,
+      produtoNome: raw.produto_nome,
+      funcionarioNome: raw.funcionario_nome,
     };
     return Feedback.recuperar(props);
   }
@@ -30,24 +33,31 @@ export class FeedbackMap {
     return {
       id: feedback.id,
       formularioId: feedback.formularioId,
-      envioId: feedback.envioId, // Adicionado para consistência
+      envioId: feedback.envioId ?? null, // Adicionado para consistência
       respostas: feedback.respostas as Prisma.InputJsonValue,
       dataCriacao: feedback.dataCriacao,
       dataExclusao: feedback.dataExclusao ?? null,
+      cliente_nome: feedback.clienteNome,
+      produto_nome: feedback.produtoNome,
+      funcionario_nome: feedback.funcionarioNome,
     };
   }
 
   /**
    * Converte a entidade de domínio para um DTO de resposta da API.
    */
-  public static toResponseDTO(feedback: Feedback): FeedbackResponseDTO {
-    return {
-      id: feedback.id,
-      formularioId: feedback.formularioId,
-      envioId: feedback.envioId, // Adicionado para consistência
-      respostas: feedback.respostas,
-      dataCriacao: feedback.dataCriacao.toISOString(),
-      dataExclusao: feedback.dataExclusao ? feedback.dataExclusao.toISOString() : undefined,
-    };
-  }
+public static toResponseDTO(feedback: Feedback): FeedbackResponseDTO {
+  return {
+    id: feedback.id,
+    formularioId: feedback.formularioId,
+    envioId: feedback.envioId ?? null,
+    respostas: feedback.respostas,
+    dataCriacao: feedback.dataCriacao.toISOString(),
+    dataExclusao: feedback.dataExclusao ? feedback.dataExclusao.toISOString() : undefined,
+    clienteNome: feedback.clienteNome,
+    produtoNome: feedback.produtoNome,
+    funcionarioNome: feedback.funcionarioNome,
+  };
+}
+
 }

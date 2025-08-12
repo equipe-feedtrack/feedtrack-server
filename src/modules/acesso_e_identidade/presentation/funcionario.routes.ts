@@ -10,6 +10,7 @@ import { FuncionarioController } from '../presentation/controller/funcionario.co
 import { validationMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 import { CriarFuncionarioValidationDTO } from './validation/CriarFuncionario.dto';
 import { AtualizarFuncionarioValidationDTO } from './validation/AtualizarFuncionario.dto';
+import { BuscarTodosFuncionariosUseCase } from '../application/use-cases/buscarTodosFuncionariosUseCase';
 
 const prismaClient = new PrismaClient();
 const funcionarioRepository = new FuncionarioRepositoryPrisma(prismaClient);
@@ -18,17 +19,19 @@ const buscarFuncionarioPorIdUseCase = new BuscarFuncionarioPorIdUseCase(funciona
 const buscarFuncionarioPorUsuarioIdUseCase = new BuscarFuncionarioPorUsuarioIdUseCase(funcionarioRepository);
 const atualizarFuncionarioUseCase = new AtualizarFuncionarioUseCase(funcionarioRepository);
 const deletarFuncionarioUseCase = new DeletarFuncionarioUseCase(funcionarioRepository);
+const buscarTodosFuncionariosUseCase = new BuscarTodosFuncionariosUseCase(funcionarioRepository);
+
 
 const funcionarioController = new FuncionarioController(
   criarFuncionarioUseCase,
   buscarFuncionarioPorIdUseCase,
   buscarFuncionarioPorUsuarioIdUseCase,
   atualizarFuncionarioUseCase,
-  deletarFuncionarioUseCase
+  deletarFuncionarioUseCase,
+  buscarTodosFuncionariosUseCase
 );
 
 const funcionarioRouter = Router();
-console.log("funcionarioRouter initialized.");
 
 /**
  * @swagger
@@ -62,6 +65,26 @@ funcionarioRouter.post(
     }
   }
 );
+
+/**
+ * @swagger
+ * /funcionarios:
+ *   get:
+ *     summary: Busca todos os funcionários
+ *     tags: [Funcionários]
+ *     responses:
+ *       200:
+ *         description: Lista de funcionários.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+funcionarioRouter.get('/funcionarios', async (req, res, next) => {
+  try {
+    await funcionarioController.buscarTodos(req, res);
+  } catch (error) {
+    next(error);
+  }
+});
 
 
 /**

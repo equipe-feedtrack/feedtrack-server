@@ -1,5 +1,5 @@
-import { IsString, IsOptional, IsDateString, IsEnum, IsBoolean } from 'class-validator';
-import { TipoCampanha, SegmentoAlvo } from '@modules/campanha/domain/campanha.types';
+import { IsString, IsNotEmpty, IsEnum, IsDateString, IsOptional, IsUUID, IsBoolean } from 'class-validator';
+import { TipoCampanha, SegmentoAlvo, CanalEnvio } from '../../domain/campanha.types';
 
 export class AtualizarCampanhaValidationDTO {
     @IsString()
@@ -24,11 +24,19 @@ export class AtualizarCampanhaValidationDTO {
 
     @IsDateString()
     @IsOptional()
-    dataFim?: Date | null;
+    dataFim?: Date;
 
     @IsString()
     @IsOptional()
     templateMensagem?: string;
+
+    @IsEnum(CanalEnvio)
+    @IsOptional()
+    canalEnvio?: CanalEnvio;
+
+    @IsUUID()
+    @IsOptional()
+    formularioId?: string;
 
     @IsBoolean()
     @IsOptional()

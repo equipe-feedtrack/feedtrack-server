@@ -10,6 +10,7 @@ import { UsuarioController } from '../presentation/controller/usuario.controller
 import { validationMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 import { CriarUsuarioValidationDTO } from './validation/CriarUsuario.dto';
 import { AtualizarUsuarioValidationDTO } from './validation/AtualizarUsuario.dto';
+import { BuscarTodosUsuariosUseCase } from '../application/use-cases/buscarTodosUsuariosUseCase';
 
 const prismaClient = new PrismaClient();
 const usuarioRepository = new UsuarioRepositoryPrisma(prismaClient);
@@ -18,17 +19,18 @@ const buscarUsuarioPorIdUseCase = new BuscarUsuarioPorIdUseCase(usuarioRepositor
 const buscarUsuarioPorNomeUsuarioUseCase = new BuscarUsuarioPorNomeUsuarioUseCase(usuarioRepository);
 const atualizarUsuarioUseCase = new AtualizarUsuarioUseCase(usuarioRepository);
 const deletarUsuarioUseCase = new DeletarUsuarioUseCase(usuarioRepository);
+const buscarTodosUsuariosUseCase = new BuscarTodosUsuariosUseCase(usuarioRepository);
 
 const usuarioController = new UsuarioController(
   criarUsuarioUseCase,
   buscarUsuarioPorIdUseCase,
   buscarUsuarioPorNomeUsuarioUseCase,
   atualizarUsuarioUseCase,
-  deletarUsuarioUseCase
+  deletarUsuarioUseCase,
+  buscarTodosUsuariosUseCase
 );
 
 const usuarioRouter = Router();
-console.log("usuarioRouter initialized.");
 
 /**
  * @swagger
@@ -53,6 +55,26 @@ console.log("usuarioRouter initialized.");
 usuarioRouter.post('/usuario', validationMiddleware(CriarUsuarioValidationDTO), async (req, res, next) => {
   try {
     await usuarioController.criar(req, res);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @swagger
+ * /usuarios:
+ *   get:
+ *     summary: Busca todos os usuários
+ *     tags: [Usuários]
+ *     responses:
+ *       200:
+ *         description: Lista de usuários.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+usuarioRouter.get('/usuarios', async (req, res, next) => {
+  try {
+    await usuarioController.buscarTodos(req, res);
   } catch (error) {
     next(error);
   }

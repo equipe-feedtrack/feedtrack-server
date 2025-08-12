@@ -1,6 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsDateString, IsEnum, IsUUID } from 'class-validator';
-import { TipoCampanha, SegmentoAlvo } from '@modules/campanha/domain/campanha.types';
-import { CanalEnvio } from '@prisma/client';
+import { IsString, IsNotEmpty, IsEnum, IsDateString, IsOptional, IsUUID } from 'class-validator';
+import { TipoCampanha, SegmentoAlvo, CanalEnvio } from '../../domain/campanha.types';
 
 export class CriarCampanhaValidationDTO {
     @IsString()
@@ -25,17 +24,17 @@ export class CriarCampanhaValidationDTO {
 
     @IsDateString()
     @IsOptional()
-    dataFim: Date | null;
+    dataFim?: Date;
 
     @IsString()
     @IsNotEmpty()
     templateMensagem: string;
 
-    @IsUUID()
-    @IsNotEmpty()
-    formularioId: string;
-
     @IsEnum(CanalEnvio)
     @IsNotEmpty()
     canalEnvio: CanalEnvio;
+
+    @IsUUID()
+    @IsNotEmpty()
+    formularioId: string;
 }
