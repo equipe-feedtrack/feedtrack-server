@@ -209,6 +209,7 @@ perguntaRouter.get('/pergunta/:id', perguntaController.buscarPorId);
  *           type: string
  *         required: true
  *         description: ID da pergunta a ser atualizada.
+ * 
  *     requestBody:
  *       required: true
  *       content:
@@ -216,6 +217,9 @@ perguntaRouter.get('/pergunta/:id', perguntaController.buscarPorId);
  *           schema:
  *             type: object
  *             properties:
+ *               id:
+ *                 type: string
+ *                 description: ID da pergunta a ser atualizada (obrigatório).
  *               texto:
  *                 type: string
  *                 description: Novo texto da pergunta (opcional).
@@ -254,6 +258,7 @@ perguntaRouter.get('/pergunta/:id', perguntaController.buscarPorId);
  *       500:
  *         description: Erro interno do servidor.
  */
+
 perguntaRouter.put('/atualizar-pergunta/:id', perguntaController.atualizar);
 
 /**

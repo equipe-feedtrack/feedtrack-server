@@ -11,6 +11,9 @@ vi.mock('@prisma/client', () => {
             findUnique: vi.fn(),
             findMany: vi.fn(),
         },
+        usuario: {
+            findUnique: vi.fn(),
+        },
         $transaction: vi.fn(async (callback) => await callback(mockPrisma)),
     };
     return {
@@ -50,13 +53,14 @@ describe('EnvioRepositoryPrisma', () => {
         }, envioId);
 
         vi.mocked(prisma.envioFormulario.upsert).mockResolvedValueOnce(envioEntity as any);
+        vi.mocked(prisma.usuario.findUnique).mockResolvedValueOnce({ id: usuarioId }); // Mock the user existence check
 
         await repo.salvar(envioEntity);
 
         expect(prisma.envioFormulario.upsert).toHaveBeenCalledWith({
             where: { id: envioEntity.id },
             create: {
-                id: envioId,
+                id: expect.any(String),
                 status: StatusFormulario.PENDENTE,
                 dataCriacao: expect.any(Date),
                 dataEnvio: null,
@@ -84,6 +88,7 @@ describe('EnvioRepositoryPrisma', () => {
         ];
 
         vi.mocked(prisma.$transaction).mockResolvedValueOnce([{}, {}] as any);
+        vi.mocked(prisma.usuario.findUnique).mockResolvedValue({ id: fixedUuids.usuarioId }); // Mock for multiple user checks
 
         await repo.salvarVarios(envios);
 

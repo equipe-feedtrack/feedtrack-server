@@ -45,7 +45,7 @@ export class CampanhaMap {
       dataInicio: raw.dataInicio,
       dataFim: raw.dataFim,
       templateMensagem: raw.templateMensagem,
-      formularioId: raw.formularioId,
+      formularioId: raw.formularioId ?? '',
       canalEnvio: raw.canalEnvio,
       ativo: raw.ativo,
       dataCriacao: raw.dataCriacao,

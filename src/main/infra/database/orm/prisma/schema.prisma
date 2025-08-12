@@ -65,37 +65,37 @@ enum CanalEnvio {
 // --- MODELS ---
 
 model Usuario {
-  id              String         @id @default(uuid())
-  nome            String         @unique
-  email           String         @unique
-  senha           String
-  tipo            TipoUsuario
-  status          StatusUsuario
-  dataCriacao     DateTime       @default(now()) @map("data_criacao")
-  dataAtualizacao DateTime       @updatedAt @map("data_atualizacao")
-  dataExclusao    DateTime?      @map("data_exclusao")
-
-  funcionario     Funcionario? // Remover @relation(onDelete: Cascade)
+  id        String         @id @default(uuid())
+  nome_usuario     String         @unique
+  senha_hash       String
+  tipo             TipoUsuario
+  status           StatusUsuario
+  data_criacao     DateTime       @default(now())
+  data_atualizacao DateTime       @updatedAt
+  data_exclusao    DateTime?
+  funcionario      Funcionario?   @relation("UsuarioFuncionario") // Relação bidirecional
   enviosFormulario EnvioFormulario[]
-  logsAtividade   LogAtividade[]
+  logsAtividade    LogAtividade[]
 
   @@map("usuarios")
 }
 
 model Funcionario {
-  id              String         @id @default(uuid())
+  id              String        @id @default(uuid())
   cargo           String
-  dataAdmissao    DateTime       @map("data_admissao")
-  status          StatusUsuario  @default(ATIVO)
-  dataCriacao     DateTime       @default(now()) @map("data_criacao")
-  dataAtualizacao DateTime       @updatedAt @map("data_atualizacao")
-  dataExclusao    DateTime?      @map("data_exclusao")
+  dataAdmissao    DateTime?     @default(now()) @map("data_admissao")
+  status          StatusUsuario @default(ATIVO)
+  dataCriacao     DateTime      @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime      @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime?     @map("data_exclusao")
 
-  usuario         Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  usuarioId       String         @unique @map("usuario_id")
+  usuarioId       String        @unique @map("usuario_id")
+  usuario         Usuario       @relation("UsuarioFuncionario", fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@map("funcionarios")
 }
+
+
 
 model LogAtividade {
   id             String   @id @default(uuid())
@@ -103,20 +103,18 @@ model LogAtividade {
   detalhes       String?
   dataOcorrencia DateTime @default(now()) @map("data_ocorrencia")
 
-  // Denormalizado para facilitar consulta de logs
   nomeUsuario String      @map("nome_usuario")
   tipoUsuario TipoUsuario @map("tipo_usuario")
 
-  // Relação com o usuário que realizou a ação
-  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  usuario   Usuario @relation(fields: [id], references: [id])
   usuarioId String  @map("usuario_id")
 
-  // Identificação polimórfica do alvo da ação
   entidadeAlvoId   String?           @map("entidade_alvo_id")
   entidadeAlvoTipo EntidadeAlvoTipo? @map("entidade_alvo_tipo")
 
   @@map("logs_atividade")
 }
+
 
 model Cliente {
   id                  String        @id @default(uuid())
@@ -251,8 +249,9 @@ model EnvioFormulario {
   clienteId    String?     @map("cliente_id")
   campanha     Campanha?   @relation(fields: [campanhaId], references: [id], onDelete: SetNull)
   campanhaId   String?     @map("campanha_id")
-  usuario      Usuario?    @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
-  usuarioId    String?     @map("usuario_id")
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId    String     @map("usuario_id")
+
   feedback     Feedback?   @relation(name: "EnvioFormularioToFeedback")
 
   @@map("envios_formulario")

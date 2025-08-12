@@ -16,7 +16,6 @@ export enum StatusUsuario { // Renomeado de 'Status_usuarios' para o domínio
 // Interface IUsuario (Representa a entidade completa)
 export interface IUsuario extends IDatasControle {
   id: string; // ID é obrigatório para uma entidade
-  pessoa: Pessoa; // Entidade Pessoa
   nomeUsuario: string; // Renomeado de 'usuario' para evitar conflito com a própria classe
   senhaHash: string; // Armazena o hash da senha
   tipo: TipoUsuario; // Tipo de usuário (role)
@@ -24,9 +23,7 @@ export interface IUsuario extends IDatasControle {
 }
 
 // IUsuarioProps: O que se passa para criar (sem ID e datas, que são gerados)
-export type CriarUsuarioProps = Omit<IUsuario, 'id' | 'status' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao' | 'pessoa'> & { // Omitindo 'pessoa'
-  pessoa: Omit<PessoaProps, 'id'>; // Recebe as props da pessoa sem o ID dela
-};
+export type CriarUsuarioProps = Omit<IUsuario, 'usuarioId' | 'status' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>
 
 export type RecuperarUsuarioProps = IUsuario;
 

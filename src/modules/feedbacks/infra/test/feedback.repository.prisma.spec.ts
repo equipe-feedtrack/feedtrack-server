@@ -61,11 +61,7 @@ describe("FeedbackRepositoryPrisma", () => {
       id: feedbackEntity.id,
       formularioId: feedbackEntity.formularioId,
       envioId: feedbackEntity.envioId,
-<<<<<<< HEAD
-      resposta: JSON.parse(JSON.stringify(feedbackEntity.respostas)),
-=======
       respostas: feedbackEntity.respostas,
->>>>>>> feat-yago
       dataCriacao: feedbackEntity.dataCriacao,
       dataExclusao: feedbackEntity.dataExclusao,
     } as FeedbackPrisma);
@@ -99,17 +95,13 @@ describe("FeedbackRepositoryPrisma", () => {
         perguntaId: randomUUID(),
         tipo: TipoPergunta.TEXTO,
         resposta_texto: "Teste de busca",
-        data_resposta: new Date().toISOString(),
+        data_resposta: new Date(),
       }],
       dataCriacao: new Date(),
       dataExclusao: null,
     };
 
-<<<<<<< HEAD
-    vi.mocked(prisma.feedback.findUnique).mockResolvedValue(mockDbResponse as unknown as FeedbackPrisma);
-=======
     vi.mocked(prisma.feedback.findUnique).mockResolvedValue(mockDbResponse);
->>>>>>> feat-yago
 
     const result = await repo.recuperarPorUuid(feedbackId);
 
