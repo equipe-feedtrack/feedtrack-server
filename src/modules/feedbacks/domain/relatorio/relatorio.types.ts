@@ -1,5 +1,0 @@
-interface IRelatorio {
-
-}
-
-export{IRelatorio}

@@ -1,18 +1,20 @@
 interface IPergunta {
-    id?: string;
+    id: string;
     texto: string;
     tipo: string;
-    opcoes?: string[];
-    ordem: number;
+    ativo: boolean;
+    opcoes?: string[] | null;
+    dataCriacao: Date;
+    dataAtualizacao: Date;
+    dataExclusao: Date | null;
   }
 
-  type CriarPerguntaProps =  Omit<IPergunta, 'id'>;
+ type CriarPerguntaProps = Omit<IPergunta, 'id' | 'ativo' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao' | 'formularios'>;
 
-  type RecuperarPerguntaProps = Required<IPergunta>;
+ type RecuperarPerguntaProps = Omit<IPergunta, 'opcoes'>  & { opcoes?: string[] } & {id: string;};
 
   export {
     IPergunta,
-     CriarPerguntaProps,
-     RecuperarPerguntaProps
-    
-    }
+    CriarPerguntaProps,
+    RecuperarPerguntaProps
+  }

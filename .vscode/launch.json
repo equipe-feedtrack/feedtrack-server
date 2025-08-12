@@ -1,19 +1,60 @@
 {
-    // Para fazer o debug do código e não depender dos console.log
-"version": "0.2.0",
-"configurations": [
+  // Para fazer o debug do código e não depender dos console.log
+  "version": "0.2.0",
+  "configurations": [
     {
-        "type": "node",
-        "request": "launch",
-        "name": "Launch Program",
-        "skipFiles": [
-            "<node_internals>/**"
-        ],
-        "program": "${workspaceFolder}\\src\\index.ts",
-        "preLaunchTask": "tsc: build - tsconfig.json",
-        "outFiles": [
-            "${workspaceFolder}/dist/**/*.js"
-        ]
+      "name": "Debug Vitest All Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "test:all" // Roda o script 'test:all' do package.json, que inclui db:test:push e todos os testes
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "node_modules/**"
+      ],
+      "sourceMaps": true,
+      // Certifique-se de que estes paths estão corretos para seus arquivos transpilados (se houver)
+      // Se você não transpila antes de rodar vitest, pode precisar ajustar isto.
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/src/**/*.js" 
+      ],
+      "env": {
+        "DATABASE_URL": "file:./test.db" // Variável de ambiente para testes de integração
+      }
+    },
+    {
+      "name": "Debug Vitest Current File",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "test:run", // Roda o script 'test:run' do package.json (que é 'vitest run')
+        "--", // Argumentos que vêm depois do '--' são passados para o Vitest
+        "${relativeFile}" // Vitest vai depurar apenas o arquivo TypeScript atualmente aberto
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "node_modules/**"
+      ],
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js",
+        "${workspaceFolder}/src/**/*.js"
+      ],
+      "env": {
+        "DATABASE_URL": "file:./test.db"
+      }
     }
-]
+  ]
 }

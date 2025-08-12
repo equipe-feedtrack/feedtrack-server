@@ -5,8 +5,14 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon",
+    "dev:console": "node -r tsconfig-paths/register -r sucrase/register src/main/index.ts",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:integration:repo": "cross-env DATABASE_URL=\"file:./test.db\" vitest run --dir src/modules/formulario/infra",
+    "db:test:push": "cross-env DATABASE_URL=\"file:./test.db\" npx prisma db push --accept-data-loss --schema src/main/infra/database/orm/prisma/schema.prisma",
+    "test:all": "npm run db:test:push && npm run test:unit:domain && npm run test:unit:mappers && npm run test:integration:repo",
+    "migrate": "npx prisma migrate dev --schema src/main/infra/database/orm/prisma/schema.prisma",
+    "reset": "npx prisma migrate reset --schema src/main/infra/database/orm/prisma/schema.prisma",
+    "studio": "npx prisma studio --schema src/main/infra/database/orm/prisma/schema.prisma"
   },
   "_moduleAliases": {
     "@modules": "dist/modules",
@@ -31,19 +37,40 @@
   "author": "Cleison, Yago, Alexsandro, Moisés, Enzo.",
   "license": "ISC",
   "devDependencies": {
-    "@types/jest": "^29.5.14",
+    "@prisma/client": "^6.12.0",
+    "@types/body-parser": "^1.19.6",
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^22.15.3",
+    "@types/nodemailer": "^6.4.17",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "@vitest/ui": "^3.1.3",
+    "cross-env": "^7.0.3",
     "nodemon": "^3.1.10",
+    "prisma": "^6.12.0",
     "sucrase": "^3.35.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3",
-    "vitest": "^3.1.3"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@types/express": "^5.0.1",
+    "@types/axios": "^0.9.36",
+    "@types/cors": "^2.8.19",
+    "axios": "^1.10.0",
+    "body-parser": "^2.2.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "module-alias": "^2.2.3",
-    "prisma": "^6.7.0"
+    "morgan": "^1.10.1",
+    "nodemailer": "^7.0.5",
+    "reflect-metadata": "^0.2.2",
+    "sqlite": "^5.1.1"
   }
 }

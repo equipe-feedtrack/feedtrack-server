@@ -1,18 +1,24 @@
 import { defineConfig } from 'vite'
-import { resolve } from 'path'
-import { fileURLToPath } from 'url'
+import path, { resolve } from 'path'
 import { configDefaults } from 'vitest/config'
 
 export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    include: ['**/*.spec.ts', '**/*.test.ts'], // Garante que Vitest reconheça seus testes
     exclude: [...configDefaults.exclude],
   },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src'),
-      '@shared': resolve(__dirname, 'src/shared'), // ajuste conforme seu projeto
-    },
-  },
+ resolve: {
+        alias: [
+            {
+                find: "@modules",
+                replacement: path.resolve(__dirname, "src/modules"),
+            },
+            {
+                find: "@shared",
+                replacement: path.resolve(__dirname, "src/shared"),
+            },
+        ]
+    }    
 })

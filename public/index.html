@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Feedback - Formulário</title>
+</head>
+<body>
+  <h1>Feedback</h1>
+  <p>Formulário ID: <span id="formularioId"></span></p>
+  <p>Cliente ID: <span id="clienteId"></span></p>
+  <pre id="dadosJson"></pre>
+
+  <script>
+    const url = new URL(window.location.href);
+    const pathSegments = url.pathname.split('/');
+
+    const formularioIndex = pathSegments.indexOf('formulario');
+    const clienteIndex = pathSegments.indexOf('cliente');
+
+    const formularioId = formularioIndex !== -1 ? pathSegments[formularioIndex + 1] : '';
+    const clienteId = clienteIndex !== -1 ? pathSegments[clienteIndex + 1] : '';
+
+    document.getElementById('formularioId').textContent = formularioId;
+    document.getElementById('clienteId').textContent = clienteId;
+
+    // Buscar dados via API backend
+    if (formularioId && clienteId) {
+      fetch(`/api/v1/resposta-formulario-get/formulario/${formularioId}/cliente/${clienteId}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('dadosJson').textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(err => {
+          document.getElementById('dadosJson').textContent = 'Erro ao carregar dados';
+          console.error(err);
+        });
+    }
+  </script>
+</body>
+</html>
