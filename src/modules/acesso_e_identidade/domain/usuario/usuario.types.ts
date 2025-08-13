@@ -6,6 +6,7 @@ export enum TipoUsuario { // Renomeado de 'Tipo' para clareza
   USER = 'USER',
   ADMIN = 'ADMIN',
   SUPER_ADMIN = 'SUPER_ADMIN',
+  EMPRESA = 'EMPRESA',
 }
 
 export enum StatusUsuario { // Renomeado de 'Status_usuarios' para o domínio
@@ -19,11 +20,13 @@ export interface IUsuario extends IDatasControle {
   nomeUsuario: string; // Renomeado de 'usuario' para evitar conflito com a própria classe
   senhaHash: string; // Armazena o hash da senha
   tipo: TipoUsuario; // Tipo de usuário (role)
+  email: string | null; // Opcional, para usuários que possuem email
   status: StatusUsuario; // Status do usuário (ativo/inativo)
+  nomeEmpresa: string | null; // Opcional, para usuários do tipo EMPRESA
 }
 
 // IUsuarioProps: O que se passa para criar (sem ID e datas, que são gerados)
-export type CriarUsuarioProps = Omit<IUsuario, 'usuarioId' | 'status' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>
+export type CriarUsuarioProps = Omit<IUsuario, 'id' | 'status' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>
 
 export type RecuperarUsuarioProps = IUsuario;
 

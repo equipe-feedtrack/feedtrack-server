@@ -18,4 +18,7 @@ export class CriarUsuarioValidationDTO {
   tipo: TipoUsuario;
 
 
+  
+
+
 }

@@ -16,6 +16,7 @@ enum TipoUsuario {
   USER
   ADMIN
   SUPER_ADMIN
+  EMPRESA
 }
 
 enum StatusFormulario {
@@ -68,8 +69,10 @@ model Usuario {
   id        String         @id @default(uuid())
   nome_usuario     String         @unique
   senha_hash       String
+  email            String?        @unique
   tipo             TipoUsuario
   status           StatusUsuario
+  nome_empresa     String?        @map("nome_empresa") // Opcional, para usuários do tipo EMPRESA
   data_criacao     DateTime       @default(now())
   data_atualizacao DateTime       @updatedAt
   data_exclusao    DateTime?

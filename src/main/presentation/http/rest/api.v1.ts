@@ -1,5 +1,6 @@
 import { funcionarioRouter } from "@modules/acesso_e_identidade/presentation/funcionario.routes";
 import { usuarioRouter } from "@modules/acesso_e_identidade/presentation/usuario.routes";
+import { authRouter } from "@modules/acesso_e_identidade/presentation/auth.routes"; // Added
 import { campanhaRouter } from "@modules/campanha/presentation/campanha.routes";
 import { feedbackRoutes } from "@modules/feedbacks/presentation/feedback.routes";
 import { envioRouter } from "@modules/formulario/presentation/envio.routes";
@@ -30,6 +31,8 @@ apiv1Router.use(feedbackRoutes);
 apiv1Router.use(funcionarioRouter)
 
 apiv1Router.use(usuarioRouter)
+
+apiv1Router.use(authRouter); // Added
 
 
 

@@ -1,13 +1,17 @@
 import { Entity } from "@shared/domain/entity"; // Sua classe base Entity
-import { Pessoa } from "@shared/domain/pessoa.entity"; // Sua entidade Pessoa
 import { randomUUID } from "crypto"; // Para gerar IDs
 import { CriarUsuarioProps, IUsuario, RecuperarUsuarioProps, StatusUsuario, TipoUsuario } from "./usuario.types";
+import bcrypt from "bcrypt";
+
 
 class Usuario extends Entity<IUsuario> implements IUsuario {
   private _nomeUsuario: string; // Renomeado para evitar conflito
   private _senhaHash: string; // Armazena o hash da senha
   private _tipo: TipoUsuario;
   private _status: StatusUsuario; // Status do usuário
+  private _email: string | null; // Opcional, para usuários que possuem email
+  private _nomeEmpresa: string | null; // Opcional, para usuários do tipo EMPRESA
+  private _tokenRecuperacao?: string | null; // Opcional, para recuperação de senha
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
   private _dataExclusao: Date | null;
@@ -16,19 +20,30 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
   public get nomeUsuario(): string { return this._nomeUsuario; }
   public get senhaHash(): string { return this._senhaHash; }
   public get tipo(): TipoUsuario { return this._tipo; }
+  public get email(): string | null { return this._email; } // Pode ser null se não houver email
+  public get nomeEmpresa(): string | null { return this._nomeEmpresa; }
   public get status(): StatusUsuario { return this._status; }
   public get dataCriacao(): Date { return this._dataCriacao; }
   public get dataAtualizacao(): Date { return this._dataAtualizacao; }
   public get dataExclusao(): Date | null { return this._dataExclusao; }
 
   // Setters privados (com validações)
-  private set nomeUsuario(username: string) {
-    if (!username || username.trim() === '') {
-      throw new Error("Nome de usuário é obrigatório."); // Exceção específica
-    }
-    // Adicione validações de formato/unicidade para o nome de usuário (ex: min 3 caracteres)
-    this._nomeUsuario = username.trim();
+private set nomeUsuario(username: string) {
+  if (!username || username.trim().length < 3) {
+    throw new Error("Nome de usuário é obrigatório e deve ter pelo menos 3 caracteres.");
   }
+
+  const nomeLimpo = username.trim().toLowerCase();
+
+  // Regex só aceita letras minúsculas, números, underscore (_) e ponto (.)
+  const regexValido = /^[a-z0-9_.]+$/;
+  if (!regexValido.test(nomeLimpo)) {
+    throw new Error("Nome de usuário deve conter apenas letras minúsculas, números, underscore (_) ou ponto (.)");
+  }
+
+  this._nomeUsuario = nomeLimpo;
+}
+
   private set senhaHash(hash: string) {
     if (!hash || hash.trim() === '') {
       throw new Error("Senha é obrigatória."); // Exceção específica
@@ -36,7 +51,22 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
     // Adicione validações de complexidade de senha aqui (min 8 caracteres, etc.)
     this._senhaHash = hash;
   }
+
+  private set email(email: string | null) {
+  if (email) {
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regexEmail.test(email)) {
+      throw new Error("Email inválido.");
+    }
+    this._email = email.trim();
+  } else {
+    this._email = null;
+  }
+}
+
+
   private set tipo(type: TipoUsuario) { this._tipo = type; }
+  private set nomeEmpresa(nome: string | null) { this._nomeEmpresa = nome ? nome.trim() : null; }
   private set status(status: StatusUsuario) { this._status = status; }
   private set dataCriacao(date: Date) { this._dataCriacao = date; }
   private set dataAtualizacao(date: Date) { this._dataAtualizacao = date; }
@@ -48,7 +78,10 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
     this.nomeUsuario = user.nomeUsuario; // Usa o setter para validar nome de usuário
     this.senhaHash = user.senhaHash; // Usa o setter para validar senha
     this.tipo = user.tipo; // Usa o setter para validar tipo
+    this.email = user.email; // Pode ser null, então não usa setter
+    this.nomeEmpresa = user.nomeEmpresa; // Pode ser null, então não usa setter
     this.status = user.status; // Usa o setter para validar status
+
     this.dataCriacao = user.dataCriacao;
     this.dataAtualizacao = user.dataAtualizacao;
     this.dataExclusao = user.dataExclusao ?? null;
@@ -57,35 +90,58 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
   }
 
   // Métodos de Fábrica (Static Factory Methods)
-  public static criarUsuario(props: CriarUsuarioProps, id?: string): Usuario {
-
-    if (!props.nomeUsuario || props.nomeUsuario.trim() === '') {
-      throw new Error("Nome de usuário é obrigatório.");
-    }
-    if (!props.senhaHash || props.senhaHash.trim() === '') {
-      throw new Error("Senha é obrigatória.");
-    }
-
-    // Hash da senha (idealmente feito por um serviço externo ou um Value Object Senha)
-    // Para simplificar, faremos um hash básico aqui (mas não para produção!)
-    const senhaHasheada = props.senhaHash; // TODO: Integrar com bcrypt ou similar
-
-    const usuarioCompleto: IUsuario = {
-      id: id || randomUUID(), // ID é gerado aqui se não for fornecido
-      nomeUsuario: props.nomeUsuario,
-      senhaHash: senhaHasheada,
-      tipo: props.tipo,
-      status: StatusUsuario.ATIVO, // Usuário é ATIVO por padrão ao ser criado
-      dataCriacao: new Date(),
-      dataAtualizacao: new Date(),
-      dataExclusao: null,
-    };
-    return new Usuario(usuarioCompleto);
+public static async criarUsuario(props: CriarUsuarioProps, id?: string): Promise<Usuario> {
+  if (!props.nomeUsuario || props.nomeUsuario.trim() === '') {
+    throw new Error("Nome de usuário é obrigatório.");
   }
+  if (!props.senhaHash || props.senhaHash.trim() === '') {
+    throw new Error("Senha é obrigatória.");
+  }
+
+  console.log('props recebidos:', props);
+
+
+  // Gerar o hash da senha
+  const saltRounds = 10; // Quanto maior, mais seguro (mas mais lento)
+  const senhaHasheada = await bcrypt.hash(props.senhaHash, saltRounds);
+
+  const usuarioCompleto: IUsuario = {
+    id: id || randomUUID(),
+    nomeUsuario: props.nomeUsuario,
+    senhaHash: senhaHasheada,
+    tipo: props.tipo,
+    email: props.email || null, // Pode ser null se não houver email
+    status: StatusUsuario.ATIVO,
+    nomeEmpresa: props.nomeEmpresa || null,
+    dataCriacao: new Date(),
+    dataAtualizacao: new Date(),
+    dataExclusao: null,
+  };
+
+  console.log('usuarioCompleto antes de criar entidade:', usuarioCompleto.nomeEmpresa);
+
+  return new Usuario(usuarioCompleto);
+}
+
+  toJSON(): IUsuario {
+    return {
+      id: this.id,
+      nomeUsuario: this.nomeUsuario,
+      senhaHash: this.senhaHash,
+      tipo: this.tipo,
+      email: this.email,
+      status: this.status,
+      nomeEmpresa: this.nomeEmpresa,
+      dataCriacao: this.dataCriacao,
+      dataAtualizacao: this.dataAtualizacao,
+      dataExclusao: this.dataExclusao,
+    };
+  }
+
 
   public static recuperar(props: RecuperarUsuarioProps): Usuario {
     // O Prisma/Mapper deve garantir que todos os campos de IUsuario estejam presentes
-    if (!props.id || !props.nomeUsuario || !props.senhaHash || !props.tipo || !props.status || !props.dataCriacao || !props.dataAtualizacao) {
+    if (!props.id || !props.nomeUsuario || !props.senhaHash || !props.tipo || !props.status || !props.dataCriacao || !props.dataAtualizacao || props.nomeEmpresa === undefined) {
       throw new Error("Dados incompletos para recuperar Usuário."); // Exceção de recuperação
     }
     return new Usuario(props);
