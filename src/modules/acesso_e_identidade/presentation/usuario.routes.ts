@@ -170,7 +170,7 @@ usuarioRouter.get('/usuarios/nome/:nomeUsuario', async (req, res, next) => {
  *       500:
  *         description: Erro interno do servidor.
  */
-usuarioRouter.put('/usuarios/:id', validationMiddleware(AtualizarUsuarioValidationDTO), async (req, res, next) => {
+usuarioRouter.put('/atualizar-usuario/:id', validationMiddleware(AtualizarUsuarioValidationDTO), async (req, res, next) => {
   try {
     await usuarioController.atualizar(req, res);
   } catch (err) {

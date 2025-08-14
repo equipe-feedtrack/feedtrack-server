@@ -2,39 +2,203 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Feedback - Formulário</title>
+  <title>Avaliação do Produto</title>
+  <style>
+    body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+}
+
+h1 {
+  color: #1c1e21;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 10px;
+}
+
+.card {
+  background-color: #fff;
+  border: 1px solid #dddfe2;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card h2 {
+  font-size: 1.2em;
+  color: #4b4f56;
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.info-item {
+  margin-bottom: 8px;
+}
+
+.info-item strong {
+  display: inline-block;
+  width: 100px;
+  color: #606770;
+}
+
+#perguntas-lista {
+  list-style: none;
+  padding: 0;
+}
+
+#perguntas-lista li {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+textarea {
+  width: 100%;
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+.rating span.estrela {
+  cursor: pointer;
+  font-size: 22px;
+  color: #ccc;
+}
+
+.rating span.estrela.selecionada {
+  color: #f1c40f;
+}
+
+#btnEnviar {
+  padding: 10px 20px; 
+  background-color: #2ecc71; 
+  color: #fff; 
+  border: none; 
+  border-radius: 5px; 
+  cursor: pointer;
+}
+
+  </style>
 </head>
 <body>
-  <h1>Feedback</h1>
-  <p>Formulário ID: <span id="formularioId"></span></p>
-  <p>Cliente ID: <span id="clienteId"></span></p>
-  <pre id="dadosJson"></pre>
+  <div class="container">
+    <h1>Avaliação do Produto</h1>
+
+    <div class="card">
+      <h2>Cliente</h2>
+      <div class="info-item">
+        <strong>Nome:</strong> <span id="clienteNome"></span>
+      </div>
+      <div class="info-item">
+        <strong>Produto:</strong> <span id="produtoNome"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Responda o Formulário</h2>
+      <ul id="perguntas-lista"></ul>
+      <button id="btnEnviar">Enviar Avaliação</button>
+    </div>
+  </div>
 
   <script>
-    const url = new URL(window.location.href);
-    const pathSegments = url.pathname.split('/');
 
-    const formularioIndex = pathSegments.indexOf('formulario');
-    const clienteIndex = pathSegments.indexOf('cliente');
+// --- Extrair dados da URL ---
+const url = new URL(window.location.href);
+const pathSegments = url.pathname.split('/');
+const formularioId = pathSegments[pathSegments.indexOf('formulario') + 1] || '';
+const clienteId = pathSegments[pathSegments.indexOf('cliente') + 1] || '';
+const produtoId = pathSegments[pathSegments.indexOf('produto') + 1] || '';
 
-    const formularioId = formularioIndex !== -1 ? pathSegments[formularioIndex + 1] : '';
-    const clienteId = clienteIndex !== -1 ? pathSegments[clienteIndex + 1] : '';
+// Nomes via query string
+const urlParams = new URLSearchParams(window.location.search);
+const clienteNome = urlParams.get('clienteNome') || 'Cliente';
+const produtoNome = urlParams.get('produtoNome') || 'Produto';
 
-    document.getElementById('formularioId').textContent = formularioId;
-    document.getElementById('clienteId').textContent = clienteId;
+// Perguntas via query string (JSON encoded)
+let perguntas = [];
+try {
+  const perguntasStr = urlParams.get('perguntas');
+  if (perguntasStr) perguntas = JSON.parse(decodeURIComponent(perguntasStr));
+} catch (err) {
+  console.error('Erro ao ler perguntas da URL', err);
+}
 
-    // Buscar dados via API backend
-    if (formularioId && clienteId) {
-      fetch(`/api/v1/resposta-formulario-get/formulario/${formularioId}/cliente/${clienteId}`)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('dadosJson').textContent = JSON.stringify(data, null, 2);
-        })
-        .catch(err => {
-          document.getElementById('dadosJson').textContent = 'Erro ao carregar dados';
-          console.error(err);
-        });
+// Preencher dados
+document.getElementById('clienteNome').textContent = clienteNome;
+document.getElementById('produtoNome').textContent = produtoNome;
+
+const perguntasLista = document.getElementById('perguntas-lista');
+perguntas.forEach(p => {
+  const item = document.createElement('li');
+  let htmlResposta = '';
+
+  if (p.tipo === 'nota') {
+    htmlResposta = `<div class="rating" data-pergunta-id="${p.id}">`;
+    for (let i = 1; i <= 5; i++) {
+      htmlResposta += `<span class="estrela" data-valor="${i}">★</span>`;
     }
+    htmlResposta += `</div>`;
+  } else {
+    htmlResposta = `<textarea rows="3" data-pergunta-id="${p.id}"></textarea>`;
+  }
+
+  item.innerHTML = `<strong>Pergunta:</strong> ${p.texto}<br>${htmlResposta}`;
+  perguntasLista.appendChild(item);
+});
+
+// Eventos das estrelas
+document.querySelectorAll('.rating').forEach(div => {
+  div.querySelectorAll('.estrela').forEach(star => {
+    star.addEventListener('click', () => {
+      const valor = parseInt(star.dataset.valor);
+      div.dataset.notaSelecionada = valor;
+      div.querySelectorAll('.estrela').forEach(s => {
+        s.classList.toggle('selecionada', parseInt(s.dataset.valor) <= valor);
+      });
+    });
+  });
+});
+
+// Enviar feedback
+document.getElementById('btnEnviar').addEventListener('click', () => {
+  const respostas = Array.from(document.querySelectorAll('#perguntas-lista > li')).map(li => {
+    const ratingDiv = li.querySelector('.rating');
+    if (ratingDiv) {
+      return { perguntaId: ratingDiv.dataset.perguntaId, resposta: parseInt(ratingDiv.dataset.notaSelecionada || 0) };
+    }
+    const textarea = li.querySelector('textarea');
+    return { perguntaId: textarea.dataset.perguntaId, resposta: textarea.value };
+  });
+
+  fetch('/api/v1/feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ formularioId, clienteId, produtoId, respostas })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error(res.statusText);
+    return res.json();
+  })
+  .then(() => alert('Avaliação enviada com sucesso!'))
+  .catch(err => alert('Erro ao enviar avaliação: ' + err.message));
+});
+
+
   </script>
 </body>
 </html>

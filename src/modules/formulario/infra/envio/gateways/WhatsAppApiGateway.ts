@@ -17,8 +17,8 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
 
   constructor() {
     // As credenciais devem vir de variáveis de ambiente, nunca diretamente no código!
-    this.apiUrl = process.env.WHATSAPP_API_URL || 'http://localhost:3000/api/sendText';
-    this.feedbackUrl = process.env.FEEDBACK_URL || 'http://localhost:3000/feedback'; // VINCULAR O LINK REAL QUE IRÁ GERAR A PÁGINA DE FEEDBACK'
+    this.apiUrl = process.env.WHATSAPP_API_URL || 'https://waha.feedtrack.site/api/sendText';
+    this.feedbackUrl = 'http://localhost:3006/api/v1/resposta-formulario';// VINCULAR O LINK REAL QUE IRÁ GERAR A PÁGINA DE FEEDBACK'
 
     if (!this.apiUrl || !this.feedbackUrl) {
       throw new Error("As variáveis de ambiente WHATSAPP_API_URL e FEEDBACK_URL devem ser configuradas.");
@@ -33,8 +33,7 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
    */
   public async enviar(destinatario: string, conteudo: string, formularioId: string, clienteId: string): Promise<void> {
     console.log(`[WhatsAppApiGateway] Preparando para enviar mensagem para: ${destinatario}`);
-    const link = `${this.feedbackUrl}`;
-    const linkCompleto = `${link}`
+    const linkCompleto = `${this.feedbackUrl}/formulario/${formularioId}/cliente/${clienteId}`;
     const mensagemCompleta = `${conteudo}\n\nResponda aqui: ${linkCompleto}`;
 
     try {
@@ -42,7 +41,7 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
 
       // Monta o corpo da requisição conforme a documentação da API que você usar
       const payload = {
-        "chatId": `${destinatario}@c.us`, // Exemplo para o formato de chat ID
+        "chatId": `55${destinatario}@c.us`, // Exemplo para o formato de chat ID
         "text": mensagemCompleta,
         "session": "default"
       };

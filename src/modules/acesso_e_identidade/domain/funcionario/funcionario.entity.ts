@@ -110,11 +110,26 @@ private set dataAdmissao(value: Date | null | undefined) {
     return new Funcionario(funcionarioCompleto);
   }
 
+  toJSON(): IFuncionario{
+    return{
+      id: this.id,
+      usuarioId: this.usuarioId,
+      cargo: this.cargo,
+      dataAdmissao: this.dataAdmissao,
+      status: this.status,
+      dataCriacao: this.dataCriacao,
+      dataAtualizacao: this.dataAtualizacao,
+      dataExclusao: this.dataExclusao
+    }
+  }
+
   public static recuperar(props: RecuperarFuncionarioProps): Funcionario {
     // O Prisma/Mapper deve garantir que todos os campos de IFuncionario estejam presentes e válidos
     if (!props.id || !props.usuarioId || !props.cargo || !props.dataAdmissao === undefined || !props.status || !props.dataCriacao || !props.dataAtualizacao || props.dataExclusao === undefined) {
       throw new Error("Dados incompletos para recuperar Funcionário."); // Exceção de recuperação
     }
+
+
     // Adicione mais validações ao recuperar se o construtor for mais flexível
     return new Funcionario(props);
   }
