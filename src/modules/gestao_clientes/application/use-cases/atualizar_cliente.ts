@@ -3,20 +3,16 @@ import { ClienteMap } from '@modules/gestao_clientes/infra/mappers/cliente.map';
 import { ClienteResponseDTO } from '../dto/cliente_response.dto';
 import { AtualizarClienteInputDTO } from '../dto/atualizar_cliente_input.dto';
 import { IUseCase } from '@shared/application/use-case/usecase.interface';
-import { IProdutoRepository } from '@modules/produtos/infra/produto.repository.interface';
 import { StatusCliente } from '@modules/gestao_clientes/domain/cliente.types';
 
 
 export class AtualizarClienteUseCase implements IUseCase<AtualizarClienteInputDTO, ClienteResponseDTO> {
   private readonly _clienteRepository: IClienteRepository;
-  private readonly _produtoRepository: IProdutoRepository;
 
   constructor(
     clienteRepository: IClienteRepository,
-    produtoRepository: IProdutoRepository
   ) {
     this._clienteRepository = clienteRepository;
-    this._produtoRepository = produtoRepository;
   }
 
   async execute(input: AtualizarClienteInputDTO): Promise<ClienteResponseDTO> {
@@ -28,54 +24,21 @@ export class AtualizarClienteUseCase implements IUseCase<AtualizarClienteInputDT
     }
 
     // 2. Aplicar as atualizações na entidade de domínio.
-    // A própria entidade é responsável por validar e alterar seu estado.
-
-    // Atualiza dados da Pessoa, se fornecidos.
-    if (input.pessoa) {
-        // A entidade Pessoa deve ter métodos para atualizar seus próprios dados.
-        if (typeof input.pessoa.nome === 'string') {
-            cliente.pessoa.atualizarNome(input.pessoa.nome);
-        }
-        if (input.pessoa.email !== undefined) {
-            cliente.pessoa.atualizarEmail(input.pessoa.email);
-        }
-        if (typeof input.pessoa.telefone === 'string') {
-            cliente.pessoa.atualizarTelefone(input.pessoa.telefone);
-        }
+    if (input.nome !== undefined) {
+      cliente.atualizarNome(input.nome);
     }
-
-    // Atualiza dados diretos do Cliente.
-    if (typeof input.cidade === 'string' || input.cidade === null) {
-      cliente.atualizarCidade(input.cidade); // A entidade Cliente deve ter este método.
+    if (input.email !== undefined) {
+      cliente.atualizarEmail(input.email);
     }
-    if (typeof input.vendedorResponsavel === 'string') {
-      cliente.atualizarVendedorResponsavel(input.vendedorResponsavel); // A entidade Cliente deve ter este método.
+    if (input.telefone !== undefined) {
+      cliente.atualizarTelefone(input.telefone);
     }
-    if (input.status === StatusCliente.INATIVO) {
-        cliente.inativar(); // Usa o método de domínio específico para inativar.
+    if (input.cidade !== undefined) {
+      cliente.atualizarCidade(input.cidade ?? '');
     }
-    // Adicionar lógica para reativar se necessário.
-
-    // // 3. Gerencia a relação com Produtos.
-    // // Adiciona novos produtos, se fornecidos.
-    // if (!input.idsProdutosParaAdicionar.length) {
-    //     for (const produtoId of input.idsProdutosParaAdicionar) {
-    //         const produto = await this._produtoRepository.recuperarPorUuid(produtoId);
-    //         if (produto) {
-    //             cliente.adicionarProduto(produto);
-    //         }
-    //     }
-    // }
-    // Remove produtos, se fornecidos.
-//  if (input.idsProdutosParaRemover && input.idsProdutosParaRemover.length > 0) {
-//       for (const produtoId of input.idsProdutosParaRemover) {
-//         // Busca o objeto Produto completo antes de remover
-//         const produtoARemover = await this._produtoRepository.recuperarPorUuid(produtoId);
-//         if (produtoARemover) {
-//           cliente.removerProduto(produtoARemover); // Passando o objeto completo
-//         }
-//       }
-//     }
+    if (input.status !== undefined) {
+      cliente.atualizarStatus(input.status);
+    }
 
     // 4. Persistir a entidade atualizada no banco de dados.
     await this._clienteRepository.atualizar(cliente);

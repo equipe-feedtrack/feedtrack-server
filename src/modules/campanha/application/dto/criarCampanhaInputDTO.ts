@@ -11,4 +11,5 @@ export interface CriarCampanhaInputDTO {
   templateMensagem: string;
   formularioId: string;
   canalEnvio: CanalEnvio;
+  empresaId: string;
 }

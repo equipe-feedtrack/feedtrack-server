@@ -24,6 +24,7 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
   private _cargo: string;
   private _dataAdmissao: Date | null; // Data de admissão (pode ser nula se não for obrigatório)
   private _status: StatusUsuario; // Status do funcionário
+  private _empresaId: string;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
   private _dataExclusao: Date | null;
@@ -33,6 +34,7 @@ class Funcionario extends Entity<IFuncionario> implements IFuncionario {
   public get cargo(): string { return this._cargo; }
   public get dataAdmissao(): Date | null { return this._dataAdmissao; }
   public get status(): StatusUsuario { return this._status; }
+  public get empresaId(): string { return this._empresaId; }
   public get dataCriacao(): Date { return this._dataCriacao; }
   public get dataAtualizacao(): Date { return this._dataAtualizacao; }
   public get dataExclusao(): Date | null { return this._dataExclusao; }
@@ -62,6 +64,7 @@ private set dataAdmissao(value: Date | null | undefined) {
 
 
   private set status(value: StatusUsuario) { this._status = value; }
+  private set empresaId(value: string) { this._empresaId = value; }
   private set dataCriacao(value: Date) { this._dataCriacao = value; }
   private set dataAtualizacao(value: Date) { this._dataAtualizacao = value; }
   private set dataExclusao(value: Date | null) { this._dataExclusao = value; }
@@ -72,6 +75,7 @@ private set dataAdmissao(value: Date | null | undefined) {
     this.cargo = funcionario.cargo;
     this.dataAdmissao = funcionario.dataAdmissao ;
     this.status = funcionario.status; 
+    this.empresaId = funcionario.empresaId;
     this.dataCriacao = funcionario.dataCriacao;
     this.dataAtualizacao = funcionario.dataAtualizacao;
     this.dataExclusao = funcionario.dataExclusao ?? null;
@@ -103,6 +107,7 @@ private set dataAdmissao(value: Date | null | undefined) {
       cargo: props.cargo,
       dataAdmissao: props.dataAdmissao,
       status: StatusUsuario.ATIVO,
+      empresaId: props.empresaId,
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,
@@ -117,6 +122,7 @@ private set dataAdmissao(value: Date | null | undefined) {
       cargo: this.cargo,
       dataAdmissao: this.dataAdmissao,
       status: this.status,
+      empresaId: this.empresaId,
       dataCriacao: this.dataCriacao,
       dataAtualizacao: this.dataAtualizacao,
       dataExclusao: this.dataExclusao
@@ -125,7 +131,7 @@ private set dataAdmissao(value: Date | null | undefined) {
 
   public static recuperar(props: RecuperarFuncionarioProps): Funcionario {
     // O Prisma/Mapper deve garantir que todos os campos de IFuncionario estejam presentes e válidos
-    if (!props.id || !props.usuarioId || !props.cargo || !props.dataAdmissao === undefined || !props.status || !props.dataCriacao || !props.dataAtualizacao || props.dataExclusao === undefined) {
+    if (!props.id || !props.usuarioId || !props.cargo || !props.dataAdmissao === undefined || !props.status || !props.dataCriacao || !props.dataAtualizacao || props.dataExclusao === undefined || !props.empresaId) {
       throw new Error("Dados incompletos para recuperar Funcionário."); // Exceção de recuperação
     }
 

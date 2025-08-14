@@ -11,7 +11,7 @@ export class UsuarioMap {
       email: usuarioPrisma.email || null, // Pode ser null se não houver email
       tipo: usuarioPrisma.tipo as TipoUsuario,
       status: usuarioPrisma.status as StatusUsuario,
-      nomeEmpresa: usuarioPrisma.nome_empresa || null, // Pode ser null para usuários que não são do tipo EMPRESA
+      empresaId: usuarioPrisma.empresaId,
       dataCriacao: usuarioPrisma.data_criacao,
       dataAtualizacao: usuarioPrisma.data_atualizacao,
       dataExclusao: usuarioPrisma.data_exclusao,
@@ -28,10 +28,11 @@ export class UsuarioMap {
       tipo: usuario.tipo,
       email: usuario.email, // Adicionei email aqui, se necessário
       status: usuario.status,
-      nome_empresa: usuario.nomeEmpresa, // Pode ser null para usuários que não são do tipo EMPRESA
+      empresaId: usuario.empresaId,
       data_criacao: usuario.dataCriacao,
       data_atualizacao: usuario.dataAtualizacao,
       data_exclusao: usuario.dataExclusao,
     };
   }
 }
+

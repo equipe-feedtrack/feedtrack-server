@@ -26,6 +26,7 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
       update: {
         respostas: dadosParaPersistencia.respostas,
         dataExclusao: dadosParaPersistencia.dataExclusao,
+        empresaId: dadosParaPersistencia.empresaId,
       },
     });
   }
@@ -90,8 +91,16 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
     return FeedbackMap.toDomain(raw);
   }
 
-  async buscarTodos(): Promise<Feedback[]> {
-    const rawFeedbacks = await this.prisma.feedback.findMany();
+  async buscarTodos(empresaId?: string): Promise<Feedback[]> {
+    const whereClause: any = {};
+
+    if (empresaId) {
+      whereClause.empresaId = empresaId;
+    }
+
+    const rawFeedbacks = await this.prisma.feedback.findMany({
+      where: whereClause,
+    });
 
     if (!rawFeedbacks || rawFeedbacks.length === 0) {
       return [];

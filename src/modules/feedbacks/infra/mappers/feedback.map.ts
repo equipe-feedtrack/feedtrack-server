@@ -21,6 +21,7 @@ export class FeedbackMap {
       clienteNome: raw.cliente_nome,
       produtoNome: raw.produto_nome,
       funcionarioNome: raw.funcionario_nome,
+      empresaId: raw.empresaId,
     };
     return Feedback.recuperar(props);
   }
@@ -40,6 +41,7 @@ export class FeedbackMap {
       cliente_nome: feedback.clienteNome,
       produto_nome: feedback.produtoNome,
       funcionario_nome: feedback.funcionarioNome,
+      empresaId: feedback.empresaId,
     };
   }
 
@@ -57,6 +59,7 @@ public static toResponseDTO(feedback: Feedback): FeedbackResponseDTO {
     clienteNome: feedback.clienteNome,
     produtoNome: feedback.produtoNome,
     funcionarioNome: feedback.funcionarioNome,
+    empresaId: feedback.empresaId,
   };
 }
 

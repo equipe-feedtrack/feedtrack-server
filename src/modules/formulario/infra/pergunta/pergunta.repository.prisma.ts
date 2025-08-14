@@ -46,12 +46,20 @@ async buscarMuitosPorId(ids: (string | null | undefined)[]): Promise<Pergunta[]>
 }
 
 
-  async inserir(pergunta: Pergunta): Promise<void> {
-    const dadosParaPersistencia = PerguntaMap.toPersistence(pergunta);
-    await this.prisma.pergunta.create({
-      data: dadosParaPersistencia,
-    });
+async inserir(pergunta: Pergunta): Promise<void> {
+  const dadosParaPersistencia = PerguntaMap.toPersistence(pergunta);
+
+  if (!dadosParaPersistencia.empresaId) {
+    throw new Error("O campo 'empresaId' é obrigatório ao criar uma pergunta.");
   }
+
+  await this.prisma.pergunta.create({
+    data: dadosParaPersistencia,
+  });
+}
+
+
+
 
   async atualizar(pergunta: Pergunta): Promise<void> {
     const dadosParaPersistencia = PerguntaMap.toPersistence(pergunta);

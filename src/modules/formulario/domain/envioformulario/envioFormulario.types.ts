@@ -9,6 +9,7 @@ export interface IEnvio {
   campanhaId: string;
   usuarioId: string ;
   produtoId: string;
+  empresaId: string;
   dataCriacao: Date;
   dataEnvio: Date | null;
   tentativasEnvio: number;

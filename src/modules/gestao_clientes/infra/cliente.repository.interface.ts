@@ -28,7 +28,7 @@ export interface IClienteRepository {
    * @param segmento O segmento alvo (ex: TODOS_CLIENTES, NOVOS_CLIENTES).
    * @returns Uma Promise que resolve para uma lista de entidades Cliente (ICliente[]).
    */
-  buscarPorSegmento(segmento: SegmentoAlvo): Promise<Cliente[]>;
+  buscarPorSegmento(segmento: SegmentoAlvo, empresaId?: string): Promise<Cliente[]>;
 
   // --- Métodos Adicionais que você pode precisar (opcionais, mas comuns) ---
   /**

@@ -16,7 +16,6 @@ enum TipoUsuario {
   USER
   ADMIN
   SUPER_ADMIN
-  EMPRESA
 }
 
 enum StatusFormulario {
@@ -46,7 +45,6 @@ enum TipoAcao {
   ATUALIZAR_CLIENTE
   DESATIVAR_CAMPANHA
   INICIAR_ENVIO_CAMPANHA
-  // ... adicione todas as ações necessárias
 }
 
 enum EntidadeAlvoTipo {
@@ -65,18 +63,45 @@ enum CanalEnvio {
 
 // --- MODELS ---
 
+model Empresa {
+  id              String    @id @default(uuid())
+  nome            String    @unique
+  cnpj            String?   @unique
+  dataCriacao     DateTime  @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
+  dataExclusao    DateTime? @map("data_exclusao")
+
+  usuarios     Usuario[]
+  funcionarios Funcionario[]
+  clientes     Cliente[]
+  produtos     Produto[]
+  campanhas    Campanha[]
+  vendas       Venda[]
+  feedbacks    Feedback[]
+  formularios  Formulario[]
+  perguntas    Pergunta[]
+  logs         LogAtividade[]
+  envios       EnvioFormulario[]
+
+
+  @@map("empresas")
+}
+
 model Usuario {
-  id        String         @id @default(uuid())
-  nome_usuario     String         @unique
+  id               String        @id @default(uuid())
+  nome_usuario     String        @unique
   senha_hash       String
-  email            String?        @unique
+  email            String?       @unique
   tipo             TipoUsuario
   status           StatusUsuario
-  nome_empresa     String?        @map("nome_empresa") // Opcional, para usuários do tipo EMPRESA
-  data_criacao     DateTime       @default(now())
-  data_atualizacao DateTime       @updatedAt
+  data_criacao     DateTime      @default(now())
+  data_atualizacao DateTime      @updatedAt
   data_exclusao    DateTime?
-  funcionario      Funcionario?   @relation("UsuarioFuncionario") // Relação bidirecional
+
+  empresaId        String
+  empresa          Empresa       @relation(fields: [empresaId], references: [id])
+
+  funcionario      Funcionario?  @relation("UsuarioFuncionario")
   enviosFormulario EnvioFormulario[]
   logsAtividade    LogAtividade[]
 
@@ -95,10 +120,11 @@ model Funcionario {
   usuarioId       String        @unique @map("usuario_id")
   usuario         Usuario       @relation("UsuarioFuncionario", fields: [usuarioId], references: [id], onDelete: Cascade)
 
+  empresaId       String
+  empresa         Empresa       @relation(fields: [empresaId], references: [id])
+
   @@map("funcionarios")
 }
-
-
 
 model LogAtividade {
   id             String   @id @default(uuid())
@@ -115,37 +141,30 @@ model LogAtividade {
   entidadeAlvoId   String?           @map("entidade_alvo_id")
   entidadeAlvoTipo EntidadeAlvoTipo? @map("entidade_alvo_tipo")
 
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id])
+
   @@map("logs_atividade")
 }
-
 
 model Cliente {
   id                  String        @id @default(uuid())
   nome                String
   telefone            String?
   email               String?
-  vendedorResponsavel String        @map("vendedor_responsavel")
   cidade              String?
   status              StatusUsuario
   dataCriacao         DateTime      @default(now()) @map("data_criacao")
   dataAtualizacao     DateTime      @updatedAt @map("data_atualizacao")
   dataExclusao        DateTime?     @map("data_exclusao")
 
-  // Relações
-  produtos         ClientesOnProdutos[]
+  empresaId           String
+  empresa             Empresa       @relation(fields: [empresaId], references: [id])
+
+  vendas           Venda[]
   enviosFormulario EnvioFormulario[]
 
   @@map("clientes")
-}
-
-model ClientesOnProdutos {
-  cliente   Cliente @relation(fields: [clienteId], references: [id], onDelete: Cascade)
-  clienteId String  @map("cliente_id")
-  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-  produtoId String  @map("produto_id")
-
-  @@id([clienteId, produtoId])
-  @@map("clientes_on_produtos")
 }
 
 model Produto {
@@ -158,11 +177,29 @@ model Produto {
   dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
   dataExclusao    DateTime? @map("data_exclusao")
 
-  // Relação Um-para-Muitos (um Cliente pode ter vários Produtos)
-  clientes ClientesOnProdutos[]
+  empresaId       String
+  empresa         Empresa   @relation(fields: [empresaId], references: [id])
+
+  vendas          Venda[]
   enviosFormulario EnvioFormulario[]
 
   @@map("produtos")
+}
+
+model Venda {
+  id            String    @id @default(uuid())
+  dataVenda     DateTime  @default(now()) @map("data_venda")
+  
+  clienteId     String
+  cliente       Cliente   @relation(fields: [clienteId], references: [id])
+
+  produtoId     String
+  produto       Produto   @relation(fields: [produtoId], references: [id])
+
+  empresaId     String
+  empresa       Empresa   @relation(fields: [empresaId], references: [id])
+
+  @@map("vendas")
 }
 
 model Pergunta {
@@ -175,7 +212,9 @@ model Pergunta {
   dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
   dataExclusao    DateTime? @map("data_exclusao")
 
-  // Relação Muitos-para-Muitos com Formulário
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id])
+
   formularios PerguntasOnFormularios[]
 
   @@map("perguntas")
@@ -183,32 +222,31 @@ model Pergunta {
 
 model Formulario {
   id              String    @id @default(uuid())
-  titulo          String // Renomeado de 'texto' para 'titulo' para maior clareza
+  titulo          String
   descricao       String
   ativo           Boolean
+  empresaId       String    @map("empresa_id")
   dataCriacao     DateTime  @default(now()) @map("data_criacao")
   dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
   dataExclusao    DateTime? @map("data_exclusao")
 
-  // Relações
   perguntas PerguntasOnFormularios[]
   campanhas Campanha[]
   feedbacks Feedback[]
   envios    EnvioFormulario[]
 
+  empresa   Empresa @relation(fields: [empresaId], references: [id])
+
   @@map("formularios")
 }
 
-// Tabela de junção explícita para a relação N-N entre Pergunta e Formulário
 model PerguntasOnFormularios {
   id           String     @id @default(uuid())
   pergunta     Pergunta   @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
   perguntaId   String     @map("pergunta_id")
   formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
   formularioId String     @map("formulario_id")
-
-  // Exemplo de campo extra na tabela de junção
-  ordemNaLista Int @map("ordem_na_lista")
+  ordemNaLista Int        @map("ordem_na_lista")
 
   @@map("perguntas_on_formularios")
 }
@@ -228,11 +266,12 @@ model Campanha {
   dataAtualizacao  DateTime     @updatedAt @map("data_atualizacao")
   dataExclusao     DateTime?    @map("data_exclusao")
 
-  // Relação com o Formulário
+  empresaId        String
+  empresa          Empresa      @relation(fields: [empresaId], references: [id])
+
   formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
   formularioId String?     @map("formulario_id")
 
-  // Relação 1-para-Muitos com EnvioFormulario
   envios EnvioFormulario[]
 
   @@map("campanhas")
@@ -246,7 +285,6 @@ model EnvioFormulario {
   dataCriacao        DateTime         @default(now()) @map("data_criacao")
   dataEnvio          DateTime?        @map("data_envio")
 
-  // Relações
   formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
   formularioId String?     @map("formulario_id")
   cliente      Cliente?    @relation(fields: [clienteId], references: [id], onDelete: SetNull)
@@ -259,11 +297,13 @@ model EnvioFormulario {
   produto      Produto?    @relation(fields: [produtoId], references: [id], onDelete: SetNull)
   produtoId    String?     @map("produto_id")
 
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id])
+
   feedback     Feedback?   @relation(name: "EnvioFormularioToFeedback")
 
   @@map("envios_formulario")
 }
-
 
 model Feedback {
   id               String    @id @default(uuid())
@@ -274,11 +314,12 @@ model Feedback {
   produto_nome     String?
   funcionario_nome String?
 
-  // Relação com o Formulário (para saber a estrutura das perguntas)
+  empresaId       String
+  empresa         Empresa   @relation(fields: [empresaId], references: [id])
+
   formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
   formularioId String?     @map("formulario_id")
 
-  // Relação 1-para-1 com EnvioFormulario
   envio   EnvioFormulario? @relation(name: "EnvioFormularioToFeedback", fields: [envioId], references: [id], onDelete: SetNull)
   envioId String?          @unique @map("envio_id")
 

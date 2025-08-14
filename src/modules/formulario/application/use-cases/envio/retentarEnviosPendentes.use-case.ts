@@ -49,9 +49,9 @@ export class RetentarEnviosPendentesUseCase {
         }
 
         if (campanha.canalEnvio === CanalEnvio.EMAIL) {
-          await this.emailGateway.enviar(cliente.pessoa.email, campanha.templateMensagem, envio.formularioId, envio.clienteId, envio.produtoId);
+          await this.emailGateway.enviar(cliente.email, campanha.templateMensagem, envio.formularioId, envio.clienteId, envio.produtoId);
         } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-          await this.whatsappGateway.enviar(cliente.pessoa.telefone, campanha.templateMensagem, envio.formularioId, envio.clienteId, envio.produtoId);
+          await this.whatsappGateway.enviar(cliente.telefone, campanha.templateMensagem, envio.formularioId, envio.clienteId, envio.produtoId);
         } else {
           envio.registrarFalha('Canal de envio inválido na campanha.');
           return;

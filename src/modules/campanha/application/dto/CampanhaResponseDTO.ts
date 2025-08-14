@@ -13,6 +13,7 @@ export interface CampanhaResponseDTO {
   templateMensagem: string;
   formularioId: string;
   ativo: boolean;
+  empresaId: string;
   dataCriacao: string; // String ISO
   dataAtualizacao: string; // String ISO
 }

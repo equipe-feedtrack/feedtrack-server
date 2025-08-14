@@ -8,6 +8,7 @@ interface IFeedback {
   clienteNome?: string | null;
   produtoNome?: string | null;
   funcionarioNome?: string | null;
+  empresaId: string;
 }
 
 /**
@@ -19,7 +20,7 @@ type CriarFeedbackProps = Omit<IFeedback, "id" | "dataCriacao" | "dataExclusao">
 /**
  * Dados necessários para criar um novo feedback manual.
  */
-type CriarFeedbackManualProps = Pick<IFeedback, "clienteNome" | "produtoNome" | "funcionarioNome" | "respostas">;
+type CriarFeedbackManualProps = Pick<IFeedback, "clienteNome" | "produtoNome" | "funcionarioNome" | "respostas" | "empresaId">;
 
 
 /**

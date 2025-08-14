@@ -10,7 +10,7 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
   private _tipo: TipoUsuario;
   private _status: StatusUsuario; // Status do usuário
   private _email: string | null; // Opcional, para usuários que possuem email
-  private _nomeEmpresa: string | null; // Opcional, para usuários do tipo EMPRESA
+  private _empresaId: string;
   private _tokenRecuperacao?: string | null; // Opcional, para recuperação de senha
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
@@ -21,7 +21,7 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
   public get senhaHash(): string { return this._senhaHash; }
   public get tipo(): TipoUsuario { return this._tipo; }
   public get email(): string | null { return this._email; } // Pode ser null se não houver email
-  public get nomeEmpresa(): string | null { return this._nomeEmpresa; }
+  public get empresaId(): string { return this._empresaId; }
   public get status(): StatusUsuario { return this._status; }
   public get dataCriacao(): Date { return this._dataCriacao; }
   public get dataAtualizacao(): Date { return this._dataAtualizacao; }
@@ -66,7 +66,7 @@ private set nomeUsuario(username: string) {
 
 
   private set tipo(type: TipoUsuario) { this._tipo = type; }
-  private set nomeEmpresa(nome: string | null) { this._nomeEmpresa = nome ? nome.trim() : null; }
+  private set empresaId(empresaId: string) { this._empresaId = empresaId; }
   private set status(status: StatusUsuario) { this._status = status; }
   private set dataCriacao(date: Date) { this._dataCriacao = date; }
   private set dataAtualizacao(date: Date) { this._dataAtualizacao = date; }
@@ -79,7 +79,7 @@ private set nomeUsuario(username: string) {
     this.senhaHash = user.senhaHash; // Usa o setter para validar senha
     this.tipo = user.tipo; // Usa o setter para validar tipo
     this.email = user.email; // Pode ser null, então não usa setter
-    this.nomeEmpresa = user.nomeEmpresa; // Pode ser null, então não usa setter
+    this.empresaId = user.empresaId;
     this.status = user.status; // Usa o setter para validar status
 
     this.dataCriacao = user.dataCriacao;
@@ -112,13 +112,11 @@ public static async criarUsuario(props: CriarUsuarioProps, id?: string): Promise
     tipo: props.tipo,
     email: props.email || null, // Pode ser null se não houver email
     status: StatusUsuario.ATIVO,
-    nomeEmpresa: props.nomeEmpresa || null,
+    empresaId: props.empresaId,
     dataCriacao: new Date(),
     dataAtualizacao: new Date(),
     dataExclusao: null,
   };
-
-  console.log('usuarioCompleto antes de criar entidade:', usuarioCompleto.nomeEmpresa);
 
   return new Usuario(usuarioCompleto);
 }
@@ -131,7 +129,7 @@ public static async criarUsuario(props: CriarUsuarioProps, id?: string): Promise
       tipo: this.tipo,
       email: this.email,
       status: this.status,
-      nomeEmpresa: this.nomeEmpresa,
+      empresaId: this.empresaId,
       dataCriacao: this.dataCriacao,
       dataAtualizacao: this.dataAtualizacao,
       dataExclusao: this.dataExclusao,
@@ -141,7 +139,7 @@ public static async criarUsuario(props: CriarUsuarioProps, id?: string): Promise
 
   public static recuperar(props: RecuperarUsuarioProps): Usuario {
     // O Prisma/Mapper deve garantir que todos os campos de IUsuario estejam presentes
-    if (!props.id || !props.nomeUsuario || !props.senhaHash || !props.tipo || !props.status || !props.dataCriacao || !props.dataAtualizacao || props.nomeEmpresa === undefined) {
+    if (!props.id || !props.nomeUsuario || !props.senhaHash || !props.tipo || !props.status || !props.dataCriacao || !props.dataAtualizacao || !props.empresaId) {
       throw new Error("Dados incompletos para recuperar Usuário."); // Exceção de recuperação
     }
     return new Usuario(props);

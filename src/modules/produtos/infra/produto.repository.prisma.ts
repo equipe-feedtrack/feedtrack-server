@@ -27,6 +27,7 @@ export class ProdutoRepositoryPrisma extends PrismaRepository implements IProdut
         dataAtualizacao: dadosParaPersistencia.data_atualizacao,
         dataExclusao: dadosParaPersistencia.data_exclusao,
         ativo: dadosParaPersistencia.ativo,
+        empresaId: dadosParaPersistencia.empresaId,
       },
     });
   }
@@ -59,6 +60,7 @@ export class ProdutoRepositoryPrisma extends PrismaRepository implements IProdut
         dataAtualizacao: dadosParaPersistencia.data_atualizacao,
         dataExclusao: dadosParaPersistencia.data_exclusao, // Pode ser null
         ativo: dadosParaPersistencia.ativo,
+        empresaId: dadosParaPersistencia.empresaId,
       },
     });
   }
@@ -72,8 +74,8 @@ export class ProdutoRepositoryPrisma extends PrismaRepository implements IProdut
     if (filtros?.ativo !== undefined) {
       whereClause.ativo = filtros.ativo; // Filtra por ativo
     }
-    if (filtros?.cliente_id) {
-      whereClause.cliente_id = filtros.cliente_id; // Filtra por cliente
+    if (filtros?.empresaId) {
+      whereClause.empresaId = filtros.empresaId; // Filtra por empresaId
     }
     // Adicione mais lógica de filtro aqui
 

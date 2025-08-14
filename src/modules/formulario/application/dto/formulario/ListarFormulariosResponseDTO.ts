@@ -9,6 +9,7 @@ export interface ListarFormulariosResponseDTO {
   titulo: string;
   descricao?: string ;
   ativo: boolean;
+  empresaId: string;
   dataCriacao: string; // A data é enviada como uma string no formato ISO 8601
   perguntas: Pergunta[]
 }

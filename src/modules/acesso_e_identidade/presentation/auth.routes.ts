@@ -2,13 +2,10 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { UsuarioRepositoryPrisma } from '../infra/usuario/usuario.repository.prisma';
 import { LoginUseCase } from '../application/use-cases/loginUseCase';
-import { CadastroEmpresaUseCase } from '../application/use-cases/cadastroEmpresaUseCase';
-import { TipoUsuario } from '@modules/acesso_e_identidade/domain/usuario/usuario.types';
 
 const prismaClient = new PrismaClient();
 const usuarioRepository = new UsuarioRepositoryPrisma(prismaClient);
 const loginUseCase = new LoginUseCase(usuarioRepository);
-const cadastroEmpresaUseCase = new CadastroEmpresaUseCase(usuarioRepository);
 
 const authRouter = Router();
 
@@ -73,14 +70,5 @@ authRouter.post('/login', async (req, res, next) => {
  *       500:
  *         description: Erro interno do servidor.
  */
-authRouter.post('/cadastro-empresa', async (req, res, next) => {
-  try {
-    const { nomeUsuario, senha, nomeEmpresa, email } = req.body;
-    const usuario = await cadastroEmpresaUseCase.execute({ nomeUsuario, senhaHash: senha , nomeEmpresa, tipo: TipoUsuario.EMPRESA, email });
-    res.status(201).json(usuario);
-  } catch (error) {
-    next(error);
-  }
-});
 
 export { authRouter };

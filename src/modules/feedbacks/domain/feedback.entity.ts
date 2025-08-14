@@ -1,4 +1,3 @@
-
 import { TipoPergunta } from "@shared/domain/data.types";
 import { FeedbackExceptions } from "./feedback.exceptions";
 import { CriarFeedbackProps, IFeedback, RecuperarFeedbackProps, CriarFeedbackManualProps } from "./feedback.types";
@@ -14,6 +13,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   private _clienteNome: string | null;
   private _produtoNome: string | null;
   private _funcionarioNome: string | null;
+  private _empresaId: string;
 
   // Getters
   get formularioId(): string | null { return this._formularioId; }
@@ -24,6 +24,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   get clienteNome(): string | null { return this._clienteNome; }
   get produtoNome(): string | null { return this._produtoNome; }
   get funcionarioNome(): string | null { return this._funcionarioNome; }
+  get empresaId(): string { return this._empresaId; }
 
   // Setters privados
   private set formularioId(value: string | null) {
@@ -48,6 +49,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   private set clienteNome(value: string | null) { this._clienteNome = value; }
   private set produtoNome(value: string | null) { this._produtoNome = value; }
   private set funcionarioNome(value: string | null) { this._funcionarioNome = value; }
+  private set empresaId(value: string) { this._empresaId = value; }
 
   // Construtor privado
   private constructor(props: IFeedback) {
@@ -60,6 +62,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
     this.clienteNome = props.clienteNome ?? null;
     this.produtoNome = props.produtoNome ?? null;
     this.funcionarioNome = props.funcionarioNome ?? null;
+    this.empresaId = props.empresaId;
 
     if (this.formularioId && this.envioId) {
         this.validarInvariantes();
@@ -172,6 +175,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
       respostas: respostasValidadas,
       dataCriacao: new Date(),
       dataExclusao: null,
+      empresaId: props.empresaId,
     };
     return new Feedback(feedbackCompleto);
   }
@@ -187,6 +191,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
       clienteNome: props.clienteNome,
       produtoNome: props.produtoNome,
       funcionarioNome: props.funcionarioNome,
+      empresaId: props.empresaId,
     };
     return new Feedback(feedbackCompleto);
   }
@@ -196,6 +201,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
     if (!props.respostas || props.respostas.length === 0) {
       throw new FeedbackExceptions.RespostaInvalida("Respostas do feedback não podem ser vazias.");
     }
+    if (!props.empresaId) { throw new Error("empresaId é obrigatório para recuperar Feedback."); }
     return new Feedback(props);
   }
 
@@ -206,6 +212,3 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
 }
 
 export { Feedback }
-
-
-  

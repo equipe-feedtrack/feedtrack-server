@@ -43,12 +43,13 @@ export class DispararEnvioIndividualUseCase {
       campanhaId,
       formularioId: formulario.id,
       usuarioId,
-      produtoId
+      produtoId,
+      empresaId: campanha.empresaId
     });
 
     try {
-        const destinatarioTelefone = cliente.pessoa.telefone;
-        const destinatarioEmail = cliente.pessoa.email;
+        const destinatarioTelefone = cliente.telefone;
+        const destinatarioEmail = cliente.email;
         const conteudo = campanha.templateMensagem;
         const clienteId = envio.clienteId;
         const formularioId = envio.formularioId;

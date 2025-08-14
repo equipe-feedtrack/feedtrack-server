@@ -8,5 +8,5 @@ export interface LoginOutputDTO {
     nomeUsuario: string;
     email: string | null;
     tipo: string; // ou seu enum TipoUsuario
-    nomeEmpresa: string | null
+    empresaId: string;
 }

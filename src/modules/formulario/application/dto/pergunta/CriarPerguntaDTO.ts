@@ -4,4 +4,6 @@ export interface CriarPerguntaInputDTO {
   texto: string;
   tipo: 'nota' | 'texto' | 'multipla_escolha';
   opcoes?: string[] | null;
+  empresaId: string;
+
 }

@@ -25,8 +25,8 @@ export class LoginUseCase implements IUseCase<LoginInputDTO, LoginOutputDTO> {
         id: usuario.id,
         nomeUsuario: usuario.nomeUsuario,
         email: usuario.email || null,
-        tipo: usuario.tipo,
-        nomeEmpresa: usuario.nomeEmpresa || null
+        tipo: usuario.tipo, 
+        empresaId: usuario.empresaId
     };
   }
 }

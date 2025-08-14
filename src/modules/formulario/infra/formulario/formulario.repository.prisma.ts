@@ -12,18 +12,7 @@ export class FormularioRepositoryPrisma implements IFormularioRepository<Formula
     const dadosFormulario = FormularioMap.toPersistence(formulario);
 
     await this.prisma.formulario.create({
-      data: {
-        ...dadosFormulario,
-        perguntas: {
-          create: formulario.perguntas.map((p, index) => ({
-            ordemNaLista: index, // Fornece o valor para o campo obrigatório.
-            pergunta: {
-              connect: { id: p.id },
-            },
-            
-          })),
-        },
-      },
+      data: dadosFormulario,
     });
   }
 
@@ -35,44 +24,25 @@ export class FormularioRepositoryPrisma implements IFormularioRepository<Formula
   async recuperarPorUuid(id: string): Promise<Formulario | null> {
     const formularioDb = await this.prisma.formulario.findUnique({
       where: { id },
-      // ✅ CORREÇÃO: Para uma relação N-N explícita, o include precisa ser aninhado
-      // para buscar os dados da Pergunta através da tabela de junção.
-      include: {
-        
-        perguntas: {
-          include: {
-            pergunta: true,
-          },
-        },
-      },
     });
 
     if (!formularioDb) return null;
 
-    // O Mapper lida com a conversão da estrutura aninhada para o domínio.
     return FormularioMap.toDomain(formularioDb);
   }
   
-  async listar(filtros?: { ativo?: boolean }): Promise<Formulario[]> {
-    const formulariosDb = await this.prisma.formulario.findMany({
-      where: {
-        ativo: filtros?.ativo,
-      },
-      include: {
-        perguntas: {
-          include: {
-            pergunta: {
-              select:{
-                id: true,
-                tipo: true,
-                opcoes: true,
-                texto: true
+  async listar(filtros?: { ativo?: boolean, empresaId?: string }): Promise<Formulario[]> {
+    const whereClause: any = {};
 
-              }
-            }
-          },
-        },
-      },
+    if (filtros?.ativo !== undefined) {
+      whereClause.ativo = filtros.ativo;
+    }
+    if (filtros?.empresaId) {
+      whereClause.empresaId = filtros.empresaId;
+    }
+
+    const formulariosDb = await this.prisma.formulario.findMany({
+      where: whereClause,
     });
     return formulariosDb.map(form => FormularioMap.toDomain(form));
   }
@@ -84,18 +54,7 @@ export class FormularioRepositoryPrisma implements IFormularioRepository<Formula
 
     await this.prisma.formulario.update({
         where: { id: formulario.id },
-        data: {
-            ...dadosEscalares,
-            perguntas: {
-                deleteMany: {},
-                create: formulario.perguntas.map((p, index) => ({
-                    ordemNaLista: index,
-                    pergunta: {
-                        connect: { id: p.id }
-                    }
-                }))
-            }
-        }
+        data: dadosEscalares
     });
   }
 
@@ -107,10 +66,6 @@ export class FormularioRepositoryPrisma implements IFormularioRepository<Formula
   }
 
   async deletar(id: string): Promise<void> {
-    // Garante que as entradas na tabela de junção sejam deletadas primeiro.
-    await this.prisma.perguntasOnFormularios.deleteMany({
-        where: { formularioId: id }
-    });
     await this.prisma.formulario.delete({
       where: { id },
     });

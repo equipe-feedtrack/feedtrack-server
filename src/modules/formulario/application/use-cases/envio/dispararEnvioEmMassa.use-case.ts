@@ -37,7 +37,8 @@ export class DispararEnvioEmMassaUseCase {
         campanhaId: campanha.id,
         formularioId: campanha.formularioId,
         usuarioId: "system-user-uuid",
-        produtoId
+        produtoId,
+        empresaId: campanha.empresaId
       });
       enviosPendentes.push(envio);
     }
@@ -63,9 +64,9 @@ export class DispararEnvioEmMassaUseCase {
           }
 
           if (campanha.canalEnvio === CanalEnvio.EMAIL) {
-              await this.EmailGateway.enviar(clienteParaEnvio.pessoa.email, conteudo, formularioId, clienteId, produtoId);
+              await this.EmailGateway.enviar(clienteParaEnvio.email, conteudo, formularioId, clienteId, produtoId);
           } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-              await this.whatsAppGateway.enviar(clienteParaEnvio.pessoa.telefone, conteudo, formularioId, clienteId, produtoId );
+              await this.whatsAppGateway.enviar(clienteParaEnvio.telefone, conteudo, formularioId, clienteId, produtoId );
           } else {
               throw new Error("Canal de envio inválido na campanha.");
           }

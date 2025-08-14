@@ -17,6 +17,8 @@ export class PerguntaMap {
       texto: pergunta.texto,
       tipo: pergunta.tipo,
       ativo: pergunta.ativo,
+
+      empresaId: pergunta.empresaId,
       // 3. Converte 'null' em 'undefined' para respeitar o DTO
       opcoes: pergunta.opcoes ?? undefined,
       // 4. Converte as datas para o formato string ISO 8601
@@ -57,6 +59,7 @@ export class PerguntaMap {
       tipo: tipoPergunta,
       opcoes: opcoesTratadas, // Passa as opções já tratadas
       ativo: raw.ativo,
+      empresaId: raw.empresaId,
       dataCriacao: raw.dataCriacao,
       dataAtualizacao: raw.dataAtualizacao,
       dataExclusao: raw.dataExclusao,
@@ -66,17 +69,19 @@ export class PerguntaMap {
     return Pergunta.recuperar(propsParaEntidade);
   }
 
-  public static toPersistence(pergunta: Pergunta) {
-    // Aqui fazemos a "tradução" de camelCase (domínio) para snake_case (banco).
-    return {
-      id: pergunta.id,
-      texto: pergunta.texto,
-      tipo: pergunta.tipo,
-      opcoes: pergunta.opcoes ?? Prisma.JsonNull,
-      ativo: pergunta.ativo,
-      dataCriacao: pergunta.dataCriacao,
-      dataAtualizacao: pergunta.dataAtualizacao,
-      dataExclusao: pergunta.dataExclusao,
-    };
-  }
+public static toPersistence(pergunta: Pergunta) {
+  return {
+    id: pergunta.id,
+    texto: pergunta.texto,
+    tipo: pergunta.tipo,
+    opcoes: pergunta.opcoes ?? Prisma.JsonNull,
+    ativo: pergunta.ativo,
+    empresaId: pergunta.empresaId,
+    dataCriacao: pergunta.dataCriacao,
+    dataAtualizacao: pergunta.dataAtualizacao,
+    dataExclusao: pergunta.dataExclusao,
+
+  };
+}
+
 }

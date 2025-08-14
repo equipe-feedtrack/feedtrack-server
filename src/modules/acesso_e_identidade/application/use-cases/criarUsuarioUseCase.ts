@@ -13,3 +13,4 @@ export class CriarUsuarioUseCase
     return await this.usuarioRepository.inserir(usuario);
   }
 }
+

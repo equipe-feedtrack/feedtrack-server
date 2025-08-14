@@ -12,6 +12,7 @@ export class Envio extends Entity<IEnvio> implements IEnvio {
   private _campanhaId: string; // Adicionado para vincular o envio à campanha
   private _usuarioId: string;
   private _produtoId: string;
+  private _empresaId: string;
   private _dataCriacao: Date;
   private _dataEnvio: Date | null;
   private _tentativasEnvio: number;
@@ -25,6 +26,7 @@ export class Envio extends Entity<IEnvio> implements IEnvio {
   get campanhaId(): string { return this._campanhaId; } // Getter para o ID da campanha
   get usuarioId(): string { return this._usuarioId; }
   get produtoId(): string { return this._produtoId; }
+  get empresaId(): string { return this._empresaId; }
   get dataCriacao(): Date { return this._dataCriacao; }
   get dataEnvio(): Date | null { return this._dataEnvio; }
   get tentativasEnvio(): number { return this._tentativasEnvio; }

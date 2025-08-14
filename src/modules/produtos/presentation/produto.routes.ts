@@ -21,10 +21,9 @@ const prisma = new PrismaClient();
 
 // Repositórios
 const produtoRepository = new ProdutoRepositoryPrisma(prisma);
-const clienteRepository = new ClienteRepositoryPrisma(prisma);
 
 // Casos de Uso
-const criarProdutoUseCase = new CriarProdutoUseCase(produtoRepository, clienteRepository);
+const criarProdutoUseCase = new CriarProdutoUseCase(produtoRepository);
 const buscarProdutoPorIdUseCase = new BuscarProdutoPorIdUseCase(produtoRepository);
 const atualizarProdutoUseCase = new AtualizarProdutoUseCase(produtoRepository);
 const deletarProdutoUseCase = new DeletarProdutoUseCase(produtoRepository);

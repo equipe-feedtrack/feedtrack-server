@@ -8,6 +8,7 @@ import { formularioRouter } from "@modules/formulario/presentation/formulario.ro
 import { perguntaRouter } from "@modules/formulario/presentation/pergunta.routes";
 import { clienteRouter } from "@modules/gestao_clientes/presentation/gestao_clientes.routes";
 import produtoRouter from "@modules/produtos/presentation/produto.routes";
+import { empresaRoutes } from "@modules/empresa/presentation/empresa.routes";
 import Express, { Router } from "express";
 
 const apiv1Router: Router = Express.Router();
@@ -33,6 +34,8 @@ apiv1Router.use(funcionarioRouter)
 apiv1Router.use(usuarioRouter)
 
 apiv1Router.use(authRouter); // Added
+
+apiv1Router.use(empresaRoutes);
 
 
 
