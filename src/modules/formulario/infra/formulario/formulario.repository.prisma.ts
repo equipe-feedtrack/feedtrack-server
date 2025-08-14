@@ -20,6 +20,7 @@ export class FormularioRepositoryPrisma implements IFormularioRepository<Formula
             pergunta: {
               connect: { id: p.id },
             },
+            
           })),
         },
       },
@@ -37,6 +38,7 @@ export class FormularioRepositoryPrisma implements IFormularioRepository<Formula
       // ✅ CORREÇÃO: Para uma relação N-N explícita, o include precisa ser aninhado
       // para buscar os dados da Pergunta através da tabela de junção.
       include: {
+        
         perguntas: {
           include: {
             pergunta: true,
@@ -59,7 +61,15 @@ export class FormularioRepositoryPrisma implements IFormularioRepository<Formula
       include: {
         perguntas: {
           include: {
-            pergunta: true,
+            pergunta: {
+              select:{
+                id: true,
+                tipo: true,
+                opcoes: true,
+                texto: true
+
+              }
+            }
           },
         },
       },

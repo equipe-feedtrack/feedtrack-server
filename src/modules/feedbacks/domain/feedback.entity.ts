@@ -148,8 +148,8 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
           respostaLimpa.resposta_texto = resposta_texto;
           break;
         case TipoPergunta.NOTA:
-          if (typeof nota !== 'number' || nota < 0 || nota > 10) {
-            throw new FeedbackExceptions.RespostaInvalida("Nota inválida para tipo NOTA (deve ser número entre 0 e 10).");
+          if (typeof nota !== 'number' || nota < 0 || nota >5) {
+            throw new FeedbackExceptions.RespostaInvalida("Nota inválida para tipo NOTA (deve ser número entre 0 e 5).");
           }
           respostaLimpa.nota = nota;
           break;

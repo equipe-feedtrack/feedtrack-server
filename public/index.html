@@ -1,205 +1,346 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Avaliação do Produto</title>
-  <style>
-    body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #f0f2f5;
-  color: #333;
-  margin: 0;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - Formulário</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-.container {
-  max-width: 600px;
-  width: 100%;
-}
+        :root {
+            --background: #f8f9fa;
+            --foreground: #111827;
+            --muted-foreground: #6b7280;
+            --card: #ffffff;
+            --card-foreground: #111827;
+            --primary: #3b82f6;
+            --primary-foreground: #ffffff;
+            --border: #e5e7eb;
+            --input: #f3f4f6;
+            --success: #16a34a;
+        }
 
-h1 {
-  color: #1c1e21;
-  border-bottom: 2px solid #ccc;
-  padding-bottom: 10px;
-}
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: var(--background);
+            color: var(--foreground);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
-.card {
-  background-color: #fff;
-  border: 1px solid #dddfe2;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+        .container {
+            width: 100%;
+            max-width: 550px;
+            background-color: var(--card);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
 
-.card h2 {
-  font-size: 1.2em;
-  color: #4b4f56;
-  margin-top: 0;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
-}
+        h1 {
+            color: var(--foreground);
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2rem;
+            font-weight: 700;
+        }
 
-.info-item {
-  margin-bottom: 8px;
-}
+        .subtitle {
+            text-align: center;
+            margin-bottom: 35px;
+            font-size: 1rem;
+            color: var(--muted-foreground);
+        }
 
-.info-item strong {
-  display: inline-block;
-  width: 100px;
-  color: #606770;
-}
+        .pergunta {
+            margin-bottom: 25px;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: fadeIn 0.5s forwards;
+        }
 
-#perguntas-lista {
-  list-style: none;
-  padding: 0;
-}
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-#perguntas-lista li {
-  background-color: #f9f9f9;
-  padding: 10px;
-  border: 1px solid #eee;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--card-foreground);
+        }
 
-textarea {
-  width: 100%;
-  padding: 6px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  resize: vertical;
-}
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            color: var(--foreground);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box;
+        }
 
-.rating span.estrela {
-  cursor: pointer;
-  font-size: 22px;
-  color: #ccc;
-}
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 1.2em;
+        }
 
-.rating span.estrela.selecionada {
-  color: #f1c40f;
-}
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
 
-#btnEnviar {
-  padding: 10px 20px; 
-  background-color: #2ecc71; 
-  color: #fff; 
-  border: none; 
-  border-radius: 5px; 
-  cursor: pointer;
-}
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
 
-  </style>
+        button:hover {
+            background-color: #2563eb; /* Darker primary */
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        #thankYouMessage {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        #thankYouMessage .icon {
+            color: var(--success);
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+        }
+
+        #thankYouMessage h2 {
+            color: var(--foreground);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        #thankYouMessage p {
+            font-size: 1.1rem;
+            color: var(--muted-foreground);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 50px;
+        }
+        .loader .spinner {
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Avaliação do Produto</h1>
+    <div class="container" id="formContainer">
+        <h1>Deixe seu Feedback</h1>
+        <p class="subtitle">Sua opinião nos ajuda a melhorar.</p>
 
-    <div class="card">
-      <h2>Cliente</h2>
-      <div class="info-item">
-        <strong>Nome:</strong> <span id="clienteNome"></span>
-      </div>
-      <div class="info-item">
-        <strong>Produto:</strong> <span id="produtoNome"></span>
-      </div>
+        <div id="loader" class="loader">
+            <div class="spinner"></div>
+            <p>Carregando formulário...</p>
+        </div>
+
+        <form id="formFeedback" style="display: none;">
+            <div id="perguntasContainer"></div>
+            <button type="submit" id="submitButton">Enviar Feedback</button>
+        </form>
     </div>
 
-    <div class="card">
-      <h2>Responda o Formulário</h2>
-      <ul id="perguntas-lista"></ul>
-      <button id="btnEnviar">Enviar Avaliação</button>
-      <div id="message-container" style="margin-top: 15px;"></div>
+    <div class="container" id="thankYouContainer" style="display: none;">
+        <div id="thankYouMessage">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <h2>Obrigado!</h2>
+            <p>Seu feedback foi recebido com sucesso. Agradecemos sua contribuição!</p>
+        </div>
     </div>
-  </div>
 
-  <script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const url = new URL(window.location.href);
+            const pathSegments = url.pathname.split("/");
 
-// --- Extrair dados da URL ---
-const url = new URL(window.location.href);
-const pathSegments = url.pathname.split('/');
-const formularioId = pathSegments[pathSegments.indexOf('formulario') + 1] || '';
-const clienteId = pathSegments[pathSegments.indexOf('cliente') + 1] || '';
-const produtoId = pathSegments[pathSegments.indexOf('produto') + 1] || '';
+            const formularioId = pathSegments[pathSegments.indexOf("formulario") + 1] || "";
+            const clienteId = pathSegments[pathSegments.indexOf("cliente") + 1] || "";
 
-// Nomes via query string
-const urlParams = new URLSearchParams(window.location.search);
-const clienteNome = urlParams.get('clienteNome') || 'Cliente';
-const produtoNome = urlParams.get('produtoNome') || 'Produto';
+            const formContainer = document.getElementById("formContainer");
+            const thankYouContainer = document.getElementById("thankYouContainer");
+            const formFeedback = document.getElementById("formFeedback");
+            const perguntasContainer = document.getElementById("perguntasContainer");
+            const submitButton = document.getElementById("submitButton");
+            const loader = document.getElementById("loader");
 
-// Perguntas via query string (JSON encoded)
-let perguntas = [];
-try {
-  const perguntasStr = urlParams.get('perguntas');
-  if (perguntasStr) perguntas = JSON.parse(decodeURIComponent(perguntasStr));
-} catch (err) {
-  console.error('Erro ao ler perguntas da URL', err);
-}
+            async function fetchFormularioData() {
+                if (!formularioId || !clienteId) {
+                    loader.innerHTML = "<p>Erro: IDs de formulário ou cliente não encontrados no URL.</p>";
+                    return;
+                }
 
-// Preencher dados
-document.getElementById('clienteNome').textContent = clienteNome;
-document.getElementById('produtoNome').textContent = produtoNome;
+                try {
+                    const res = await fetch(
+                        `/api/v1/resposta-formulario-get/formulario/${formularioId}/cliente/${clienteId}`
+                    );
+                    if (!res.ok) throw new Error('Falha ao buscar dados do formulário');
+                    const data = await res.json();
 
-const perguntasLista = document.getElementById('perguntas-lista');
-perguntas.forEach(p => {
-  const item = document.createElement('li');
-  let htmlResposta = '';
+                    for (const [index, pergunta] of data.formulario.perguntas.entries()) {
+                        const perguntaRes = await fetch(
+                            `/api/v1/pergunta/${pergunta.perguntaId}`
+                        );
+                        if (!perguntaRes.ok) continue; // Pula para a próxima pergunta se esta falhar
+                        const perguntaData = await perguntaRes.json();
 
-  if (p.tipo === 'nota') {
-    htmlResposta = `<div class="rating" data-pergunta-id="${p.id}">`;
-    for (let i = 1; i <= 5; i++) {
-      htmlResposta += `<span class="estrela" data-valor="${i}">★</span>`;
-    }
-    htmlResposta += `</div>`;
-  } else {
-    htmlResposta = `<textarea rows="3" data-pergunta-id="${p.id}"></textarea>`;
-  }
+                        const div = document.createElement("div");
+                        div.className = "pergunta";
+                        div.style.animationDelay = `${index * 0.1}s`;
 
-  item.innerHTML = `<strong>Pergunta:</strong> ${p.texto}<br>${htmlResposta}`;
-  perguntasLista.appendChild(item);
-});
+                        const label = document.createElement("label");
+                        label.textContent = perguntaData.texto;
+                        label.htmlFor = perguntaData.id;
+                        div.appendChild(label);
 
-// Eventos das estrelas
-document.querySelectorAll('.rating').forEach(div => {
-  div.querySelectorAll('.estrela').forEach(star => {
-    star.addEventListener('click', () => {
-      const valor = parseInt(star.dataset.valor);
-      div.dataset.notaSelecionada = valor;
-      div.querySelectorAll('.estrela').forEach(s => {
-        s.classList.toggle('selecionada', parseInt(s.dataset.valor) <= valor);
-      });
-    });
-  });
-});
+                        const tipo = perguntaData.tipo.toLowerCase();
+                        let input;
 
-// Enviar feedback
-document.getElementById('btnEnviar').addEventListener('click', () => {
-  const respostas = Array.from(document.querySelectorAll('#perguntas-lista > li')).map(li => {
-    const ratingDiv = li.querySelector('.rating');
-    if (ratingDiv) {
-      return { perguntaId: ratingDiv.dataset.perguntaId, resposta: parseInt(ratingDiv.dataset.notaSelecionada || 0) };
-    }
-    const textarea = li.querySelector('textarea');
-    return { perguntaId: textarea.dataset.perguntaId, resposta: textarea.value };
-  });
+                        if (tipo === "texto") {
+                            input = document.createElement("textarea");
+                            input.placeholder = "Digite sua resposta aqui...";
+                        } else if (tipo === "nota" && Array.isArray(perguntaData.opcoes)) {
+                            input = document.createElement("select");
+                            const placeholder = document.createElement("option");
+                            placeholder.value = "";
+                            placeholder.textContent = "Selecione uma nota";
+                            placeholder.disabled = true;
+                            placeholder.selected = true;
+                            input.appendChild(placeholder);
+                            
+                            perguntaData.opcoes.forEach((op) => {
+                                const option = document.createElement("option");
+                                option.value = op;
+                                option.textContent = op;
+                                input.appendChild(option);
+                            });
+                        } else {
+                            input = document.createElement("input");
+                            input.type = "text";
+                            input.placeholder = "Digite sua resposta...";
+                        }
 
-  fetch('/api/v1/feedback', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ formularioId, clienteId, produtoId, respostas })
-  })
-  .then(res => {
-    if (!res.ok) throw new Error(res.statusText);
-    return res.json();
-  })
-  .then(() => alert('Avaliação enviada com sucesso!'))
-  .catch(err => alert('Erro ao enviar avaliação: ' + err.message));
-});
+                        input.dataset.tipo = tipo;
+                        input.id = perguntaData.id;
+                        input.name = perguntaData.id;
+                        input.required = true;
+                        div.appendChild(input);
+                        perguntasContainer.appendChild(div);
+                    }
+                    
+                    loader.style.display = 'none';
+                    formFeedback.style.display = 'block';
 
+                } catch (err) {
+                    console.error("Erro ao carregar formulário", err);
+                    loader.innerHTML = "<p>Ocorreu um erro ao carregar as perguntas. Tente novamente mais tarde.</p>";
+                }
+            }
 
-  </script>
+            formFeedback.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                submitButton.disabled = true;
+                submitButton.textContent = "Enviando...";
+
+                const respostas = Array.from(perguntasContainer.querySelectorAll('input, select, textarea')).map(input => {
+                    const tipo = input.dataset.tipo;
+                    const value = input.value;
+                    const id = input.id;
+
+                    if (tipo === "texto") return { perguntaId: id, tipo, resposta_texto: value };
+                    if (tipo === "nota") return { perguntaId: id, tipo, nota: Number(value) };
+                    return { perguntaId: id, tipo, resposta_texto: value };
+                });
+
+                const payload = { formularioId, envioId: clienteId, respostas };
+
+                try {
+                    const res = await fetch("/api/v1/feedback/manual", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
+
+                    if (!res.ok) {
+                        const errorText = await res.text();
+                        throw new Error(errorText || "Falha ao enviar o feedback.");
+                    }
+                    
+                    formContainer.style.display = 'none';
+                    thankYouContainer.style.display = 'block';
+
+                } catch (err) {
+                    console.error(err);
+                    alert("Erro ao enviar feedback: " + err.message);
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Enviar Feedback";
+                }
+            });
+
+            fetchFormularioData();
+        });
+    </script>
 </body>
 </html>
