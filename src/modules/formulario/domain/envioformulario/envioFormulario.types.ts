@@ -8,6 +8,7 @@ export interface IEnvio {
   formularioId: string;
   campanhaId: string;
   usuarioId: string ;
+  produtoId: string;
   dataCriacao: Date;
   dataEnvio: Date | null;
   tentativasEnvio: number;
@@ -20,3 +21,5 @@ export type CriarEnvioProps = Omit<
 >;
 
 export type RecuperarEnvioProps = IEnvio;
+
+export type AtualizarEnvioProps = Partial<Omit<IEnvio, 'id' | 'dataCriacao'>>;

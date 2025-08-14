@@ -1,5 +1,5 @@
 import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.repository.interface";
-import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
 import { IEmailGateway, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
@@ -22,8 +22,8 @@ export class DispararEnvioIndividualUseCase {
     private readonly EmailGateway: IEmailGateway,
   ) {}
 
-  public async execute(input: { clienteId: string, campanhaId: string, usuarioId: string }): Promise<void> {
-    const { clienteId, campanhaId, usuarioId } = input;
+  public async execute(input: { clienteId: string, campanhaId: string, usuarioId: string, produtoId: string }): Promise<void> {
+    const { clienteId, campanhaId, usuarioId, produtoId } = input;
 
     const cliente = await this.clienteRepository.recuperarPorUuid(clienteId);
     if (!cliente) {
@@ -43,6 +43,7 @@ export class DispararEnvioIndividualUseCase {
       campanhaId,
       formularioId: formulario.id,
       usuarioId,
+      produtoId
     });
 
     try {
@@ -59,7 +60,7 @@ export class DispararEnvioIndividualUseCase {
             throw new Error("E-mail do cliente não fornecido.");
         }
         console.log("[Email: ]",campanha.canalEnvio);
-        await this.EmailGateway.enviar(destinatarioEmail, conteudo, formularioId, clienteId);
+        await this.EmailGateway.enviar(destinatarioEmail, conteudo, formularioId, clienteId, produtoId);
 
       }
        if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
@@ -67,7 +68,7 @@ export class DispararEnvioIndividualUseCase {
             throw new Error("Telefone do cliente não fornecido.");
         }
         // console.log(campanha.canalEnvio);
-        await this.whatsAppGateway.enviar(destinatarioTelefone, conteudo, formularioId, clienteId);
+        await this.whatsAppGateway.enviar(destinatarioTelefone, conteudo, formularioId, clienteId, produtoId);
 
       } else {
         throw new Error("Canal de envio inválido na campanha.");

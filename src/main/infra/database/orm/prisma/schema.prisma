@@ -160,6 +160,7 @@ model Produto {
 
   // Relação Um-para-Muitos (um Cliente pode ter vários Produtos)
   clientes ClientesOnProdutos[]
+  enviosFormulario EnvioFormulario[]
 
   @@map("produtos")
 }
@@ -254,11 +255,15 @@ model EnvioFormulario {
   campanhaId   String?     @map("campanha_id")
   usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   usuarioId    String     @map("usuario_id")
+  
+  produto      Produto?    @relation(fields: [produtoId], references: [id], onDelete: SetNull)
+  produtoId    String?     @map("produto_id")
 
   feedback     Feedback?   @relation(name: "EnvioFormularioToFeedback")
 
   @@map("envios_formulario")
 }
+
 
 model Feedback {
   id               String    @id @default(uuid())

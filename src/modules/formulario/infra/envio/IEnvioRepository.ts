@@ -1,4 +1,4 @@
-import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { Cliente } from "@modules/gestao_clientes/domain/cliente.entity";
 
 
@@ -16,11 +16,11 @@ export interface IEnvioRepository {
 
 // src/application/gateways/IWhatsAppGateway.ts
 export interface IWhatsAppGateway {
-  enviar(destinatario: string | null, conteudo: string, formularioId: string, clienteId:string): Promise<void>;
+  enviar(destinatario: string | null, conteudo: string, formularioId: string, clienteId:string, produtoId: string): Promise<void>;
 }
 
 export interface IEmailGateway {
-  enviar(destinatario: string | null, conteudo: string, clienteId: string, formularioId: string ): Promise<void>;
+  enviar(destinatario: string | null, conteudo: string, clienteId: string, formularioId: string, produtoId: string ): Promise<void>;
 }
 
 // src/application/services/IFeedbackService.ts

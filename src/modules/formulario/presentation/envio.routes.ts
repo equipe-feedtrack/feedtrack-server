@@ -122,6 +122,7 @@ envioRouter.post('/envio/individual', envioController.dispararIndividual);
  *             required:
  *               - campanhaId
  *               - usuarioId
+ *               - produtoId
  *             properties:
  *               campanhaId:
  *                 type: string
@@ -129,6 +130,9 @@ envioRouter.post('/envio/individual', envioController.dispararIndividual);
  *               usuarioId:
  *                 type: string
  *                 description: ID do usuário que está disparando o envio.
+ *               produtoId:
+ *                 type: string
+ *                 description: ID do produto associado ao envio.
  *     responses:
  *       200:
  *         description: Envios em massa disparados com sucesso.

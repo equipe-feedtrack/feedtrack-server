@@ -1,7 +1,7 @@
 // src/modules/formulario/infra/mappers/envio.map.ts
 
 import { EnvioFormulario as EnvioPrisma, Prisma, StatusFormulario } from '@prisma/client';
-import { Envio } from '@modules/formulario/domain/envioformulario/envio.entity.ts';
+import { Envio } from '@modules/formulario/domain/envioformulario/envio.entity';
 import { IEnvio } from '@modules/formulario/domain/envioformulario/envioFormulario.types';
 
 export class EnvioMap {
@@ -13,6 +13,7 @@ export class EnvioMap {
       id: raw.id,
       status: raw.status,
       feedbackId: null, // Esta propriedade agora existe e é mapeada
+      produtoId: raw.produtoId ?? '',
       clienteId: raw.clienteId ?? '',
       formularioId: raw.formularioId ?? '',
       campanhaId: raw.campanhaId ?? '',

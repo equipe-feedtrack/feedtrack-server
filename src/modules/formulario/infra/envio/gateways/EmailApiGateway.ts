@@ -12,11 +12,11 @@ export class EmailGateway implements IEmailGateway {
   /**
    * Envia um e-mail usando a API externa de envio FeedTrack.
    */
-  async enviar(destinatario: string, conteudo: string, formularioId: string, clienteId: string): Promise<void> {
+  async enviar(destinatario: string, conteudo: string, formularioId: string, clienteId: string, produtoId: string): Promise<void> {
     console.log(`[EmailGateway] Preparando para enviar e-mail para: ${destinatario}`);
 
     try {
-      const linkCompleto = `${this.feedbackUrl}/formulario/${formularioId}/cliente/${clienteId}`;
+      const linkCompleto = `${this.feedbackUrl}/formulario/${formularioId}/cliente/${clienteId}/produto/${produtoId}`;
 
       // Corpo HTML mais elaborado e com identidade FeedTrack
       const mensagemCompleta = `

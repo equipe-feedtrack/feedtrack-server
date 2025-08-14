@@ -238,7 +238,7 @@ router.get('/feedbacks', feedbackController.buscarTodos);
  */
 router.delete('/feedback/:id', feedbackController.excluirLogicamente);
 
-router.get('/resposta-formulario/formulario/:formularioId/cliente/:clienteId', (req, res) => {
+router.get('/resposta-formulario/formulario/:formularioId/cliente/:clienteId/produto/:produtoId', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
 
