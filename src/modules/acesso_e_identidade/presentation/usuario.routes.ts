@@ -34,7 +34,7 @@ const usuarioRouter = Router();
 
 /**
  * @swagger
- * /usuarios:
+ * /usuario:
  *   post:
  *     summary: Cria um novo usuário
  *     tags: [Usuários]
@@ -143,7 +143,7 @@ usuarioRouter.get('/usuarios/nome/:nomeUsuario', async (req, res, next) => {
 
 /**
  * @swagger
- * /usuarios/{id}:
+ * /atualizar-usuario/{id}:
  *   put:
  *     summary: Atualiza um usuário existente
  *     tags: [Usuários]

@@ -35,7 +35,7 @@ const funcionarioRouter = Router();
 
 /**
  * @swagger
- * /funcionarios:
+ * /funcionario:
  *   post:
  *     summary: Cria um novo funcionário
  *     tags: [Funcionários]

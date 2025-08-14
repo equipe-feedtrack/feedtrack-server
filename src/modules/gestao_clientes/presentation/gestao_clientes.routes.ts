@@ -439,7 +439,7 @@ clienteRouter.delete('/deletar-cliente/:id', clienteController.deletar);
  * /cliente/{clienteId}/produtos:
  *   post:
  *     summary: Gerencia produtos associados a um cliente (adicionar/remover)
- *     tags: [Clientes]
+ *     tags: Clientes
  *     parameters:
  *       - in: path
  *         name: clienteId

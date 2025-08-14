@@ -22,14 +22,11 @@ export class LoginUseCase implements IUseCase<LoginInputDTO, LoginOutputDTO> {
 
     // Retorna dados do usuário sem a senha
     return {
-      sucesso: true,
-      usuario: {
         id: usuario.id,
         nomeUsuario: usuario.nomeUsuario,
         email: usuario.email || null,
         tipo: usuario.tipo,
         nomeEmpresa: usuario.nomeEmpresa || null
-      },
     };
   }
 }

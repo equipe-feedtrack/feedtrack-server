@@ -24,6 +24,13 @@ export class AtualizarProdutoUseCase {
     if (input.valor !== undefined) {
       produto.atualizarValor(input.valor); // Crie este método na entidade Produto
     }
+    if (input.ativo !== undefined) {
+      if (input.ativo) {
+        produto.ativar();
+      } else {
+        produto.inativar();
+      }
+    }
     
     // 3. Persistir a entidade atualizada
     await this.produtoRepository.atualizar(produto);

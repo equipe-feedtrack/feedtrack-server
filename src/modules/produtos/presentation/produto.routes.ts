@@ -11,6 +11,7 @@ import { BuscarProdutoPorIdUseCase } from '../application/use-cases/buscar_produ
 import { CriarProdutoUseCase } from '../application/use-cases/criar_produto';
 import { ClienteRepositoryPrisma } from '@modules/gestao_clientes/infra/cliente.repository.prisma';
 import { ProdutoRepositoryPrisma } from '../infra/produto.repository.prisma';
+import { ReativarProdutoUseCase } from '../application/use-cases/reativar_produto';
 
 // --- INICIALIZAÇÃO DE DEPENDÊNCIAS ---
 // O PrismaClient deve ser instanciado uma única vez na aplicação.
@@ -28,6 +29,7 @@ const buscarProdutoPorIdUseCase = new BuscarProdutoPorIdUseCase(produtoRepositor
 const atualizarProdutoUseCase = new AtualizarProdutoUseCase(produtoRepository);
 const deletarProdutoUseCase = new DeletarProdutoUseCase(produtoRepository);
 const listarProdutosUseCase = new ListarProdutosUseCase(produtoRepository);
+const reativarProdutoUseCase = new ReativarProdutoUseCase(produtoRepository)
 
 // Controlador
 const produtoController = new ProdutoController(
@@ -36,6 +38,7 @@ const produtoController = new ProdutoController(
   atualizarProdutoUseCase,
   deletarProdutoUseCase,
   listarProdutosUseCase,
+  reativarProdutoUseCase
 );
 
 // --- DEFINIÇÃO DO ROUTER ---
@@ -43,7 +46,7 @@ const produtoRouter = Router();
 
 /**
  * @swagger
- * /product:
+ * /produto:
  *   post:
  *     summary: Cria um novo produto
  *     tags: [Produtos]
@@ -106,7 +109,7 @@ produtoRouter.post('/produto', produtoController.criarProduto);
 
 /**
  * @swagger
- * /product/{id}:
+ * /produto/{id}:
  *   get:
  *     summary: Busca um produto por ID
  *     tags: [Produtos]
@@ -154,7 +157,7 @@ produtoRouter.get('/produto/:id', produtoController.buscarProdutoPorId);
 
 /**
  * @swagger
- * /products:
+ * /produtos:
  *   get:
  *     summary: Lista todos os produtos ou produtos filtrados
  *     tags: [Produtos]
@@ -206,7 +209,7 @@ produtoRouter.get('/produtos', produtoController.listarProdutos);
 
 /**
  * @swagger
- * /update-product/{id}:
+ * /atualizar-produto/{id}:
  *   put:
  *     summary: Atualiza um produto existente
  *     tags: [Produtos]
@@ -234,6 +237,9 @@ produtoRouter.get('/produtos', produtoController.listarProdutos);
  *                 type: number
  *                 format: float
  *                 description: Novo valor do produto (opcional).
+ *               ativo:
+ *                 type: boolean
+ *                 description: Define se o produto está ativo ou inativo (opcional).
  *     responses:
  *       200:
  *         description: Produto atualizado com sucesso.
@@ -293,5 +299,53 @@ produtoRouter.put('/atualizar-produto/:id', produtoController.atualizarProduto);
  *         description: Erro interno do servidor.
  */
 produtoRouter.delete('/deletar-produto/:id', produtoController.deletarProduto);
+
+/**
+ * @swagger
+ * /reativar-produto/{id}:
+ *   patch:
+ *     summary: Reativa um produto (define ativo como true e dataExclusao como null)
+ *     tags: [Produtos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do produto a ser reativado.
+ *     responses:
+ *       200:
+ *         description: Produto reativado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 nome:
+ *                   type: string
+ *                 descricao:
+ *                   type: string
+ *                 valor:
+ *                   type: number
+ *                 ativo:
+ *                   type: boolean
+ *                 dataCriacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataAtualizacao:
+ *                   type: string
+ *                   format: date-time
+ *                 dataExclusao:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *       404:
+ *         description: Produto não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+produtoRouter.patch('/reativar-produto/:id', produtoController.reativarProduto);
 
 export default produtoRouter;

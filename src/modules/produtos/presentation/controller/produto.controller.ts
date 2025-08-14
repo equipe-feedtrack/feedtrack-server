@@ -7,6 +7,7 @@ import { DeletarProdutoUseCase } from '@modules/produtos/application/use-cases/d
 import { AtualizarProdutoUseCase } from '@modules/produtos/application/use-cases/atualizar_produto';
 import { BuscarProdutoPorIdUseCase } from '@modules/produtos/application/use-cases/buscar_produto_por_id';
 import { CriarProdutoUseCase } from '@modules/produtos/application/use-cases/criar_produto';
+import { ReativarProdutoUseCase } from '@modules/produtos/application/use-cases/reativar_produto';
 
 // Importar DTOs de input/output
 import { AtualizarProdutoInputDTO } from '@modules/produtos/application/dto/atualizar_produto_input.dto';
@@ -22,7 +23,8 @@ export class ProdutoController {
     private readonly buscarProdutoPorIdUseCase: BuscarProdutoPorIdUseCase,
     private readonly atualizarProdutoUseCase: AtualizarProdutoUseCase,
     private readonly deletarProdutoUseCase: DeletarProdutoUseCase,
-    private readonly listarProdutosUseCase: ListarProdutosUseCase
+    private readonly listarProdutosUseCase: ListarProdutosUseCase,
+    private readonly reativarProdutoUseCase: ReativarProdutoUseCase
   ) { }
 
   // Métodos do Controlador
@@ -91,10 +93,22 @@ export class ProdutoController {
       if (!id) throw new BadRequestError('ID do produto é obrigatório para exclusão.');
 
       await this.deletarProdutoUseCase.execute(id);
-      res.json({ message: 'Produto deletado com sucesso.' });
-      res.status(204).send(); // 204 No Content para deleção bem-sucedida
+      res.status(204).send(); // 204 No Content para deleção bem-sucedida // 204 No Content para deleção bem-sucedida
     } catch (error: any) {
       next(error);
     }
   }
+
+  public reativarProduto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      if (!id) throw new BadRequestError('ID do produto é obrigatório para reativação.');
+
+      const produtoReativado = await this.reativarProdutoUseCase.execute(id);
+      res.status(200).json(produtoReativado);
+    } catch (error: any) {
+      next(error);
+    }
+  }
+  
 }
