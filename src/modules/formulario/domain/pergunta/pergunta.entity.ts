@@ -1,85 +1,128 @@
-import { IPergunta } from "./pergunta.types";
+import { Entity } from "@shared/domain/entity";
+import { randomUUID } from "crypto";
+import {
+  OpcaoDuplicadaException,
+  PerguntaTextoVazioException,
+  QuantidadeMinimaOpcoesException,
+  TipoPerguntaInvalidoException,
+  ValidacaoPerguntaException,
+} from "./pergunta.exception";
+import { CriarPerguntaProps, IPergunta, RecuperarPerguntaProps } from "./pergunta.types";
 
-class Pergunta implements IPergunta{
+class Pergunta extends Entity<IPergunta> implements IPergunta {
+  private _texto: string;
+  private _tipo: string;
+  private _ativo: boolean;
+  private _opcoes: string[] | null;
+  private _empresaId: string;
+  private _dataCriacao: Date;
+  private _dataAtualizacao: Date;
+  private _dataExclusao: Date | null;
 
-private _id: number;
-private _texto: string;
-private _tipo: 'texto' | 'nota' | 'multipla_escolha';
-private _opcoes?: string[] | undefined;
-private _ordem: number;
+  constructor(pergunta: IPergunta) {
+    super(pergunta.id);
 
-
-get id(): number {
-  return this._id;
-}
-
-get texto(): string {
-  return this._texto;
-}
-
-private set texto(value: string) {
-  if (!value) {
-    throw new Error('O texto da pergunta é obrigatório.');
-  }
-  this._texto = value;
-}
-
-get tipo(): 'nota' | 'texto' | 'multipla_escolha' {
-  return this._tipo;
-}
-
- private set tipo(value: 'nota' | 'texto' | 'multipla_escolha') {
-  if (!['nota', 'texto', 'multipla_escolha'].includes(value)) {
-    throw new Error("O tipo de pergunta deve ser 'nota', 'texto' ou 'multipla_escolha'.");
-  }
-  this._tipo = value;
-  // Limpar opções se o tipo mudar para algo que não seja múltipla escolha
-  if (value !== 'multipla_escolha') {
-    this._opcoes = undefined;
-  }
-}
-
-public get opcoes(): string[] | undefined {
-  return this._opcoes;
-}
-
-private set opcoes(value: string[] | undefined) {
-  this._opcoes = value;
-}
-
-
-get ordem(): number {
-  return this._ordem;
-}
-
-private set ordem(value: number) {
-  if (value === undefined || value === null || value < 1) {
-    throw new Error('A ordem da pergunta deve ser maior ou igual a 1.');
-  }
-  this._ordem = value;
-}
-
-constructor(data: IPergunta) {
-    this._id = data.id ?? Date.now(); // Simulação de ID
-    this._texto = data.texto;
-    this._tipo = data.tipo;
-    this._opcoes = data.opcoes;
-    this._ordem = data.ordem;
-    this.validar();
-
+    this._empresaId = pergunta.empresaId;
+    this.texto = pergunta.texto;
+    this.tipo = pergunta.tipo;
+    this._ativo = pergunta.ativo;
+    this._opcoes = pergunta.opcoes ?? null;
+    this._dataCriacao = pergunta.dataCriacao ?? new Date();
+    this._dataAtualizacao = pergunta.dataAtualizacao ?? new Date();
+    this._dataExclusao = pergunta.dataExclusao ?? null;
   }
 
-private validar(): void {
-  if (!this.texto) {
-    throw new Error('O texto da pergunta é obrigatório.');
+  get texto() { return this._texto; }
+  set texto(value: string) {
+    if (!value || value.trim() === "") {
+      throw new PerguntaTextoVazioException();
+    }
+    this._texto = value;
+    this._dataAtualizacao = new Date();
   }
-  if (!['nota', 'texto', 'multipla_escolha'].includes(this.tipo)) {
-    throw new Error("O tipo de pergunta deve ser 'nota', 'texto' ou 'multipla_escolha'.");
+
+  get tipo() { return this._tipo; }
+  set tipo(value: string) {
+    const tiposValidos = ["nota", "texto", "multipla_escolha"];
+    if (!tiposValidos.includes(value)) {
+      throw new TipoPerguntaInvalidoException(value);
+    }
+    this._tipo = value;
+    if (value !== "multipla_escolha") this._opcoes = null;
+    this._dataAtualizacao = new Date();
   }
-  if (this.ordem < 1) {
-    throw new Error('A ordem da pergunta deve ser maior ou igual a 1.');
+
+  get opcoes() { return this._opcoes; }
+  set opcoes(value: string[] | null) {
+    if (this._tipo === "texto" && value !== null) {
+      throw new ValidacaoPerguntaException("Perguntas do tipo texto não devem ter opções.");
+    }
+    if (this._tipo === "nota") {
+      this._opcoes = value && value.length > 0 ? value : ["1", "2", "3", "4", "5"];
+    } else {
+      this._opcoes = value;
+    }
+    this._dataAtualizacao = new Date();
   }
-}
+
+  get ativo() { return this._ativo; }
+  get empresaId() { return this._empresaId; }
+  get dataCriacao() { return this._dataCriacao; }
+  get dataAtualizacao() { return this._dataAtualizacao; }
+  get dataExclusao() { return this._dataExclusao; }
+
+  public static criar(props: CriarPerguntaProps, id?: string): Pergunta {
+    const pergunta: IPergunta = {
+      id: id ?? randomUUID(),
+      texto: props.texto,
+      tipo: props.tipo,
+      ativo: true,
+      empresaId: props.empresaId,
+      opcoes: props.opcoes ?? (props.tipo === "nota" ? ["1","2","3","4","5"] : null),
+      dataCriacao: new Date(),
+      dataAtualizacao: new Date(),
+      dataExclusao: null,
+    };
+    return new Pergunta(pergunta);
+  }
+
+  public static recuperar(props: RecuperarPerguntaProps): Pergunta {
+  // Garante que as opções estejam corretas antes de criar a entidade
+  const opcoesValidadas = props.opcoes ?? (props.tipo === "nota" ? ["1","2","3","4","5"] : null);
+
+  // Monta o objeto completo para passar ao construtor
+  const perguntaCompleta: IPergunta = {
+    id: props.id,
+    texto: props.texto,
+    tipo: props.tipo,
+    ativo: props.ativo,
+    empresaId: props.empresaId,
+    opcoes: opcoesValidadas,
+    dataCriacao: props.dataCriacao,
+    dataAtualizacao: props.dataAtualizacao,
+    dataExclusao: props.dataExclusao ?? null,
+  };
+
+  return new Pergunta(perguntaCompleta);
 }
 
-export {Pergunta}
+
+  public atualizarTexto(novoTexto: string) {
+    this.texto = novoTexto;
+  }
+
+  public atualizarTipo(novoTipo: string, novasOpcoes?: string[] | null) {
+    this.tipo = novoTipo;
+    this.opcoes = novoTipo === "nota" ? (novasOpcoes ?? ["1","2","3","4","5"]) : novasOpcoes ?? null;
+  }
+
+  public inativar() {
+    if (!this._ativo) throw new Error("Pergunta já está inativa");
+    this._ativo = false;
+    this._dataExclusao = new Date();
+    this._dataAtualizacao = new Date();
+  }
+}
+
+
+export { Pergunta };
