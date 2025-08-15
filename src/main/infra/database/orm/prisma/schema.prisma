@@ -204,7 +204,7 @@ model Produto {
 }
 
 model Venda {
-  id        String    @id @default(uuid())
+  id        String    @id 
   dataVenda DateTime  @default(now()) @map("data_venda")
   
   clienteId String

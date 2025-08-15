@@ -1,4 +1,5 @@
 import { Entity } from "@shared/domain/entity";
+import { randomUUID } from "node:crypto";
 
 export interface VendaProps {
   id?: string;
@@ -115,6 +116,19 @@ toJSON(): VendaProps {
   // Factory method
 
   public static create(props: VendaProps): Venda {
-    return new Venda(props);
+
+    const vendaCompleta = {
+      id: randomUUID(),
+          clienteId: props.clienteId,
+    produtoId: props.produtoId,
+    empresaId: props.empresaId,
+    dataVenda: props.dataVenda,
+    cliente: props.cliente,
+    produto: props.produto,
+    }
+
+
+
+    return new Venda(vendaCompleta);
   }
 }

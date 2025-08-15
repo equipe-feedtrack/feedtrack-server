@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 
 export class VendaRepositoryPrisma implements IVendaRepository {
 async save(venda: Venda): Promise<Venda> {
+  console.log("[venda id]", venda)
   const vendaPersistence = VendaMap.toPersistence(venda);
 
   // Verifica se a empresa existe
@@ -26,7 +27,8 @@ async save(venda: Venda): Promise<Venda> {
 }
 
 
-async findById(id: string): Promise<Venda | null> {
+async findById(id: string): Promise<any> {
+  console.log("[venda id]", id)
   const venda = await prisma.venda.findUnique({
     where: { id },
     include: {
@@ -35,29 +37,34 @@ async findById(id: string): Promise<Venda | null> {
     }
   });
 
+  console.log("[venda]", venda)
+
   if (!venda) return null;
 
-  return Venda.create({
-    id: venda.id,
-    clienteId: venda.clienteId,
-    produtoId: venda.produtoId,
-    empresaId: venda.empresaId,
-    dataVenda: venda.dataVenda,
-    cliente: venda.cliente
-  ? {
-      email: venda.cliente.email ?? undefined,
-      telefone: venda.cliente.telefone ?? undefined
-    }
-  : undefined,
-produto: venda.produto
-  ? {
-      nome: venda.produto.nome ?? undefined,
-      valor: venda.produto.valor ?? undefined,
-      descricao: venda.produto.descricao ?? undefined
-    }
-  : undefined
+  return VendaMap.toDomain(venda);
 
-  });
+
+//   return Venda.create({
+//     id: venda.id,
+//     clienteId: venda.clienteId,
+//     produtoId: venda.produtoId,
+//     empresaId: venda.empresaId,
+//     dataVenda: venda.dataVenda,
+//     cliente: venda.cliente
+//   ? {
+//       email: venda.cliente.email ?? undefined,
+//       telefone: venda.cliente.telefone ?? undefined
+//     }
+//   : undefined,
+// produto: venda.produto
+//   ? {
+//       nome: venda.produto.nome ?? undefined,
+//       valor: venda.produto.valor ?? undefined,
+//       descricao: venda.produto.descricao ?? undefined
+//     }
+//   : undefined
+
+//   });
 }
 
 

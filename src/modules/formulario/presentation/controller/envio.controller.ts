@@ -22,6 +22,7 @@ export class EnvioController {
   public dispararIndividual = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { campanhaId, vendaId, empresaId } = req.body;
+      console.log(`Recebido pedido de envio individual para vendaId: ${vendaId}`);
       
       
       await this.dispararEnvioIndividualUseCase.execute({ campanhaId, vendaId, empresaId });

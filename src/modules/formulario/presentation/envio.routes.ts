@@ -40,8 +40,9 @@ const whatsappGateway = new WhatsAppApiGateway();
 const dispararEnvioIndividualUseCase = new DispararEnvioIndividualUseCase(
     envioRepository,
   campanhaRepository,
-  emailGateway, // Injetando o gateway de e-mail
+ // Injetando o gateway de e-mail
   whatsappGateway,// Injetando o gateway de WhatsApp
+    emailGateway,
   EmpresaRepository,
   vendaRepository
 );

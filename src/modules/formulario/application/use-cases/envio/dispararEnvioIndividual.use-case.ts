@@ -50,16 +50,22 @@ export class DispararEnvioIndividualUseCase {
     // }
 
     const envio = Envio.criar({
-      campanhaId,
-      empresaId: campanha.empresaId,
-      vendaId
+      campanhaId: campanhaId,
+      empresaId: empresaId,
+      vendaId: vendaId,
     });
 
 try {
+  console.log("CHEGOU AQUI")
   const conteudo = campanha.templateMensagem;
+  console.log("[CANAL DE ENVIO]", campanha.canalEnvio)
 
 const destinatarioEmail = venda.cliente?.email;
 const destinatarioTelefone = venda.cliente?.telefone;
+
+
+console.log("[Email]", destinatarioEmail); 
+console.log("[WhatsApp]", destinatarioTelefone);
 
 
   if (campanha.canalEnvio === CanalEnvio.EMAIL) {
@@ -70,9 +76,11 @@ const destinatarioTelefone = venda.cliente?.telefone;
     await this.EmailGateway.enviar(destinatarioEmail, conteudo, vendaId, empresaId, campanhaId);
   } 
   else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
+      console.log("[Enviando por WhatsApp]", destinatarioTelefone);
     if (!destinatarioTelefone) {
       throw new Error("Telefone do cliente não fornecido.");
     }
+    
     console.log("[Enviando por WhatsApp]", destinatarioTelefone);
     await this.whatsAppGateway.enviar(destinatarioTelefone, conteudo, vendaId, empresaId, campanhaId);
   } 
