@@ -14,15 +14,30 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
   async salvar(feedback: Feedback): Promise<void> {
     const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
 
-await this.prisma.feedback.upsert({
-  where: { envioId: feedback.envioId }, // Usa o campo único envioId
-  create: dadosParaPersistencia,
-  update: {
-    respostas: dadosParaPersistencia.respostas,
-    dataExclusao: dadosParaPersistencia.dataExclusao,
-  },
-});
+    const envioId = feedback.envioId;
 
+    if (!envioId) {
+      throw new Error("EnvioId é obrigatório para upsert no Feedback.");
+    }
+
+    await this.prisma.feedback.upsert({
+      where: { envioId },
+      create: dadosParaPersistencia,
+      update: {
+        respostas: dadosParaPersistencia.respostas,
+        dataExclusao: dadosParaPersistencia.dataExclusao,
+        empresaId: dadosParaPersistencia.empresaId,
+      },
+    });
+  }
+
+  async salvarManual(feedback: Feedback): Promise<void> {
+    const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
+
+    // Aqui não precisa de envioId nem upsert, só create normal
+    await this.prisma.feedback.create({
+      data: dadosParaPersistencia,
+    });
   }
 
   /**
@@ -76,13 +91,21 @@ await this.prisma.feedback.upsert({
     return FeedbackMap.toDomain(raw);
   }
 
-  async buscarTodos(): Promise<Feedback[]> {
-    const rawFeedbacks = await this.prisma.feedback.findMany();
+  async buscarTodos(empresaId?: string): Promise<Feedback[]> {
+    const whereClause: any = {};
+
+    if (empresaId) {
+      whereClause.empresaId = empresaId;
+    }
+
+    const rawFeedbacks = await this.prisma.feedback.findMany({
+      where: whereClause,
+    });
 
     if (!rawFeedbacks || rawFeedbacks.length === 0) {
       return [];
     }
-    
+
     // Mapeia cada objeto do Prisma para uma entidade de domínio.
     return rawFeedbacks.map(FeedbackMap.toDomain);
   }

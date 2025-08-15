@@ -21,8 +21,10 @@ export class EnvioController {
    */
   public dispararIndividual = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { clienteId, campanhaId, usuarioId } = req.body;
-      await this.dispararEnvioIndividualUseCase.execute({ clienteId, campanhaId, usuarioId });
+      const { clienteId, campanhaId, usuarioId, produtoId } = req.body;
+      
+      
+      await this.dispararEnvioIndividualUseCase.execute({ clienteId, campanhaId, usuarioId, produtoId });
       res.status(200).json({ message: 'Envio individual disparado com sucesso.' });
     } catch (error) {
       next(error);
@@ -35,8 +37,8 @@ export class EnvioController {
    */
   public dispararEmMassa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { campanhaId, quantidade, intervalo } = req.body;
-      await this.dispararEnvioEmMassaUseCase.execute(campanhaId, { quantidade, intervalo });
+      const { campanhaId, quantidade, intervalo, produtoId } = req.body;
+      await this.dispararEnvioEmMassaUseCase.execute(campanhaId, { quantidade, intervalo }, produtoId);
       res.status(200).json({ message: 'Disparo em massa iniciado com sucesso.' });
     } catch (error) {
       next(error);
@@ -58,3 +60,4 @@ export class EnvioController {
     }
   };
 }
+

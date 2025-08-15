@@ -19,6 +19,7 @@ describe('FormularioMap', () => {
   const dataFixa = new Date('2025-08-10T14:00:00.000Z');
   const PERGUNTA_ID = '1e7d8c5e-2f6b-4a8c-9b1d-0e9f8a7b6c5d';
   const FORMULARIO_ID = 'a3b8d6f8-3e2c-4b5d-9a1f-8c7b6a5e4d3c';
+  const EMPRESA_ID = 'b4c9e7d1-5f8a-4c3b-9d2e-1f0a9b8c7d6e';
 
   const mockPergunta = Pergunta.recuperar({
     id: PERGUNTA_ID,
@@ -37,6 +38,7 @@ describe('FormularioMap', () => {
     descricao: 'Feedback sobre o nosso serviço.',
     perguntas: [mockPergunta],
     ativo: true,
+    empresaId: EMPRESA_ID,
     dataCriacao: dataFixa,
     dataAtualizacao: dataFixa,
     dataExclusao: null,
@@ -61,6 +63,7 @@ describe('FormularioMap', () => {
         titulo: 'Formulário de Satisfação',
         descricao: 'Feedback sobre o nosso serviço.',
         ativo: true,
+        empresaId: EMPRESA_ID,
         dataCriacao: dataFixa,
         dataAtualizacao: dataFixa,
         dataExclusao: null,
@@ -93,8 +96,8 @@ describe('FormularioMap', () => {
       expect(formularioDomain).toBeInstanceOf(Formulario);
       expect(formularioDomain.id).toBe(FORMULARIO_ID);
       expect(formularioDomain.titulo).toBe('Formulário de Satisfação');
-      expect(formularioDomain.perguntas[0].id).toBe(PERGUNTA_ID);
-      expect(PerguntaMap.toDomain).toHaveBeenCalledWith(formularioPrisma.perguntas[0].pergunta);
+      expect(formularioDomain.perguntas).toHaveLength(0); // Perguntas are no longer directly associated
+      expect(formularioDomain.empresaId).toBe(EMPRESA_ID);
     });
   });
 
@@ -107,6 +110,7 @@ describe('FormularioMap', () => {
       expect(persistenceObject.id).toBe(FORMULARIO_ID);
       expect(persistenceObject.titulo).toBe('Formulário de Satisfação');
       expect(persistenceObject.ativo).toBe(true);
+      expect(persistenceObject.empresaId).toBe(EMPRESA_ID);
     });
   });
 
@@ -127,10 +131,9 @@ describe('FormularioMap', () => {
       const dto = FormularioMap.toResponseDTO(mockFormularioDomain);
 
       // ENTÃO: as dependências são chamadas e o DTO é montado corretamente
-      expect(PerguntaMap.toDTO).toHaveBeenCalledWith(mockPergunta);
       expect(dto.id).toBe(FORMULARIO_ID);
-      expect(dto.perguntas).toHaveLength(1);
-      expect(dto.perguntas[0].id).toBe(PERGUNTA_ID);
+      expect(dto.perguntas).toHaveLength(0); // Perguntas are no longer directly associated
+      expect(dto.empresaId).toBe(EMPRESA_ID);
       expect(dto.dataCriacao).toBe(dataFixa.toISOString());
     });
   });
@@ -143,6 +146,7 @@ describe('FormularioMap', () => {
       // ENTÃO: o DTO deve ter o formato correto e a contagem de perguntas
       expect(dto.id).toBe(FORMULARIO_ID);
       expect(dto.titulo).toBe('Formulário de Satisfação');
+      expect(dto.empresaId).toBe(EMPRESA_ID);
       expect(dto.dataCriacao).toBe(dataFixa.toISOString());
     });
   });

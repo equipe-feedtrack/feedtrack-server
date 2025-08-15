@@ -9,6 +9,7 @@ export interface IFuncionario extends IDatasControle { // Herda as datas de cont
   cargo: string;
   dataAdmissao: Date | null; // Renomeado para dataAdmissao (camelCase)
   status: StatusUsuario; // Reutiliza o status de usuário
+  empresaId: string;
 }
 
 type CriarFuncionarioProps = Omit<IFuncionario, 'id' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao' | 'status'>; // Recebe as props da pessoa sem o ID dela

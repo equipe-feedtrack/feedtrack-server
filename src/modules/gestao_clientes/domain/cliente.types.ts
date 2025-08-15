@@ -1,6 +1,4 @@
-import { Produto } from "@modules/produtos/domain/produto.entity";
 import { IDatasControle } from "@shared/domain/data.types";
-import { Pessoa } from "@shared/domain/pessoa.entity";
 
 enum StatusCliente {
 
@@ -11,19 +9,18 @@ enum StatusCliente {
 
 interface ICliente extends IDatasControle {
   id: string;
-  pessoa: Pessoa;
+  nome: string;
+  email?: string;
+  telefone: string;
   cidade: string | null;
-  vendedorResponsavel: string;
   status: StatusCliente;
-  produtos: Array<Produto>;
+  empresaId: string;
 }
 
 interface ClienteEssencial {
   nome: string;
   email?: string;
   telefone: string;
-  produtos: Array<Produto>;
-  vendedorResponsavel: string;
 }
 
 
@@ -36,4 +33,3 @@ type RecuperarClienteProps = ICliente;
 
 
 export { ClienteEssencial, CriarClienteProps, ICliente, RecuperarClienteProps, StatusCliente };
-

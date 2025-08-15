@@ -5,6 +5,7 @@ import { BuscarFuncionarioPorUsuarioIdUseCase } from '../../application/use-case
 import { AtualizarFuncionarioUseCase } from '../../application/use-cases/atualizarFuncionarioUseCase';
 import { DeletarFuncionarioUseCase } from '../../application/use-cases/deletarFuncionarioUseCase';
 import { Funcionario } from '@modules/acesso_e_identidade/domain/funcionario/funcionario.entity';
+import { BuscarTodosFuncionariosUseCase } from '@modules/acesso_e_identidade/application/use-cases/buscarTodosFuncionariosUseCase';
 
 export class FuncionarioController {
   constructor(
@@ -12,7 +13,8 @@ export class FuncionarioController {
     private buscarFuncionarioPorIdUseCase: BuscarFuncionarioPorIdUseCase,
     private buscarFuncionarioPorUsuarioIdUseCase: BuscarFuncionarioPorUsuarioIdUseCase,
     private atualizarFuncionarioUseCase: AtualizarFuncionarioUseCase,
-    private deletarFuncionarioUseCase: DeletarFuncionarioUseCase
+    private deletarFuncionarioUseCase: DeletarFuncionarioUseCase,
+    private buscarTodosFuncionariosUseCase: BuscarTodosFuncionariosUseCase
   ) {}
 
   async criar(req: Request, res: Response): Promise<Response> {
@@ -32,6 +34,15 @@ export class FuncionarioController {
         return res.status(404).json({ message: 'Funcionário não encontrado.' });
       }
       return res.status(200).json(funcionario);
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
+  async buscarTodos(req: Request, res: Response): Promise<Response> {
+    try {
+      const funcionarios = await this.buscarTodosFuncionariosUseCase.execute();
+      return res.status(200).json(funcionarios);
     } catch (error: any) {
       return res.status(500).json({ message: error.message });
     }

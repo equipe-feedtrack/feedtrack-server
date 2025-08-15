@@ -1,5 +1,5 @@
 import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.repository.interface";
-import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { IEmailGateway, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
 import { CanalEnvio } from "@prisma/client";
@@ -22,7 +22,7 @@ export class DispararEnvioEmMassaUseCase {
     private readonly EmailGateway: IEmailGateway,
   ) {}
 
-  public async execute(campanhaId: string, config: DisparoEmMassaConfig): Promise<void> {
+  public async execute(campanhaId: string, config: DisparoEmMassaConfig, produtoId: string): Promise<void> {
     const campanha = await this.campanhaRepository.recuperarPorUuid(campanhaId);
     if (!campanha) {
       throw new Error("Campanha não encontrada.");
@@ -37,6 +37,8 @@ export class DispararEnvioEmMassaUseCase {
         campanhaId: campanha.id,
         formularioId: campanha.formularioId,
         usuarioId: "system-user-uuid",
+        produtoId,
+        empresaId: campanha.empresaId
       });
       enviosPendentes.push(envio);
     }
@@ -62,9 +64,9 @@ export class DispararEnvioEmMassaUseCase {
           }
 
           if (campanha.canalEnvio === CanalEnvio.EMAIL) {
-              await this.EmailGateway.enviar(clienteParaEnvio.pessoa.email, conteudo, formularioId, clienteId);
+              await this.EmailGateway.enviar(clienteParaEnvio.email, conteudo, formularioId, clienteId, produtoId);
           } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-              await this.whatsAppGateway.enviar(clienteParaEnvio.pessoa.telefone, conteudo, formularioId, clienteId );
+              await this.whatsAppGateway.enviar(clienteParaEnvio.telefone, conteudo, formularioId, clienteId, produtoId );
           } else {
               throw new Error("Canal de envio inválido na campanha.");
           }

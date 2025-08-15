@@ -11,6 +11,7 @@ export interface EnvioResponseDTO {
   feedbackId: string;
   clienteId: string;
   formularioId: string;
+  produtoId: string
   dataCriacao: string;
   dataEnvio?: string | null;
   erro?: string | null;

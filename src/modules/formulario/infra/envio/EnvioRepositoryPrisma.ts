@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { IEnvioRepository } from "./IEnvioRepository";
 import { EnvioMap } from "../mappers/EnvioMap";
 

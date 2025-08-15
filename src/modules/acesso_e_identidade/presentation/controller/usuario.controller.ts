@@ -5,6 +5,7 @@ import { BuscarUsuarioPorNomeUsuarioUseCase } from '../../application/use-cases/
 import { AtualizarUsuarioUseCase } from '../../application/use-cases/atualizarUsuarioUseCase';
 import { DeletarUsuarioUseCase } from '../../application/use-cases/deletarUsuarioUseCase';
 import { Usuario } from '@modules/acesso_e_identidade/domain/usuario/usuario.entity';
+import { BuscarTodosUsuariosUseCase } from '@modules/acesso_e_identidade/application/use-cases/buscarTodosUsuariosUseCase';
 
 export class UsuarioController {
   constructor(
@@ -12,7 +13,8 @@ export class UsuarioController {
     private buscarUsuarioPorIdUseCase: BuscarUsuarioPorIdUseCase,
     private buscarUsuarioPorNomeUsuarioUseCase: BuscarUsuarioPorNomeUsuarioUseCase,
     private atualizarUsuarioUseCase: AtualizarUsuarioUseCase,
-    private deletarUsuarioUseCase: DeletarUsuarioUseCase
+    private deletarUsuarioUseCase: DeletarUsuarioUseCase,
+    private buscarTodosUsuariosUseCase: BuscarTodosUsuariosUseCase
   ) {}
 
   async criar(req: Request, res: Response): Promise<Response> {
@@ -32,6 +34,15 @@ export class UsuarioController {
         return res.status(404).json({ message: 'Usuário não encontrado.' });
       }
       return res.status(200).json(usuario);
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
+  async buscarTodos(req: Request, res: Response): Promise<Response> {
+    try {
+      const usuarios = await this.buscarTodosUsuariosUseCase.execute();
+      return res.status(200).json(usuarios);
     } catch (error: any) {
       return res.status(500).json({ message: error.message });
     }

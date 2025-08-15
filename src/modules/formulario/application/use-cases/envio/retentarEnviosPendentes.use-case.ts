@@ -1,5 +1,5 @@
 import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.repository.interface";
-import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { IEmailGateway, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
 import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
 import { CanalEnvio } from "@prisma/client";
@@ -49,9 +49,9 @@ export class RetentarEnviosPendentesUseCase {
         }
 
         if (campanha.canalEnvio === CanalEnvio.EMAIL) {
-          await this.emailGateway.enviar(cliente.pessoa.email, campanha.templateMensagem, envio.formularioId, envio.clienteId);
+          await this.emailGateway.enviar(cliente.email, campanha.templateMensagem, envio.formularioId, envio.clienteId, envio.produtoId);
         } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-          await this.whatsappGateway.enviar(cliente.pessoa.telefone, campanha.templateMensagem, envio.formularioId, envio.clienteId);
+          await this.whatsappGateway.enviar(cliente.telefone, campanha.templateMensagem, envio.formularioId, envio.clienteId, envio.produtoId);
         } else {
           envio.registrarFalha('Canal de envio inválido na campanha.');
           return;
