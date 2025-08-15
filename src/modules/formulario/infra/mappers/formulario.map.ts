@@ -18,7 +18,7 @@ export class FormularioMap {
       id: raw.id,
       titulo: raw.titulo, // Assumindo que o campo no Prisma é 'titulo'
       descricao: raw.descricao,
-      perguntas: [], // No longer directly associated during creation
+      perguntas: raw., // No longer directly associated during creation
       ativo: raw.ativo,
       empresaId: raw.empresaId,
       dataCriacao: raw.dataCriacao,
