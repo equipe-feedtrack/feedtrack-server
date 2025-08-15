@@ -7,7 +7,6 @@ export interface CampanhaResponseDTO {
   descricao?: string;
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
-  dataInicio: string; // String ISO
   canalEnvio: CanalEnvio;
   dataFim: string | null; // String ISO
   templateMensagem: string;

@@ -6,6 +6,7 @@ import {
 import { FormularioResponseDTO } from '@modules/formulario/application/dto/formulario/FormularioResponseDTO';
 import { ListarFormulariosResponseDTO } from '@modules/formulario/application/dto/formulario/ListarFormulariosResponseDTO';
 import { Formulario } from '@modules/formulario/domain/formulario/formulario.entity';
+import { PerguntaMap } from './pergunta.map';
 
 export class FormularioMap {
   /**
@@ -58,7 +59,7 @@ export class FormularioMap {
       dataCriacao: formulario.dataCriacao.toISOString(),
       dataAtualizacao: formulario.dataAtualizacao.toISOString(),
       // Delega a conversão de cada Pergunta para o PerguntaMap
-      perguntas: [],
+      perguntas: formulario.perguntas.map(PerguntaMap.toDTO),
     };
   }
 
@@ -73,7 +74,7 @@ export class FormularioMap {
       ativo: formulario.ativo,
       empresaId: formulario.empresaId,
       dataCriacao: formulario.dataCriacao.toISOString(),
-      perguntas: [],
+      perguntas: formulario.perguntas.map(PerguntaMap.toDTO),
     };
   }
 }

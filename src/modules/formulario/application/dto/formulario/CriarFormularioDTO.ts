@@ -3,4 +3,6 @@ export interface CriarFormularioInputDTO {
   descricao: string;
   ativo?: boolean;
   empresaId: string;
+  idsPerguntas: string[];
+
 }

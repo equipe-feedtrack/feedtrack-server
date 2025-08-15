@@ -1,28 +1,38 @@
 import { Venda as VendaPersistence } from "@prisma/client";
-import { Venda } from "../../domain/venda.entity";
-import { UniqueEntityID } from "@shared/domain/unique-entity-id";
-
+import { Venda, VendaPersistenceWithRelations } from "../../domain/venda.entity";
 export class VendaMap {
-  public static toDomain(raw: VendaPersistence): Venda {
-    const venda = Venda.create(
-      {
-        clienteId: raw.clienteId,
-        produtoId: raw.produtoId,
-        empresaId: raw.empresaId,
-        dataVenda: raw.dataVenda,
-      },
-      new UniqueEntityID(raw.id)
-    );
-    return venda;
-  }
+  public static toDomain(raw: VendaPersistenceWithRelations): Venda {
+  return Venda.create({
+    id: raw.id,
+    clienteId: raw.clienteId,
+    produtoId: raw.produtoId,
+    empresaId: raw.empresaId,
+    dataVenda: raw.dataVenda,
+    cliente: raw.cliente
+      ? {
+          email: raw.cliente.email ?? undefined,
+          telefone: raw.cliente.telefone ?? undefined,
+        }
+      : undefined,
+    produto: raw.produto
+      ? {
+          nome: raw.produto.nome ?? undefined,
+          valor: raw.produto.valor ?? undefined,
+          descricao: raw.produto.descricao ?? undefined,
+        }
+      : undefined,
+  });
+}
 
-  public static toPersistence(venda: Venda): VendaPersistence {
-    return {
-      id: venda.id.toString(),
-      clienteId: venda.props.clienteId,
-      produtoId: venda.props.produtoId,
-      empresaId: venda.props.empresaId,
-      dataVenda: venda.props.dataVenda,
-    };
-  }
+
+public static toPersistence(venda: Venda): Omit<VendaPersistence, 'cliente' | 'produto'> {
+  return {
+    id: venda.id.toString(),
+    clienteId: venda.clienteId,
+    produtoId: venda.produtoId,
+    empresaId: venda.empresaId,
+    dataVenda: venda.dataVenda,
+  };
+}
+
 }

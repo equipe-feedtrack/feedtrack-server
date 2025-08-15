@@ -22,7 +22,6 @@ export interface ICampanha {
   descricao?: string;
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
-  dataInicio: Date;
   dataFim: Date | null;
   templateMensagem: string;
   canalEnvio: CanalEnvio; // Canal de envio da campanha

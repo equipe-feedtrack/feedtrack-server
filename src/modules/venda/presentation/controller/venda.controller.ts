@@ -11,7 +11,7 @@ export class VendaController {
     try {
       const venda = await criarVendaUseCase.execute({ clienteId, produtoId, empresaId });
       return res.status(201).json(venda);
-    } catch (error) {
+    } catch (error: any) {
       return res.status(500).json({ message: error.message });
     }
   }

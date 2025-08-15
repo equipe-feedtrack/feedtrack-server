@@ -13,6 +13,9 @@ export class FormularioRepositoryPrisma implements IFormularioRepository<Formula
 
     await this.prisma.formulario.create({
       data: dadosFormulario,
+      include: {
+        perguntas: true,
+      },
     });
   }
 

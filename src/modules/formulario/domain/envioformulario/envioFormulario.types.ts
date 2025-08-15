@@ -3,13 +3,9 @@ import { StatusFormulario } from "@prisma/client";
 export interface IEnvio {
   id: string;
   status: StatusFormulario;
-  feedbackId: string | null;
-  clienteId: string;
-  formularioId: string;
   campanhaId: string;
-  usuarioId: string ;
-  produtoId: string;
   empresaId: string;
+  vendaId: string;
   dataCriacao: Date;
   dataEnvio: Date | null;
   tentativasEnvio: number;

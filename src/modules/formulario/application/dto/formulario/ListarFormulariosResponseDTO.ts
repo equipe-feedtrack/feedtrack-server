@@ -4,6 +4,14 @@ export interface ListarFormulariosInputDTO {
   ativo?: boolean;
 }
 
+export interface PerguntaDTO {
+  id: string;
+  texto: string;
+  opcoes?: string[];
+  // outros campos necessários
+}
+
+
 export interface ListarFormulariosResponseDTO {
   id: string;
   titulo: string;
@@ -11,5 +19,5 @@ export interface ListarFormulariosResponseDTO {
   ativo: boolean;
   empresaId: string;
   dataCriacao: string; // A data é enviada como uma string no formato ISO 8601
-  perguntas: Pergunta[]
+  perguntas: PerguntaDTO[]
 }
