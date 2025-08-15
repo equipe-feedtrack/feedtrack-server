@@ -6,20 +6,19 @@ import { EmpresaMap } from "./mappers/empresa.map";
 const prisma = new PrismaClient();
 
 export class EmpresaRepositoryPrisma implements IEmpresaRepository {
-async save(empresa: Empresa): Promise<Empresa> {
-  const empresaPersistence = EmpresaMap.toPersistence(empresa);
+ constructor(private readonly prisma: PrismaClient) {}
 
-  // Garante que cnpj vazio seja undefined
-  if (!empresaPersistence.cnpj?.trim()) {
-    empresaPersistence.cnpj = null;
+  async save(empresa: Empresa): Promise<Empresa> {
+    const empresaPersistence = EmpresaMap.toPersistence(empresa);
+
+    const upsertedEmpresa = await this.prisma.empresa.upsert({
+      where: { id: empresa.id },
+      update: empresaPersistence,
+      create: empresaPersistence,
+    });
+
+    return EmpresaMap.toDomain(upsertedEmpresa);
   }
-
-  const createdEmpresa = await prisma.empresa.create({
-    data: empresaPersistence,
-  });
-
-  return EmpresaMap.toDomain(createdEmpresa);
-}
 
 
   async findById(id: string): Promise<Empresa | null> {

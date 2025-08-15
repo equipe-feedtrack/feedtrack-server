@@ -9,13 +9,15 @@ import {
   ValidacaoPerguntaException,
 } from '../pergunta.exception';
 import { RecuperarPerguntaProps } from '../pergunta.types';
+import { randomUUID } from 'crypto';
 
 describe('Entidade Pergunta: Criar Pergunta', () => {
   it('deve criar uma pergunta do tipo nota com sucesso e opções padrão', () => {
     const pergunta = Pergunta.criar({
       texto: 'Qual a sua nota para o atendimento?',
       tipo: 'nota',
-      opcoes: undefined, // Testando opções undefined para tipo nota
+      opcoes: null, // Testando opções null para tipo nota
+      empresaId: randomUUID()
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
@@ -33,6 +35,7 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
       texto: 'Classifique de 1 a 3',
       tipo: 'nota',
       opcoes: ['1', '2', '3'], // Opções customizadas
+      empresaId: randomUUID()
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
@@ -44,20 +47,22 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
     const pergunta = Pergunta.criar({
       texto: 'O que você achou do tênis Corre 4?',
       tipo: 'texto',
-      opcoes: undefined,
+      opcoes: null,
+      empresaId: randomUUID()
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
         expect(pergunta.texto).toBe('O que você achou do tênis Corre 4?');
     expect(pergunta.tipo).toBe('texto');
-    expect(pergunta.opcoes).toBeUndefined(); // Tipo texto não deve ter opções
+    expect(pergunta.opcoes).toBeNull(); // Tipo texto não deve ter opções
   });
 
   it('deve criar uma pergunta do tipo multipla_escolha com opções válidas', () => {
     const pergunta = Pergunta.criar({
       texto: 'Qual o seu nível de satisfação?',
       tipo: 'multipla_escolha',
-      opcoes: ['ruim', 'bom', 'excelente']
+      opcoes: ['ruim', 'bom', 'excelente'],
+      empresaId: randomUUID()
     });
 
     expect(pergunta).toBeInstanceOf(Pergunta);
@@ -71,7 +76,8 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
       Pergunta.criar({
         texto: '',
         tipo: 'texto',
-        opcoes: undefined,
+        opcoes: null,
+        empresaId: randomUUID()
       }),
     ).toThrow(PerguntaTextoVazioException);
   });
@@ -81,7 +87,8 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
       Pergunta.criar({
               texto: 'Texto',
         tipo: 'escolha_unica' as any, // Forçando tipo inválido para teste
-        opcoes: undefined,
+        opcoes: null,
+        empresaId: randomUUID()
       }),
     ).toThrow(TipoPerguntaInvalidoException);
   });
@@ -92,6 +99,7 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
               texto: 'Escolha uma opção',
         tipo: 'multipla_escolha',
         opcoes: ['Sim'],
+        empresaId: randomUUID()
       }),
     ).toThrow(QuantidadeMinimaOpcoesException);
   });
@@ -102,6 +110,7 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
               texto: 'Escolha uma opção',
         tipo: 'multipla_escolha',
         opcoes: ['Sim', 'Não', 'Sim'],
+        empresaId: randomUUID()
       }),
     ).toThrow(OpcaoDuplicadaException);
   });
@@ -112,6 +121,7 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
               texto: 'Qual seu nome?',
         tipo: 'texto',
         opcoes: ['João', 'Maria'],
+        empresaId: randomUUID()
       }),
     ).toThrow(ValidacaoPerguntaException); // "Perguntas do tipo texto não devem ter opções."
   });
@@ -122,6 +132,7 @@ describe('Entidade Pergunta: Criar Pergunta', () => {
               texto: 'Sua avaliação?',
         tipo: 'nota',
         opcoes: ['bom', 'ruim'],
+        empresaId: randomUUID()
       }),
     ).toThrow(ValidacaoPerguntaException); // "Opções de nota devem ser apenas números."
   });
@@ -138,6 +149,7 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,
+      empresaId: randomUUID()
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
@@ -159,6 +171,7 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,
+      empresaId: randomUUID()
     };
 
     // Assumindo que a validação de UUID ocorre na classe base Entity ou na construção do ID
@@ -174,6 +187,7 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,
+      empresaId: randomUUID()
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
@@ -181,7 +195,7 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
     expect(pergunta).toBeInstanceOf(Pergunta);
         expect(pergunta.texto).toBe('Descreva sua experiência com o produto.');
     expect(pergunta.tipo).toBe('texto');
-    expect(pergunta.opcoes).toBeUndefined();
+    expect(pergunta.opcoes).toBeNull();
     expect(pergunta.ativo).toBe(true);
   });
 
@@ -195,6 +209,7 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,
+      empresaId: randomUUID()
     };
 
     const pergunta = Pergunta.recuperar(perguntaValida);
@@ -216,6 +231,7 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,
+      empresaId: randomUUID()
     };
 
     expect(() => Pergunta.recuperar(perguntaInvalida)).toThrow(QuantidadeMinimaOpcoesException);
@@ -231,6 +247,7 @@ describe('Entidade Pergunta: Recuperar Pergunta', () => {
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,
+      empresaId: randomUUID()
     };
     expect(() => Pergunta.recuperar(perguntaInvalida)).toThrow(ValidacaoPerguntaException);
   });
@@ -250,7 +267,7 @@ describe('Entidade Pergunta: Métodos de Comportamento', () => {
     const pergunta = Pergunta.criar({
       texto: 'Pergunta para inativar',
       tipo: 'texto',
-
+      empresaId: randomUUID()
     });
 
     expect(pergunta.dataExclusao).toBeNull();
@@ -269,6 +286,7 @@ describe('Entidade Pergunta: Métodos de Comportamento', () => {
     const pergunta = Pergunta.criar({
       texto: 'Pergunta já inativa',
       tipo: 'texto',
+      empresaId: randomUUID()
     });
     pergunta.inativar(); // Inativa pela primeira vez
 

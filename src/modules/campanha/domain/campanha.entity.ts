@@ -10,7 +10,7 @@ import { randomUUID } from "crypto";
 import { CanalEnvio } from "@prisma/client";
 class Campanha extends Entity<ICampanha> implements ICampanha {
   private _titulo: string;
-  private _descricao?: string;
+  private _descricao: string | null;
   private _tipoCampanha: TipoCampanha;
   private _segmentoAlvo: SegmentoAlvo;
   private _dataInicio: Date;
@@ -28,7 +28,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   get titulo(): string {
     return this._titulo;
   }
-  get descricao(): string | undefined {
+  get descricao(): string | null {
     return this._descricao;
   }
   get tipoCampanha(): TipoCampanha {
@@ -77,7 +77,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this._titulo = value;
   }
 
-  private set descricao(value: string | undefined) {
+  private set descricao(value: string | null) {
     this._descricao = value;
   }
 

@@ -18,20 +18,7 @@ class Pergunta extends Entity<IPergunta> implements IPergunta {
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
   private _dataExclusao: Date | null;
-
-  constructor(pergunta: IPergunta) {
-    super(pergunta.id);
-
-    this._empresaId = pergunta.empresaId;
-    this.texto = pergunta.texto;
-    this.tipo = pergunta.tipo;
-    this._ativo = pergunta.ativo;
-    this._opcoes = pergunta.opcoes ?? null;
-    this._dataCriacao = pergunta.dataCriacao ?? new Date();
-    this._dataAtualizacao = pergunta.dataAtualizacao ?? new Date();
-    this._dataExclusao = pergunta.dataExclusao ?? null;
-  }
-
+  
   get texto() { return this._texto; }
   set texto(value: string) {
     if (!value || value.trim() === "") {
@@ -70,6 +57,55 @@ class Pergunta extends Entity<IPergunta> implements IPergunta {
   get dataCriacao() { return this._dataCriacao; }
   get dataAtualizacao() { return this._dataAtualizacao; }
   get dataExclusao() { return this._dataExclusao; }
+  
+  
+  constructor(pergunta: IPergunta) {
+    super(pergunta.id);
+
+    this._empresaId = pergunta.empresaId;
+    this.texto = pergunta.texto;
+    this.tipo = pergunta.tipo;
+    this._ativo = pergunta.ativo;
+    this._opcoes = pergunta.opcoes ?? null;
+    this._dataCriacao = pergunta.dataCriacao ?? new Date();
+    this._dataAtualizacao = pergunta.dataAtualizacao ?? new Date();
+    this._dataExclusao = pergunta.dataExclusao ?? null;
+    Pergunta.validator().validarTexto(this.texto);
+    Pergunta.validator().validarTipo(this.tipo);
+    Pergunta.validator().validarOpcoes(this.opcoes, this.tipo);
+  }
+
+  private static validator() {
+    // Validações para a criação/atualização de perguntas
+    return {
+      validarTexto: (texto: string) => {
+        if (!texto || texto.trim() === "") {
+          throw new PerguntaTextoVazioException();
+        }
+      },
+      validarTipo: (tipo: string) => {
+        const tiposValidos = ["nota", "texto", "multipla_escolha"];
+        if (!tiposValidos.includes(tipo)) {
+          throw new TipoPerguntaInvalidoException(tipo);
+        }
+      },
+      validarOpcoes: (opcoes: string[] | null, tipo: string) => {
+        if (tipo === "texto" && opcoes !== null) {
+          throw new ValidacaoPerguntaException("Perguntas do tipo texto não devem ter opções.");
+        }
+        if (tipo === "multipla_escolha" && (!opcoes || opcoes.length < 2)) {
+          throw new QuantidadeMinimaOpcoesException(2);
+        }
+      },
+      validarOpcoesDuplicadas: (opcoes: string[] | null) => {
+        if (opcoes && new Set(opcoes).size !== opcoes.length) {
+          throw new OpcaoDuplicadaException(opcoes.find(opcao => opcoes.indexOf(opcao) !== opcoes.lastIndexOf(opcao)) || "Opção duplicada");
+        }
+      },
+
+    };
+  }
+
 
   public static criar(props: CriarPerguntaProps, id?: string): Pergunta {
     const pergunta: IPergunta = {

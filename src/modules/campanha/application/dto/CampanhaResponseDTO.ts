@@ -4,7 +4,7 @@ import { CanalEnvio } from '@prisma/client';
 export interface CampanhaResponseDTO {
   id: string;
   titulo: string;
-  descricao?: string;
+  descricao: string | null;
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
   dataInicio: string; // String ISO

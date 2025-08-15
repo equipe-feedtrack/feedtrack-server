@@ -1,39 +1,33 @@
+import { TipoUsuario } from "@modules/acesso_e_identidade/domain/usuario/usuario.types";
 import { Empresa } from "../../domain/empresa.entity";
 import { IEmpresaRepository } from "../../infra/empresa.repository.interface";
 import { CriarEmpresaDTO } from "../dto/criarEmpresa.dto";
 import { CriarUsuarioEmpresaUseCase } from "@modules/acesso_e_identidade/application/use-cases/criarUsuarioEmpresaUseCase";
-import { UsuarioRepositoryPrisma } from "@modules/acesso_e_identidade/infra/usuario/usuario.repository.prisma";
-import { PrismaClient } from "@prisma/client";
 import { Usuario } from "@modules/acesso_e_identidade/domain/usuario/usuario.entity";
-import { TipoUsuario } from "@modules/acesso_e_identidade/domain/usuario/usuario.types";
-
-const prisma = new PrismaClient();
-const usuarioRepository = new UsuarioRepositoryPrisma(prisma);
-const criarUsuarioEmpresaUseCase = new CriarUsuarioEmpresaUseCase(usuarioRepository);
 
 export class CriarEmpresaUseCase {
-  constructor(private readonly empresaRepository: IEmpresaRepository) {}
+    constructor(
+      private readonly empresaRepository: IEmpresaRepository,
+      private readonly criarUsuarioEmpresaUseCase: CriarUsuarioEmpresaUseCase
+    ) {}
 
-  async execute(dto: CriarEmpresaDTO): Promise<{empresa: Empresa, usuario: Usuario}> {
-    const empresa = Empresa.create({
-      nome: dto.nome,
-      cnpj: dto.cnpj,
-      email: dto.email,
-      status: "ATIVO",
-      plano: dto.plano,
-      dataCriacao: new Date(),
-      dataAtualizacao: new Date(),
-    });
+    async execute(dto: CriarEmpresaDTO): Promise<{ empresa: Empresa; usuario: Usuario }> {
+        const empresa = Empresa.create({
+          nome: dto.nome,
+          cnpj: dto.cnpj,
+          email: dto.email,
+          status: dto.status, // Ensure status comes from DTO
+          plano: dto.plano,
+        });
 
-    const createdEmpresa = await this.empresaRepository.save(empresa);
+        const createdEmpresa = await this.empresaRepository.save(empresa);
 
-    // Create a default user for the new company
-    const createdUsuario = await criarUsuarioEmpresaUseCase.execute({
-      empresaId: createdEmpresa.id,
-      nomeEmpresa: createdEmpresa.props.nome,
-      tipo: TipoUsuario.ADMIN
-    });
-
-    return {empresa: createdEmpresa, usuario: createdUsuario};
-  }
+        // Create a default user for the new company
+        const createdUsuario = await this.criarUsuarioEmpresaUseCase.execute({
+            empresaId: createdEmpresa.id,
+            nomeEmpresa: createdEmpresa.nome,
+            tipo: TipoUsuario.ADMIN // Assuming you have a type on the company (ou super admin, não sei)
+        });
+        return { empresa: createdEmpresa, usuario: createdUsuario };
+    }
 }

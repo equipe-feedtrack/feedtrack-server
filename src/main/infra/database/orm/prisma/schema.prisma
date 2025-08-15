@@ -154,8 +154,8 @@ model LogAtividade {
   nomeUsuario String      @map("nome_usuario")
   tipoUsuario TipoUsuario @map("tipo_usuario")
 
-  usuario   Usuario @relation(fields: [id], references: [id])
-  usuarioId String  @map("usuario_id")
+  usuario         Usuario          @relation(fields: [usuarioId], references: [id])
+  usuarioId       String           @map("usuario_id")
 
   entidadeAlvoId   String?           @map("entidade_alvo_id")
   entidadeAlvoTipo EntidadeAlvoTipo? @map("entidade_alvo_tipo")

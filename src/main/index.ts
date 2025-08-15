@@ -8,7 +8,7 @@ async function bootstrap() {
 
   const api_name = process.env.API_NAME || "FeedTrack API";
   const host_name = process.env.HOST_NAME || "localhost";
-  const port = Number(process.env.PORT) || 3006;
+  const port = Number(process.env.PORT) || 3000;
 
   console.log(`[${api_name}] 🚀 Inicializando a API....`);
   

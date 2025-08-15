@@ -10,7 +10,7 @@ enum StatusCliente {
 interface ICliente extends IDatasControle {
   id: string;
   nome: string;
-  email?: string;
+  email: string | null;
   telefone: string;
   cidade: string | null;
   status: StatusCliente;
@@ -19,7 +19,7 @@ interface ICliente extends IDatasControle {
 
 interface ClienteEssencial {
   nome: string;
-  email?: string;
+  email: string | null;
   telefone: string;
 }
 

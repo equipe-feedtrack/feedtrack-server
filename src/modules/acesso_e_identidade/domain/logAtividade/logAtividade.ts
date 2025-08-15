@@ -7,7 +7,7 @@ import {
   TipoAcao,
   EntidadeAlvoTipo,
 } from "./log_atividade.types"; // Seus tipos e enums de LogAtividade
-import { TipoUsuario } from "../usuario/usuario.types"; // TipoUsuario do módulo Usuario
+import { TipoUsuario } from "@prisma/client";
 
 // (Se precisar de exceções para LogAtividade, crie um arquivo log_atividade.exception.ts)
 

@@ -1,5 +1,3 @@
-// src/modules/acesso_e_identidade/domain/funcionario/funcionario.types.ts
-
 import { IDatasControle } from "@shared/domain/data.types";
 import { StatusUsuario } from "../usuario/usuario.types"; // Reutiliza o StatusUsuario
 

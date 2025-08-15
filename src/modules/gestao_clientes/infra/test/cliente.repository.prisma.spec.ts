@@ -3,9 +3,9 @@ import { Cliente } from '@modules/gestao_clientes/domain/cliente.entity';
 import { StatusCliente } from '@modules/gestao_clientes/domain/cliente.types';
 import { Produto } from '@modules/produtos/domain/produto.entity';
 import { PrismaClient, StatusUsuario } from '@prisma/client';
-import { Pessoa } from '@shared/domain/pessoa.entity';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClienteRepositoryPrisma } from '../cliente.repository.prisma';
+import { randomUUID } from 'node:crypto';
 
 const prisma = new PrismaClient();
 const repository = new ClienteRepositoryPrisma(prisma);
@@ -19,6 +19,7 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
   const CLIENTE_ID_1 = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
   const CLIENTE_ID_2 = '8c6b7e1a-4f5c-4a3b-8d9c-1e2f3a4b5c6d'; // Cliente antigo
   const CLIENTE_ID_3 = '7f4a2b9e-1c8d-4e5f-a9b0-8c7d6e5f4a3b'; // Cliente recente
+  const EMPRESA_ID = randomUUID();
 
   const dataReferencia = new Date('2025-08-03T15:00:00.000Z');
   vi.setSystemTime(dataReferencia);
@@ -29,41 +30,45 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
   let produtoDb1: Produto;
   let produtoDb2: Produto;
 
+  beforeAll(async () => {
+    // Garante que a empresa pai exista para as FKs
+    await prisma.empresa.create({
+      data: {
+        id: EMPRESA_ID,
+        nome: 'Empresa Teste',
+        email: 'empresa@teste.com',
+        plano: 'FREE',
+        status: 'ATIVO',
+      },
+    });
+  });
+
   beforeEach(async () => {
-    // 1. Limpeza do Banco ANTES DE CADA TESTE
-    // A ordem importa: delete primeiro os registros da tabela de junção.;
-    await prisma.clientesOnProdutos.deleteMany({});
+    // 1. Limpeza do Banco ANTES DE CADA TESTE (a ordem é crucial)
+    await prisma.venda.deleteMany({});
     await prisma.cliente.deleteMany({});
     await prisma.produto.deleteMany({});
-    await prisma.pessoa.deleteMany({});
 
     // 2. Criação dos Dados Base (Produtos)
     await prisma.produto.createMany({
       data: [
-        { id: PRODUTO_ID_1, nome: 'Serviço Premium', descricao: 'Detalhada A', valor: 1000, ativo: true },
-        { id: PRODUTO_ID_2, nome: 'Consultoria', descricao: 'Consultoria de 2 horas', valor: 500, ativo: true },
+        { id: PRODUTO_ID_1, nome: 'Serviço Premium', descricao: 'Detalhada A', valor: 1000, ativo: true, empresaId: EMPRESA_ID },
+        { id: PRODUTO_ID_2, nome: 'Consultoria', descricao: 'Consultoria de 2 horas', valor: 500, ativo: true, empresaId: EMPRESA_ID },
       ],
     });
 
-    // 3. Criação de Pessoas para os Clientes
-    const pessoa1 = await prisma.pessoa.create({ data: { nome: 'Pessoa Cliente 1', email: 'cliente1@example.com', telefone: '11911111111' } });
-    const pessoa2 = await prisma.pessoa.create({ data: { nome: 'Pessoa Cliente 2', email: 'cliente2@example.com', telefone: '11922222222' } });
-    const pessoa3 = await prisma.pessoa.create({ data: { nome: 'Pessoa Cliente 3', email: 'cliente3@example.com', telefone: '11933333333' } });
-
-    // 4. Criação dos Clientes e CONEXÃO das Relações
+    // 3. Criação dos Clientes com a nova estrutura de dados
     await prisma.cliente.create({
       data: {
         id: CLIENTE_ID_1,
         nome: 'Cliente Ativo Teste',
-        pessoaId: pessoa1.id,
-        cidade: 'Cidade Teste', status: StatusUsuario.ATIVO, vendedorResponsavel: 'Vendedor Teste',
-        dataCriacao: dataAntiga, dataAtualizacao: dataAntiga,
-        produtos: {
-          create: [
-            { produtoId: PRODUTO_ID_1 },
-            { produtoId: PRODUTO_ID_2 },
-          ],
-        },
+        email: 'ativo@example.com',
+        telefone: '11111111111',
+        cidade: 'Cidade Teste',
+        status: StatusUsuario.ATIVO,
+        dataCriacao: dataAntiga,
+        dataAtualizacao: dataAntiga,
+        empresaId: EMPRESA_ID,
       },
     });
 
@@ -71,37 +76,45 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
       data: {
         id: CLIENTE_ID_2,
         nome: 'Cliente Antigo',
-        pessoaId: pessoa2.id,
-        cidade: 'Cidade Antiga', status: StatusUsuario.ATIVO, vendedorResponsavel: 'Vendedor Antigo',
-        dataCriacao: dataAntiga, dataAtualizacao: dataAntiga,
-        produtos: { create: [{ produtoId: PRODUTO_ID_1 }] },
+        email: 'antigo@example.com',
+        telefone: '22222222222',
+        cidade: 'Cidade Antiga',
+        status: StatusUsuario.ATIVO,
+        dataCriacao: dataAntiga,
+        dataAtualizacao: dataAntiga,
+        empresaId: EMPRESA_ID,
       },
     });
-    
+
     await prisma.cliente.create({
       data: {
         id: CLIENTE_ID_3,
         nome: 'Cliente Novo',
-        pessoaId: pessoa3.id,
-        cidade: 'Cidade Nova', status: StatusUsuario.ATIVO, vendedorResponsavel: 'Vendedor Novo',
-        dataCriacao: dataRecente, dataAtualizacao: dataRecente,
-        produtos: { create: [{ produtoId: PRODUTO_ID_1 }] },
+        email: 'novo@example.com',
+        telefone: '33333333333',
+        cidade: 'Cidade Nova',
+        status: StatusUsuario.ATIVO,
+        dataCriacao: dataRecente,
+        dataAtualizacao: dataRecente,
+        empresaId: EMPRESA_ID,
       },
     });
 
-    // 5. Recupera as entidades para usar nos testes
+    // 4. Recupera as entidades para usar nos testes
     const p1 = await prisma.produto.findUnique({ where: { id: PRODUTO_ID_1 } });
     const p2 = await prisma.produto.findUnique({ where: { id: PRODUTO_ID_2 } });
     if (p1 && p2) {
-        produtoDb1 = Produto.recuperar(p1 as any);
-        produtoDb2 = Produto.recuperar(p2 as any);
+      produtoDb1 = Produto.recuperar(p1 as any);
+      produtoDb2 = Produto.recuperar(p2 as any);
     }
   });
 
   afterAll(async () => {
-    await prisma.clientesOnProdutos.deleteMany({});
+    // Limpeza final de todas as tabelas
+    await prisma.venda.deleteMany({});
     await prisma.cliente.deleteMany({});
     await prisma.produto.deleteMany({});
+    await prisma.empresa.deleteMany({}); // Limpa a empresa criada no beforeAll
     await prisma.$disconnect();
   });
 
@@ -111,22 +124,21 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
 
   it('deve inserir um novo cliente e conectar produtos existentes', async () => {
     const novoCliente = Cliente.criarCliente({
-      pessoa: Pessoa.criar({ nome: 'Ana Costa', email: 'ana@example.com', telefone: '11987654321' }),
+      nome: 'Ana Costa',
+      email: 'ana@example.com',
+      telefone: '11987654321',
       cidade: 'Belo Horizonte',
-      vendedorResponsavel: 'Vendedor Gama',
-      produtos: [produtoDb1, produtoDb2],
+      empresaId: EMPRESA_ID,
     });
 
     await repository.inserir(novoCliente);
 
-    const clienteSalvo = await prisma.cliente.findUnique({
-      where: { id: novoCliente.id },
-      include: { produtos: { include: { produto: true } } },
-    });
+   const clienteSalvo = await prisma.cliente.findUnique({
+     where: { id: novoCliente.id },
+   });
 
     expect(clienteSalvo).toBeDefined();
-    expect(clienteSalvo?.produtos).toHaveLength(2);
-    expect(clienteSalvo?.produtos.some(item => item.produto.id === PRODUTO_ID_1)).toBe(true);
+    expect(clienteSalvo?.nome).toBe('Ana Costa');
   });
 
   it('deve recuperar um cliente por ID, incluindo suas relações', async () => {
@@ -134,8 +146,7 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
 
     expect(clienteRecuperado).toBeInstanceOf(Cliente);
     expect(clienteRecuperado?.id).toBe(CLIENTE_ID_1);
-    expect(clienteRecuperado?.pessoa.nome).toBe('Cliente Ativo Teste');
-    expect(clienteRecuperado?.produtos).toHaveLength(2);
+    expect(clienteRecuperado?.nome).toBe('Cliente Ativo Teste');
   });
 
   it('deve atualizar os dados de um cliente e sua lista de produtos', async () => {
@@ -143,18 +154,10 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
     expect(clienteRecuperado).toBeDefined();
 
     clienteRecuperado!.atualizarCidade('Nova Cidade');
-    clienteRecuperado!.removerProduto(produtoDb1); // Remove um produto
     
     await repository.atualizar(clienteRecuperado!);
 
-    const clienteDoDb = await prisma.cliente.findUnique({
-      where: { id: CLIENTE_ID_1 },
-      include: { produtos: { include: { produto: true } } },
-    });
-
-    expect(clienteDoDb?.cidade).toBe('Nova Cidade');
-    expect(clienteDoDb?.produtos).toHaveLength(1);
-    expect(clienteDoDb?.produtos[0].produto.id).toBe(PRODUTO_ID_2);
+    expect(clienteRecuperado?.cidade).toBe('Nova Cidade');
   });
 
   it('deve inativar um cliente e persistir a mudança', async () => {

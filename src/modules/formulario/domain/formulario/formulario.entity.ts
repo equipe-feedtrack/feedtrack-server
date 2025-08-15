@@ -2,11 +2,12 @@ import { Entity } from "@shared/domain/entity";
 import { Pergunta } from "../pergunta/pergunta.entity";
 import { FormularioTituloVazioException } from "./formulario.exception";
 import { CriarFormularioProps, IFormulario, RecuperarFormularioProps } from "./formulario.types";
+import { randomUUID } from "crypto";
 
 class Formulario extends Entity<IFormulario> implements IFormulario {
  
   private _titulo: string;
-  private _descricao?: string | undefined;
+  private _descricao: string | null;
   private _perguntas: Pergunta[];
   private _ativo: boolean;
   private _empresaId: string;
@@ -20,10 +21,10 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     private set titulo(titulo: string) {
         this._titulo = titulo;
     }
-    public get descricao(): string | undefined {
+    public get descricao(): string | null {
         return this._descricao;
     }
-    private set descricao(descricao: string | undefined) {
+    private set descricao(descricao: string | null) {
         this._descricao = descricao;
     }
     public get perguntas(): Pergunta[] {
@@ -87,11 +88,12 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
   // criar um formulário novo
   public static criar(formulario: CriarFormularioProps): Formulario {
     return new Formulario({
-    titulo: formulario.titulo,
-    descricao: formulario.descricao,
-    perguntas: formulario.perguntas ?? [],
-    ativo: formulario.ativo,
-    empresaId: formulario.empresaId,
+      id: randomUUID(),
+      titulo: formulario.titulo,
+      descricao: formulario.descricao,
+      perguntas: formulario.perguntas ?? [],
+      ativo: formulario.ativo,
+      empresaId: formulario.empresaId,
     dataCriacao: formulario.dataCriacao,
     dataAtualizacao: formulario.dataAtualizacao
   });
@@ -130,7 +132,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     this.dataAtualizacao = new Date();
   }
 
-  public atualizarDescricao(descricao: string | undefined): void {
+  public atualizarDescricao(descricao: string | null): void {
     this.descricao = descricao;
     this.dataAtualizacao = new Date();
   }

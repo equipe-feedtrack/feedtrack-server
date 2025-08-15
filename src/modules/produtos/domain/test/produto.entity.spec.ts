@@ -19,6 +19,7 @@ describe('Entidade Produto', () => {
     nome: 'Notebook Gamer Xtreme',
     descricao: 'Um notebook de alta performance para jogos e trabalho.',
     valor: 7500.00,
+    empresaId: randomUUID(),
   };
 
   // --- Testes para o método 'criarProduto' ---
@@ -82,6 +83,7 @@ describe('Entidade Produto', () => {
       dataAtualizacao: new Date('2024-01-01T00:00:00Z'),
       dataExclusao: new Date('2024-02-01T00:00:00Z'), // Excluído logicamente
       ativo: false, // Inativo
+      empresaId: randomUUID(),
     };
 
     const produto = Produto.recuperar(recuperacaoProps);

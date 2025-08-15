@@ -1,6 +1,6 @@
-import { Usuario as UsuarioPrisma } from '@prisma/client';
+import { TipoUsuario, Usuario as UsuarioPrisma } from '@prisma/client';
 import { Usuario } from '@modules/acesso_e_identidade/domain/usuario/usuario.entity';
-import { StatusUsuario, TipoUsuario } from '@modules/acesso_e_identidade/domain/usuario/usuario.types';
+import { StatusUsuario } from '@modules/acesso_e_identidade/domain/usuario/usuario.types';
 
 export class UsuarioMap {
   public static toDomain(usuarioPrisma: UsuarioPrisma): Usuario {

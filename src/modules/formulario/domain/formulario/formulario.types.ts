@@ -1,9 +1,9 @@
 import { Pergunta } from "../pergunta/pergunta.entity";
 
 interface IFormulario {
-  id?: string;
+  id: string;
   titulo: string;
-  descricao?: string;
+  descricao: string | null;
   perguntas: Pergunta[];
   ativo?: boolean;
   empresaId: string;

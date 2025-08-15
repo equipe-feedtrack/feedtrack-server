@@ -1,4 +1,4 @@
-import { TipoUsuario } from "../usuario/usuario.types"; // Reutiliza TipoUsuario
+import { TipoUsuario } from "@prisma/client";
 
 // Enum para o tipo de ação realizada
 export enum TipoAcao {

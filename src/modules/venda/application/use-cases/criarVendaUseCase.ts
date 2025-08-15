@@ -8,7 +8,6 @@ export class CriarVendaUseCase {
   async execute(dto: CriarVendaDTO): Promise<Venda> {
     const venda = Venda.create({
       ...dto,
-      dataVenda: new Date(),
     });
 
     return this.vendaRepository.save(venda);

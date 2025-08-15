@@ -1,13 +1,13 @@
 import { IUseCase } from "@shared/application/use-case/usecase.interface";
 import { Usuario } from "@modules/acesso_e_identidade/domain/usuario/usuario.entity";
 import { IUsuarioRepository } from "@modules/acesso_e_identidade/infra/usuario/usuario.repository.interface";
-import { TipoUsuario } from "@modules/acesso_e_identidade/domain/usuario/usuario.types";
 import { randomBytes } from 'crypto';
+import { TipoUsuario } from "@prisma/client";
 
 interface CriarUsuarioEmpresaInput {
   empresaId: string;
   nomeEmpresa: string;
-  tipo: TipoUsuario
+  tipo: TipoUsuario;
 }
 
 export class CriarUsuarioEmpresaUseCase implements IUseCase<CriarUsuarioEmpresaInput, Usuario> {

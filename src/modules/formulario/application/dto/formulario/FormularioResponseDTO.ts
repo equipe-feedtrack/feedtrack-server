@@ -3,7 +3,7 @@ import { PerguntaResponseDTO } from "../pergunta/PerguntaResponseDTO";
 export interface FormularioResponseDTO {
   id: string;
   titulo: string;
-  descricao?: string;
+  descricao: string | null;
   ativo: boolean;
   empresaId: string;
   dataCriacao: string; // Data no formato ISO 8601

@@ -1,7 +1,4 @@
-// src/modules/acesso_e_identidade/domain/funcionario/funcionario.entity.ts
-
 import { Entity } from "@shared/domain/entity";
-import { Pessoa} from "@shared/domain/pessoa.entity"; // Entidade Pessoa
 import { randomUUID } from "crypto"; // Para gerar IDs
 import { StatusUsuario } from "../usuario/usuario.types"; // O enum StatusUsuario
 import {CriarFuncionarioProps,IFuncionario, RecuperarFuncionarioProps} from "./funcionario.types";

@@ -3,6 +3,7 @@ import { ProdutoMap } from '../produto.map'; // Ajuste o caminho
 import { Produto as ProdutoPrisma } from '@prisma/client'; // Importa Produto do Prisma Client
 import { randomUUID } from 'crypto';
 import { Produto } from '@modules/produtos/domain/produto.entity';
+import e from 'express';
 // Importe Status_Produto do PrismaClient se seu schema usa esse nome
 // import { Status_Produto } from '@prisma/client'; 
 
@@ -29,6 +30,7 @@ describe('ProdutoMap', () => {
     dataAtualizacao: new Date('2024-05-10T11:00:00.000Z'),
     dataExclusao: null,
     ativo: true,
+    empresaId: randomUUID(),
   };
 
   const mockProdutoDomainSemOpcionaisData = {
@@ -40,6 +42,7 @@ describe('ProdutoMap', () => {
     dataAtualizacao: new Date('2024-06-01T09:00:00.000Z'),
     dataExclusao: null, // Mantém null se não especificado
     ativo: true,
+    empresaId: randomUUID(),
   };
 
   const mockProdutoDomainDeletadoData = {
@@ -51,6 +54,7 @@ describe('ProdutoMap', () => {
     dataAtualizacao: new Date('2024-04-10T11:00:00Z'),
     dataExclusao: new Date('2024-04-15T12:00:00Z'), // Com data de exclusão
     ativo: false,
+    empresaId: randomUUID(),
   };
 
   // Instâncias da entidade Produto (criadas usando Produto.recuperar)
@@ -71,6 +75,7 @@ describe('ProdutoMap', () => {
       dataAtualizacao: mockProdutoDomainData.dataAtualizacao,
       dataExclusao: mockProdutoDomainData.dataExclusao,
       ativo: mockProdutoDomainData.ativo,
+      empresaId: mockProdutoDomainData.empresaId,
     };
 
     const rawProdutoPrismaSemOpcionais: ProdutoPrisma = {
@@ -82,6 +87,7 @@ describe('ProdutoMap', () => {
       dataAtualizacao: mockProdutoDomainSemOpcionaisData.dataAtualizacao,
       dataExclusao: null,
       ativo: mockProdutoDomainSemOpcionaisData.ativo,
+      empresaId: mockProdutoDomainSemOpcionaisData.empresaId,
     };
 
     it('deve converter dados crus do Prisma para uma entidade Produto completa', () => {
@@ -119,6 +125,7 @@ describe('ProdutoMap', () => {
         data_atualizacao: mockProdutoDomain.dataAtualizacao,
         data_exclusao: mockProdutoDomain.dataExclusao,
         ativo: mockProdutoDomain.ativo,
+        empresaId: mockProdutoDomain.empresaId,
       });
     });
 
@@ -143,6 +150,7 @@ describe('ProdutoMap', () => {
         dataAtualizacao: mockProdutoDomain.dataAtualizacao.toISOString(),
         dataExclusao: mockProdutoDomain.dataExclusao?.toISOString(), // Trata null
         ativo: mockProdutoDomain.ativo,
+        empresaId: mockProdutoDomain.empresaId,
       });
     });
 

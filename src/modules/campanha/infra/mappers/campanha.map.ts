@@ -39,7 +39,7 @@ export class CampanhaMap {
     const campanhaProps: ICampanha = {
       id: raw.id,
       titulo: raw.titulo,
-      descricao: raw.descricao ?? undefined,
+      descricao: raw.descricao ?? null,
       tipoCampanha: this.tipoToDomain(raw.tipoCampanha),
       segmentoAlvo: this.segmentoToDomain(raw.segmentoAlvo),
       dataInicio: raw.dataInicio,

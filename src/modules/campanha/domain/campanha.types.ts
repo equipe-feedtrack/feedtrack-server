@@ -19,7 +19,7 @@ export enum SegmentoAlvo {
 export interface ICampanha {
   id: string;
   titulo: string;
-  descricao?: string;
+  descricao: string | null;
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
   dataInicio: Date;

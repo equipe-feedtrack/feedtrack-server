@@ -1,10 +1,6 @@
+import { TipoUsuario } from "@prisma/client";
 import { IDatasControle } from "@shared/domain/data.types";
 
-export enum TipoUsuario {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-  SUPER_ADMIN = 'SUPER_ADMIN',
-}
 
 export enum StatusUsuario {
   ATIVO = 'ATIVO',

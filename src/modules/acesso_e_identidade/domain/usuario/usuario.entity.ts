@@ -1,7 +1,8 @@
 import { Entity } from "@shared/domain/entity"; // Sua classe base Entity
 import { randomUUID } from "crypto"; // Para gerar IDs
-import { CriarUsuarioProps, IUsuario, RecuperarUsuarioProps, StatusUsuario, TipoUsuario } from "./usuario.types";
+import { CriarUsuarioProps, IUsuario, RecuperarUsuarioProps, StatusUsuario } from "./usuario.types";
 import bcrypt from "bcrypt";
+import { TipoUsuario } from "@prisma/client";
 
 
 class Usuario extends Entity<IUsuario> implements IUsuario {

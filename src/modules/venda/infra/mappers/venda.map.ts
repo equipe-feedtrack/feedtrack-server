@@ -1,6 +1,5 @@
 import { Venda as VendaPersistence } from "@prisma/client";
 import { Venda } from "../../domain/venda.entity";
-import { UniqueEntityID } from "@shared/domain/unique-entity-id";
 
 export class VendaMap {
   public static toDomain(raw: VendaPersistence): Venda {
@@ -9,9 +8,7 @@ export class VendaMap {
         clienteId: raw.clienteId,
         produtoId: raw.produtoId,
         empresaId: raw.empresaId,
-        dataVenda: raw.dataVenda,
       },
-      new UniqueEntityID(raw.id)
     );
     return venda;
   }
@@ -19,10 +16,10 @@ export class VendaMap {
   public static toPersistence(venda: Venda): VendaPersistence {
     return {
       id: venda.id.toString(),
-      clienteId: venda.props.clienteId,
-      produtoId: venda.props.produtoId,
-      empresaId: venda.props.empresaId,
-      dataVenda: venda.props.dataVenda,
+      clienteId: venda.clienteId,
+      produtoId: venda.produtoId,
+      empresaId: venda.empresaId,
+      dataVenda: venda.dataVenda,
     };
   }
 }
