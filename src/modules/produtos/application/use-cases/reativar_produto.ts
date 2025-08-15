@@ -5,8 +5,8 @@ import { ProdutoMap } from "@modules/produtos/infra/mappers/produto.map";
 export class ReativarProdutoUseCase {
   constructor(private readonly produtoRepository: IProdutoRepository) {}
 
-  async execute(id: string): Promise<ProdutoResponseDTO> {
-    const produto = await this.produtoRepository.recuperarPorUuid(id);
+  async execute(id: string, empresaId: string): Promise<ProdutoResponseDTO> {
+    const produto = await this.produtoRepository.recuperarPorUuid(id, empresaId);
 
     if (!produto) {
       throw new Error(`Produto com ID ${id} não encontrado.`);

@@ -34,5 +34,17 @@ export class UsuarioMap {
       data_exclusao: usuario.dataExclusao,
     };
   }
+
+  public static toDTO(usuario: Usuario): any {
+    return {
+      id: usuario.id,
+      nomeUsuario: usuario.nomeUsuario,
+      tipo: usuario.tipo,
+      email: usuario.email,
+      status: usuario.status,
+      empresaId: usuario.empresaId,
+    };
+  }
 }
+
 

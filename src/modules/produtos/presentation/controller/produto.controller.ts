@@ -41,10 +41,10 @@ export class ProdutoController {
 
   public buscarProdutoPorId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
+      const { id, empresaId } = req.params;
       if (!id) throw new BadRequestError('ID do produto é obrigatório.');
 
-      const produto = await this.buscarProdutoPorIdUseCase.execute(id);
+      const produto = await this.buscarProdutoPorIdUseCase.execute(id, empresaId);
       if (!produto) throw new NotFoundError(`Produto com ID ${id} não encontrado.`);
 
       res.status(200).json(produto);
@@ -56,15 +56,15 @@ export class ProdutoController {
   public listarProdutos = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Implementar lógica de filtros a partir de req.query
-      const { ativo, cliente_id } = req.query; // Tipagem básica para filtros
+      const { ativo, empresaId } = req.query; // Tipagem básica para filtros
       let ativoBoolean: boolean | undefined;
       if (typeof ativo === 'string') {
         ativoBoolean = ativo.toLowerCase() === 'true'; // Converte "true" para true, "false" para false
       }
 
       const filtros: ListarProdutosInput = {
-        ativo: ativoBoolean, // Passa o booleano convertido
-        cliente_id: typeof cliente_id === 'string' ? cliente_id : undefined, // Garante que cliente_id é string ou undefined
+        ativo: ativoBoolean,
+        empresaId: empresaId as string 
       };
       const produtos = await this.listarProdutosUseCase.execute(filtros);
       res.status(200).json(produtos);
@@ -89,10 +89,10 @@ export class ProdutoController {
 
   public deletarProduto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
+      const { id, empresaId } = req.params;
       if (!id) throw new BadRequestError('ID do produto é obrigatório para exclusão.');
 
-      await this.deletarProdutoUseCase.execute(id);
+      await this.deletarProdutoUseCase.execute(id, empresaId);
       res.status(204).send(); // 204 No Content para deleção bem-sucedida // 204 No Content para deleção bem-sucedida
     } catch (error: any) {
       next(error);
@@ -101,10 +101,10 @@ export class ProdutoController {
 
   public reativarProduto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
+      const { id, empresaId } = req.params;
       if (!id) throw new BadRequestError('ID do produto é obrigatório para reativação.');
 
-      const produtoReativado = await this.reativarProdutoUseCase.execute(id);
+      const produtoReativado = await this.reativarProdutoUseCase.execute(id, empresaId);
       res.status(200).json(produtoReativado);
     } catch (error: any) {
       next(error);

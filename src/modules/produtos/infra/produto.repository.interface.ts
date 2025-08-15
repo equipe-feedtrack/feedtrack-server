@@ -13,7 +13,7 @@ export interface IProdutoRepository {
    * @param id O ID do Produto a ser recuperado.
    * @returns A entidade Produto (IProduto), ou null se não encontrada.
    */
-  recuperarPorUuid(id: string): Promise<Produto | null>;
+  recuperarPorUuid(id: string, empresaId: string): Promise<Produto | null>;
 
   /**
    * Atualiza um Produto existente no mecanismo de persistência.

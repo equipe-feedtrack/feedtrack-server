@@ -5,8 +5,8 @@ import { ProdutoResponseDTO } from '../dto/produto_response.dto';
 export class BuscarProdutoPorIdUseCase {
   constructor(private readonly produtoRepository: IProdutoRepository) {}
 
-  async execute(id: string): Promise<ProdutoResponseDTO | null> {
-    const produto = await this.produtoRepository.recuperarPorUuid(id);
+  async execute(id: string, empresaId: string): Promise<ProdutoResponseDTO | null> {
+    const produto = await this.produtoRepository.recuperarPorUuid(id, empresaId);
 
     if (!produto) {
       return null;

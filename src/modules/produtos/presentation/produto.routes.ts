@@ -9,7 +9,6 @@ import { DeletarProdutoUseCase } from '../application/use-cases/deletar_produto'
 import { AtualizarProdutoUseCase } from '../application/use-cases/atualizar_produto';
 import { BuscarProdutoPorIdUseCase } from '../application/use-cases/buscar_produto_por_id';
 import { CriarProdutoUseCase } from '../application/use-cases/criar_produto';
-import { ClienteRepositoryPrisma } from '@modules/gestao_clientes/infra/cliente.repository.prisma';
 import { ProdutoRepositoryPrisma } from '../infra/produto.repository.prisma';
 import { ReativarProdutoUseCase } from '../application/use-cases/reativar_produto';
 

@@ -1,8 +1,12 @@
 import { Entity } from "@shared/domain/entity";
+import { Plano, StatusEmpresa } from '@prisma/client'
 
 export interface EmpresaProps {
   nome: string;
   cnpj?: string;
+  plano: Plano
+  status: StatusEmpresa;
+  email: string | null ;
   dataCriacao: Date;
   dataAtualizacao: Date;
   dataExclusao?: Date | null;

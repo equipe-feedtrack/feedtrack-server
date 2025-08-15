@@ -61,12 +61,31 @@ enum CanalEnvio {
   WHATSAPP
 }
 
+enum Plano {
+  FREE
+  BASIC
+  PRO
+}
+
+enum StatusEmpresa {
+  ATIVO
+  INATIVO
+}
+
+
+
 // --- MODELS ---
 
 model Empresa {
   id              String    @id @default(uuid())
   nome            String    @unique
   cnpj            String?   @unique
+  email           String?   @unique
+  plano           Plano     @default(FREE)
+  status          StatusEmpresa @default(ATIVO)
+
+
+  
   dataCriacao     DateTime  @default(now()) @map("data_criacao")
   dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
   dataExclusao    DateTime? @map("data_exclusao")

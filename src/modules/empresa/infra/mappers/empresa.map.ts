@@ -7,6 +7,9 @@ export class EmpresaMap {
       {
         nome: raw.nome,
         cnpj: raw.cnpj ?? '',
+        email: raw.email,
+        status: raw.status,
+        plano: raw.plano,
         dataCriacao: raw.dataCriacao,
         dataAtualizacao: raw.dataAtualizacao,
         dataExclusao: raw.dataExclusao,
@@ -21,6 +24,9 @@ export class EmpresaMap {
       id: empresa.id.toString(),
       nome: empresa.props.nome,
       cnpj: empresa.props.cnpj ?? '',
+      email: empresa.props.email ?? '',
+      plano: empresa.props.plano,
+      status: empresa.props.status,
       dataCriacao: empresa.props.dataCriacao, // Adicionado
       dataAtualizacao: empresa.props.dataAtualizacao, // Adicionado
       dataExclusao: empresa.props.dataExclusao ?? null, // Adicionado

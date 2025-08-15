@@ -7,6 +7,7 @@ import { randomBytes } from 'crypto';
 interface CriarUsuarioEmpresaInput {
   empresaId: string;
   nomeEmpresa: string;
+  tipo: TipoUsuario
 }
 
 export class CriarUsuarioEmpresaUseCase implements IUseCase<CriarUsuarioEmpresaInput, Usuario> {
@@ -20,7 +21,7 @@ export class CriarUsuarioEmpresaUseCase implements IUseCase<CriarUsuarioEmpresaI
       nomeUsuario: defaultUsername,
       senhaHash: 'admin123', // This will be hashed inside criarUsuario
       email: null,
-      tipo: TipoUsuario.ADMIN, // Or a new EMPRESA_ADMIN type
+      tipo: input.tipo,
       empresaId: input.empresaId,
     });
 
