@@ -9,6 +9,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
   private _descricao?: string | undefined;
   private _perguntas: Pergunta[];
   private _ativo: boolean;
+  private _empresaId: string;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
   private _dataExclusao: Date | null;
@@ -37,6 +38,12 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     private set ativo(ativo: boolean) {
         this._ativo = ativo;
     }
+    public get empresaId(): string {
+        return this._empresaId;
+    }
+    private set empresaId(empresaId: string) {
+        this._empresaId = empresaId;
+    }
     public get dataCriacao(): Date {
         return this._dataCriacao;
     }
@@ -62,6 +69,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     this.descricao = formulario.descricao;
     this.perguntas = formulario.perguntas;
     this.ativo = formulario.ativo ?? true;
+    this.empresaId = formulario.empresaId;
     this.dataCriacao = formulario.dataCriacao ?? new Date();
     this.dataAtualizacao = formulario.dataAtualizacao ?? new Date();
     this.dataExclusao = formulario.dataExclusao ?? null;
@@ -83,6 +91,7 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
     descricao: formulario.descricao,
     perguntas: formulario.perguntas ?? [],
     ativo: formulario.ativo,
+    empresaId: formulario.empresaId,
     dataCriacao: formulario.dataCriacao,
     dataAtualizacao: formulario.dataAtualizacao
   });
@@ -163,4 +172,3 @@ class Formulario extends Entity<IFormulario> implements IFormulario {
 }
 
 export { Formulario };
-

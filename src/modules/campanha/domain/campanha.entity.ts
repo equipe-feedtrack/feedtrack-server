@@ -19,6 +19,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   private _templateMensagem: string;
   private _formularioId: string;
   private _ativo: boolean;
+  private _empresaId: string;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
   private _dataExclusao: Date | null;
@@ -51,6 +52,9 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   get ativo(): boolean {
     return this._ativo;
   }
+  get empresaId(): string {
+    return this._empresaId;
+  }
   get dataCriacao(): Date {
     return this._dataCriacao;
   }
@@ -65,7 +69,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     return this._canalEnvio;
   }
 
-  // Setters privados (com validações básicas)
+  // Setters privados (com validações)
   private set titulo(value: string) {
     if (!value || value.trim().length === 0) {
       throw new Error("Título da campanha não pode ser vazio."); // Ou CampanhaTituloVazioException
@@ -110,6 +114,9 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   private set ativo(value: boolean) {
     this._ativo = value;
   }
+  private set empresaId(value: string) {
+    this._empresaId = value;
+  }
   private set dataCriacao(value: Date) {
     this._dataCriacao = value;
   }
@@ -137,6 +144,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this.formularioId = props.formularioId;
     this.canalEnvio = props.canalEnvio;
     this.ativo = props.ativo; // 'ativo' é sempre boolean e será tratado na fábrica
+    this.empresaId = props.empresaId;
     this.dataCriacao = props.dataCriacao;
     this.dataAtualizacao = props.dataAtualizacao;
     this.dataExclusao = props.dataExclusao ?? null;
@@ -169,6 +177,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
       templateMensagem: props.templateMensagem,
       formularioId: props.formularioId,
       ativo: true, // Nova campanha é ativa por padrão
+      empresaId: props.empresaId,
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
       dataExclusao: null,

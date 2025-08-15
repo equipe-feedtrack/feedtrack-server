@@ -23,6 +23,10 @@ export class AtualizarPerguntaUseCase implements IUseCase<AtualizarPerguntaInput
       pergunta.atualizarTexto(input.texto);
     }
 
+    if (typeof input.tipo === 'string') {
+      pergunta.atualizarTipo(input.tipo);
+    }
+
     // 3. Persistir a entidade atualizada no banco de dados.
     await this._perguntaRepository.atualizar(pergunta);
 

@@ -16,7 +16,7 @@ export class CampanhaRepositoryPrisma implements ICampanhaRepository {
   async atualizar(campanha: Campanha): Promise<void> {
     const dadosParaPersistencia = CampanhaMap.toPersistence(campanha);
     // Removemos a relação do objeto principal para o Prisma lidar com ela separadamente
-    const { formulario, ...dadosEscalares } = dadosParaPersistencia;
+    const { formulario, empresa, ...dadosEscalares } = dadosParaPersistencia;
 
     await this.prisma.campanha.update({
       where: { id: campanha.id },
@@ -25,6 +25,7 @@ export class CampanhaRepositoryPrisma implements ICampanhaRepository {
         formulario: { // Conecta ao formulário, caso o ID tenha mudado
           connect: { id: campanha.formularioId },
         },
+        empresa: { connect: { id: campanha.empresaId } },
       },
     });
   }
@@ -39,8 +40,15 @@ export class CampanhaRepositoryPrisma implements ICampanhaRepository {
     return CampanhaMap.toDomain(campanhaPrisma);
   }
 
-  async listar(): Promise<Campanha[]> {
+  async listar(filtros?: any): Promise<Campanha[]> {
+    const whereClause: any = {};
+
+    if (filtros?.empresaId) {
+      whereClause.empresaId = filtros.empresaId;
+    }
+
     const campanhasPrisma = await this.prisma.campanha.findMany({
+        where: whereClause,
         orderBy: { dataCriacao: 'desc' }
     });
     return campanhasPrisma.map(campanha => CampanhaMap.toDomain(campanha));

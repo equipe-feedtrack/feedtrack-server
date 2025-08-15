@@ -20,17 +20,18 @@ export class CriarFormularioUseCase implements IUseCase<CriarFormularioInputDTO,
 
   async execute(input: CriarFormularioInputDTO): Promise<FormularioResponseDTO> {
     // 1. Validação e Recuperação das Perguntas
-    const perguntasRecuperadas = await this._perguntaRepository.buscarMuitosPorId(input.idsPerguntas);
-    if (perguntasRecuperadas.length !== input.idsPerguntas.length) {
-      throw new Error("Uma ou mais IDs de perguntas fornecidas são inválidas.");
-    }
+    // const perguntasRecuperadas = await this._perguntaRepository.buscarMuitosPorId(input.idsPerguntas);
+    // if (perguntasRecuperadas.length !== input.idsPerguntas.length) {
+    //   throw new Error("Uma ou mais IDs de perguntas fornecidas são inválidas.");
+    // }
 
     // 2. Criação da Entidade de Domínio
     const formulario = Formulario.criar({
       titulo: input.titulo,
       descricao: input.descricao,
       ativo: input.ativo,
-      perguntas: perguntasRecuperadas,
+      empresaId: input.empresaId,
+      perguntas: [], // No longer directly associated during creation
     });
 
     // 3. Persistência no Banco de Dados

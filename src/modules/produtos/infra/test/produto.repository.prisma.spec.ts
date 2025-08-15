@@ -18,21 +18,24 @@ describe('ProdutoRepositoryPrisma (Integration Tests)', () => {
       prisma.envioFormulario.deleteMany({}),
       prisma.produto.deleteMany({}),
       prisma.cliente.deleteMany({}),
+      prisma.pessoa.deleteMany({}), // Clear Pessoa table
     ]);
 
     CLIENTE_ID_PRODUTO_TESTE = randomUUID();
+    const pessoa = await prisma.pessoa.create({
+      data: { id: randomUUID(), nome: 'Cliente Produto Teste Pessoa', email: 'produtoteste@example.com', telefone: '11912345678' },
+    });
     await prisma.cliente.create({
       data: {
         id: CLIENTE_ID_PRODUTO_TESTE,
         nome: 'Cliente Produto Teste',
-        email: 'produtoteste@example.com',
-        telefone: '11912345678',
         cidade: 'Cidade Teste',
         status: 'ATIVO' as any,
         vendedorResponsavel: 'Vendedor Produtos',
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
         dataExclusao: null,
+        pessoaId: pessoa.id,
       },
     });
   });

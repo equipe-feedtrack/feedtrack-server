@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { describe, it, expect, beforeEach } from 'vitest';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -10,34 +11,38 @@ describe('Testes Prisma - Clientes e Produtos', () => {
     await prisma.clientesOnProdutos.deleteMany();
     await prisma.produto.deleteMany();
     await prisma.cliente.deleteMany();
+    await prisma.pessoa.deleteMany(); // Clear Pessoa table
   });
 
   it('Deve criar um Cliente', async () => {
+    const pessoa = await prisma.pessoa.create({
+      data: { id: randomUUID(), nome: 'Alexsandro', email: 'alexsandro@email.com', telefone: '99999-9999' },
+    });
     const cliente = await prisma.cliente.create({
       data: {
         nome: 'Alexsandro',
-        telefone: '99999-9999',
-        email: 'alexsandro@email.com',
         cidade: 'Tobias Barreto',
         status: 'ATIVO',
         vendedorResponsavel: 'João',
+        pessoaId: pessoa.id,
       },
     });
 
     expect(cliente).toHaveProperty('id');
     expect(cliente.nome).toBe('Alexsandro');
-    expect(cliente.email).toBe('alexsandro@email.com');
   });
 
   it('Deve criar um Produto associado a um Cliente', async () => {
+    const pessoa = await prisma.pessoa.create({
+      data: { id: randomUUID(), nome: 'Alexsandro', email: 'alexsandro@email.com', telefone: '99999-9999' },
+    });
     const cliente = await prisma.cliente.create({
       data: {
         nome: 'Alexsandro',
-        telefone: '99999-9999',
-        email: 'alexsandro@email.com',
         cidade: 'Tobias Barreto',
         status: 'ATIVO',
         vendedorResponsavel: 'João',
+        pessoaId: pessoa.id,
       },
     });
 
@@ -61,14 +66,16 @@ describe('Testes Prisma - Clientes e Produtos', () => {
   });
 
   it('Deve buscar um Cliente específico', async () => {
+    const pessoa = await prisma.pessoa.create({
+      data: { id: randomUUID(), nome: 'Alexsandro', email: 'alexsandro@email.com', telefone: '99999-9999' },
+    });
     const cliente = await prisma.cliente.create({
       data: {
         nome: 'Alexsandro',
-        telefone: '99999-9999',
-        email: 'alexsandro@email.com',
         cidade: 'Tobias Barreto',
         status: 'ATIVO',
         vendedorResponsavel: 'João',
+        pessoaId: pessoa.id,
       },
     });
 
@@ -81,14 +88,16 @@ describe('Testes Prisma - Clientes e Produtos', () => {
   });
 
   it('Deve atualizar um Cliente existente', async () => {
+    const pessoa = await prisma.pessoa.create({
+      data: { id: randomUUID(), nome: 'Alexsandro', email: 'alexsandro@email.com', telefone: '99999-9999' },
+    });
     const cliente = await prisma.cliente.create({
       data: {
         nome: 'Alexsandro',
-        telefone: '99999-9999',
-        email: 'alexsandro@email.com',
         cidade: 'Tobias Barreto',
         status: 'ATIVO',
         vendedorResponsavel: 'João',
+        pessoaId: pessoa.id,
       },
     });
 
@@ -102,14 +111,16 @@ describe('Testes Prisma - Clientes e Produtos', () => {
   });
 
   it('Deve excluir um Cliente', async () => {
+    const pessoa = await prisma.pessoa.create({
+      data: { id: randomUUID(), nome: 'Alexsandro', email: 'alexsandro@email.com', telefone: '99999-9999' },
+    });
     const cliente = await prisma.cliente.create({
       data: {
         nome: 'Alexsandro',
-        telefone: '99999-9999',
-        email: 'alexsandro@email.com',
         cidade: 'Tobias Barreto',
         status: 'ATIVO',
         vendedorResponsavel: 'João',
+        pessoaId: pessoa.id,
       },
     });
 
@@ -126,10 +137,13 @@ describe('Testes Prisma - Clientes e Produtos', () => {
   });
 
   it('Deve buscar todos os Clientes cadastrados', async () => {
+    const pessoa1 = await prisma.pessoa.create({ data: { id: randomUUID(), nome: 'Cliente 1', email: 'cliente1@email.com', telefone: '11111-1111' } });
+    const pessoa2 = await prisma.pessoa.create({ data: { id: randomUUID(), nome: 'Cliente 2', email: 'cliente2@email.com', telefone: '22222-2222' } });
+
     await prisma.cliente.createMany({
       data: [
-        { nome: 'Cliente 1', telefone: '11111-1111', email: 'cliente1@email.com', cidade: 'Aracaju', status: 'ATIVO', vendedorResponsavel: 'João' },
-        { nome: 'Cliente 2', telefone: '22222-2222', email: 'cliente2@email.com', cidade: 'São Paulo', status: 'INATIVO', vendedorResponsavel: 'Maria' },
+        { id: randomUUID(), nome: 'Cliente 1', cidade: 'Aracaju', status: 'ATIVO', vendedorResponsavel: 'João', pessoaId: pessoa1.id },
+        { id: randomUUID(), nome: 'Cliente 2', cidade: 'São Paulo', status: 'INATIVO', vendedorResponsavel: 'Maria', pessoaId: pessoa2.id },
       ],
     });
 

@@ -45,9 +45,10 @@ export class CampanhaMap {
       dataInicio: raw.dataInicio,
       dataFim: raw.dataFim,
       templateMensagem: raw.templateMensagem,
-      formularioId: raw.formularioId,
+      formularioId: raw.formularioId ?? '',
       canalEnvio: raw.canalEnvio,
       ativo: raw.ativo,
+      empresaId: raw.empresaId,
       dataCriacao: raw.dataCriacao,
       dataAtualizacao: raw.dataAtualizacao,
       dataExclusao: raw.dataExclusao,
@@ -74,6 +75,7 @@ export class CampanhaMap {
       dataCriacao: campanha.dataCriacao,
       dataAtualizacao: campanha.dataAtualizacao,
       dataExclusao: campanha.dataExclusao,
+      empresa: { connect: { id: campanha.empresaId } },
       // A conexão com o formulário é feita através do ID
       formulario: {
         connect: { id: campanha.formularioId },
@@ -97,6 +99,7 @@ export class CampanhaMap {
       formularioId: campanha.formularioId,
       canalEnvio: campanha.canalEnvio,
       ativo: campanha.ativo,
+      empresaId: campanha.empresaId,
       dataCriacao: new Date(campanha.dataCriacao).toISOString(),
       dataAtualizacao: new Date(campanha.dataAtualizacao).toISOString(),
     };

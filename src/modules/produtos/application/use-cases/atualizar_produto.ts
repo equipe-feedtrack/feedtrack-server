@@ -9,7 +9,7 @@ export class AtualizarProdutoUseCase {
 
   async execute(input: AtualizarProdutoInputDTO): Promise<ProdutoResponseDTO> {
     // 1. Recuperar a entidade existente
-    const produto = await this.produtoRepository.recuperarPorUuid(input.id);
+    const produto = await this.produtoRepository.recuperarPorUuid(input.id, input.empresaId);
     if (!produto) {
       throw new Error(`Produto com ID ${input.id} não encontrado.`); // Exceção específica
     }
@@ -23,6 +23,13 @@ export class AtualizarProdutoUseCase {
     }
     if (input.valor !== undefined) {
       produto.atualizarValor(input.valor); // Crie este método na entidade Produto
+    }
+    if (input.ativo !== undefined) {
+      if (input.ativo) {
+        produto.ativar();
+      } else {
+        produto.inativar();
+      }
     }
     
     // 3. Persistir a entidade atualizada

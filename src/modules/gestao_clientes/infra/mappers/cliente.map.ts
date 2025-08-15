@@ -1,22 +1,11 @@
 import { ClienteResponseDTO } from "@modules/gestao_clientes/application/dto/cliente_response.dto";
 import { Cliente } from "@modules/gestao_clientes/domain/cliente.entity";
 import { ICliente, StatusCliente } from "@modules/gestao_clientes/domain/cliente.types";
-import { ProdutoMap } from "@modules/produtos/infra/mappers/produto.map";
 import { 
     Cliente as ClientePrisma, 
-    Produto as ProdutoPrisma,
-    ClientesOnProdutos, // Importa o tipo da tabela de junção
     StatusUsuario, 
     Prisma 
 } from "@prisma/client";
-import { PessoaMap } from "@shared/infra/mappers/pessoa.map";
-
-// ✅ CORREÇÃO: Define um tipo que representa a estrutura aninhada da consulta N-N do Prisma.
-type ClienteComProdutosAninhadosPrisma = ClientePrisma & {
-  produtos: (ClientesOnProdutos & {
-    produto: ProdutoPrisma;
-  })[];
-};
 
 export class ClienteMap {
 
@@ -36,25 +25,16 @@ export class ClienteMap {
         }
     }
 
-    /**
-     * Converte um objeto de dados do Prisma (com relação N-N aninhada) para a entidade de domínio Cliente.
-     */
-    public static toDomain(raw: ClienteComProdutosAninhadosPrisma): Cliente {
+    public static toDomain(raw: ClientePrisma): Cliente {
         
-        const pessoaDomain = PessoaMap.toDomain(raw);
-
-        // ✅ CORREÇÃO: Mapeia a estrutura aninhada para extrair apenas os produtos.
-        const produtosDeDominio = (raw.produtos ?? []).map(itemDaJuncao => 
-            ProdutoMap.toDomain(itemDaJuncao.produto)
-        );
-
         const clienteProps: ICliente = {
             id: raw.id,
-            pessoa: pessoaDomain,
+            nome: raw.nome,
+            email: raw.email ?? '',
+            telefone: raw.telefone ?? '',
             cidade: raw.cidade ?? null,
-            vendedorResponsavel: raw.vendedorResponsavel, 
             status: this.statusToDomain(raw.status),
-            produtos: produtosDeDominio, // Usa a lista de produtos desembrulhada
+            empresaId: raw.empresaId,
             dataCriacao: raw.dataCriacao,
             dataAtualizacao: raw.dataAtualizacao,
             dataExclusao: raw.dataExclusao ?? null,
@@ -63,40 +43,32 @@ export class ClienteMap {
         return Cliente.recuperar(clienteProps);
     }
 
-    /**
-     * Converte a entidade de domínio Cliente para um objeto de persistência do Prisma.
-     * Nota: A relação com produtos não é tratada aqui, mas sim no repositório.
-     */
-    public static toPersistence(cliente: Cliente): Omit<Prisma.ClienteCreateInput, 'produtos'> {
+    public static toPersistence(cliente: Cliente): Prisma.ClienteCreateInput {
         
         return {
             id: cliente.id,
-            nome: cliente.pessoa.nome,
-            email: cliente.pessoa.email ?? null,
-            telefone: cliente.pessoa.telefone ?? '',
+            nome: cliente.nome,
+            email: cliente.email ?? null,
+            telefone: cliente.telefone ?? '',
             cidade: cliente.cidade ?? '',
-            vendedorResponsavel: cliente.vendedorResponsavel,
             status: this.statusToPersistence(cliente.status ?? StatusCliente.ATIVO),
+            empresa: { connect: { id: cliente.empresaId } },
             dataCriacao: cliente.dataCriacao,
             dataAtualizacao: cliente.dataAtualizacao,
             dataExclusao: cliente.dataExclusao,
         };
     }
 
-    /**
-     * Converte a entidade de domínio Cliente para um DTO de resposta da API.
-     */
     public static toResponseDTO(cliente: Cliente): ClienteResponseDTO {
         
-        const pessoaDTO = PessoaMap.toDTO(cliente.pessoa);
-
         return {
             id: cliente.id,
-            pessoa: pessoaDTO,
+            nome: cliente.nome,
+            email: cliente.email,
+            telefone: cliente.telefone,
             cidade: cliente.cidade ?? null,
-            vendedorResponsavel: cliente.vendedorResponsavel,
             status: cliente.status,
-            produtos: cliente.produtos.map(produto => ProdutoMap.toDTO(produto)),
+            empresaId: cliente.empresaId,
             dataCriacao: cliente.dataCriacao.toISOString(),
             dataAtualizacao: cliente.dataAtualizacao.toISOString(),
             dataExclusao: cliente.dataExclusao ? cliente.dataExclusao.toISOString() : null,

@@ -16,6 +16,7 @@ class Produto extends Entity<IProduto> implements IProduto {
     private _dataAtualizacao: Date;
     private _dataExclusao: Date | null ;
     private _ativo: boolean;
+    private _empresaId: string;
 
     //////////////
     //Constantes//
@@ -115,6 +116,14 @@ class Produto extends Entity<IProduto> implements IProduto {
         this._ativo = value;
     }
 
+    public get empresaId(): string {
+        return this._empresaId;
+    }
+
+    private set empresaId(empresaId: string) {
+        this._empresaId = empresaId;
+    }
+
     //////////////
     //Construtor//
     //////////////
@@ -128,6 +137,7 @@ class Produto extends Entity<IProduto> implements IProduto {
         this.dataAtualizacao = produto.dataAtualizacao;
         this.dataExclusao = produto.dataExclusao;
         this.ativo = produto.ativo;
+        this.empresaId = produto.empresaId;
     }
 
     /////////////////////////
@@ -135,12 +145,13 @@ class Produto extends Entity<IProduto> implements IProduto {
     /////////////////////////
 
     public static criarProduto(props: CriarProdutoProps): Produto {
-        const produtoCompleto: IProduto = { // <-- Construímos um IProduto COMPLETO aqui
+        const produtoCompleto: IProduto = { // <-- Construímos um IProduto COMPLEto aqui
         id: randomUUID(), // <-- Geramos o ID aqui
         nome: props.nome,
         descricao: props.descricao,
         valor: props.valor,
         ativo: true,
+        empresaId: props.empresaId,
         dataCriacao: new Date(), // <-- Geramos a data de criação
         dataAtualizacao: new Date(), // <-- Geramos a data de atualização
         dataExclusao: null, // <-- Default para null
@@ -190,4 +201,3 @@ class Produto extends Entity<IProduto> implements IProduto {
 }
 
 export { Produto };
-
