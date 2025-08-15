@@ -1,6 +1,7 @@
 export interface LoginInputDTO {
   nomeUsuario: string;
   senha: string;
+  
 }
 
 export interface LoginOutputDTO {

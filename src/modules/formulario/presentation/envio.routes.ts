@@ -16,6 +16,8 @@ import { EnvioRepositoryPrisma } from '../infra/envio/EnvioRepositoryPrisma';
 // Gateways
 import { WhatsAppApiGateway } from '../infra/envio/gateways/WhatsAppApiGateway';
 import { EmailGateway } from '../infra/envio/gateways/EmailApiGateway';
+import { VendaRepositoryPrisma } from '@modules/venda/infra/venda.repository.prisma';
+import { EmpresaRepositoryPrisma } from '@modules/empresa/infra/empresa.repository.prisma';
 
 
 // --- INICIALIZAÇÃO DE DEPENDÊNCIAS ---
@@ -23,9 +25,12 @@ const prisma = new PrismaClient();
 
 // Repositórios
 const envioRepository = new EnvioRepositoryPrisma(prisma);
-const clienteRepository = new ClienteRepositoryPrisma(prisma);
 const campanhaRepository = new CampanhaRepositoryPrisma(prisma);
-const formularioRepository = new FormularioRepositoryPrisma(prisma);
+const vendaRepository = new VendaRepositoryPrisma();
+const EmpresaRepository = new EmpresaRepositoryPrisma();
+
+
+
 
 // Gateways
 const emailGateway = new EmailGateway();
@@ -33,33 +38,34 @@ const whatsappGateway = new WhatsAppApiGateway();
 
 // Casos de Uso
 const dispararEnvioIndividualUseCase = new DispararEnvioIndividualUseCase(
-  envioRepository,
-  clienteRepository,
+    envioRepository,
   campanhaRepository,
-  formularioRepository,
-  whatsappGateway, // Injetando o gateway de WhatsApp
-  emailGateway // Injetando o gateway de e-mail
+ // Injetando o gateway de e-mail
+  whatsappGateway,// Injetando o gateway de WhatsApp
+    emailGateway,
+  EmpresaRepository,
+  vendaRepository
 );
-const dispararEnvioEmMassaUseCase = new DispararEnvioEmMassaUseCase(
-  envioRepository,
-  clienteRepository,
-  campanhaRepository,
-  emailGateway, // Injetando o gateway de e-mail
-  whatsappGateway // Injetando o gateway de WhatsApp
-);
-const retentarEnviosPendentesUseCase = new RetentarEnviosPendentesUseCase(
-  envioRepository,
-  campanhaRepository,
-  clienteRepository,
-  emailGateway,
-  whatsappGateway
-);
+// const dispararEnvioEmMassaUseCase = new DispararEnvioEmMassaUseCase(
+//   envioRepository,
+//   campanhaRepository,
+//   emailGateway, // Injetando o gateway de e-mail
+//   whatsappGateway,// Injetando o gateway de WhatsApp
+//   EmpresaRepository,
+// );
+// const retentarEnviosPendentesUseCase = new RetentarEnviosPendentesUseCase(
+//   envioRepository,
+//   campanhaRepository,
+//   clienteRepository,
+//   emailGateway,
+//   whatsappGateway
+// );
 
 // Controlador
 const envioController = new EnvioController(
   dispararEnvioIndividualUseCase,
-  dispararEnvioEmMassaUseCase,
-  retentarEnviosPendentesUseCase
+  // dispararEnvioEmMassaUseCase,
+  // retentarEnviosPendentesUseCase
 );
 
 // ====================================================================
@@ -141,7 +147,7 @@ envioRouter.post('/envio/individual', envioController.dispararIndividual);
  *       500:
  *         description: Erro interno do servidor.
  */
-envioRouter.post('/envio/massa', envioController.dispararEmMassa);
+// envioRouter.post('/envio/massa', envioController.dispararEmMassa);
 
 // Rota para retentativa de envios
 /**
@@ -170,6 +176,6 @@ envioRouter.post('/envio/massa', envioController.dispararEmMassa);
  *       500:
  *         description: Erro interno do servidor.
  */
-envioRouter.post('/envio/retentar', envioController.retentarPendentes);
+// envioRouter.post('/envio/retentar', envioController.retentarPendentes);
 
 export { envioRouter };

@@ -13,7 +13,6 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   private _descricao?: string;
   private _tipoCampanha: TipoCampanha;
   private _segmentoAlvo: SegmentoAlvo;
-  private _dataInicio: Date;
   private _canalEnvio: CanalEnvio;
   private _dataFim: Date | null;
   private _templateMensagem: string;
@@ -36,9 +35,6 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   }
   get segmentoAlvo(): SegmentoAlvo {
     return this._segmentoAlvo;
-  }
-  get dataInicio(): Date {
-    return this._dataInicio;
   }
   get dataFim(): Date | null {
     return this._dataFim;
@@ -89,10 +85,6 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this._segmentoAlvo = value;
   }
 
-  private set dataInicio(value: Date) {
-    this._dataInicio = value;
-  }
-
   private set dataFim(value: Date | null) {
     this._dataFim = value;
   }
@@ -138,7 +130,6 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this.descricao = props.descricao;
     this.tipoCampanha = props.tipoCampanha;
     this.segmentoAlvo = props.segmentoAlvo;
-    this.dataInicio = props.dataInicio;
     this.dataFim = props.dataFim ?? null;
     this.templateMensagem = props.templateMensagem;
     this.formularioId = props.formularioId;
@@ -156,7 +147,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
 
   // Método para validações complexas da entidade (invariantes)
   private validarInvariantes(): void {
-    if (this.dataFim && this.dataFim < this.dataInicio) {
+    if (this.dataFim && this.dataFim < this.dataCriacao) {
       throw new Error(
         "Data de fim da campanha não pode ser anterior à data de início."
       ); // Ou CampanhaDataInvalidaException
@@ -171,7 +162,6 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
       descricao: props.descricao,
       tipoCampanha: props.tipoCampanha,
       segmentoAlvo: props.segmentoAlvo,
-      dataInicio: props.dataInicio,
       dataFim: props.dataFim ?? null, // Default null se não fornecido na criação
       canalEnvio: props.canalEnvio || "EMAIL", // Default canal de envio, pode ser ajustado conforme necessário
       templateMensagem: props.templateMensagem,
@@ -207,8 +197,8 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this.dataAtualizacao = new Date();
   }
 
-  public atualizarPeriodo(dataInicio: Date, dataFim: Date | null): void {
-    this.dataInicio = dataInicio;
+  public atualizarPeriodo(dataCriacao: Date, dataFim: Date | null): void {
+    this.dataCriacao = dataCriacao;
     this.dataFim = dataFim ?? null;
     this.validarInvariantes(); // Revalida após mudança de datas
     this.dataAtualizacao = new Date();

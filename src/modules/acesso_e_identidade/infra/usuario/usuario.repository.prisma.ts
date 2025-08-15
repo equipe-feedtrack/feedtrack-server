@@ -41,8 +41,21 @@ async inserir(usuario: Usuario): Promise<Usuario> {
   }
 
     const usuario = await this.prisma.usuario.findUnique({
-      where: { nome_usuario: nomeUsuario },
-    });
+  where: { nome_usuario: nomeUsuario },
+  select: {
+    id: true,
+    nome_usuario: true,
+    senha_hash: true,
+    tipo: true,
+    email: true,
+    status: true,
+    empresaId: true, // <= garante que o campo vem
+    data_criacao: true,
+    data_atualizacao: true,
+    data_exclusao: true
+  }
+});
+
     if (!usuario) {
       return null;
     }

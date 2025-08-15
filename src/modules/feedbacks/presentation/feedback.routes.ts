@@ -238,31 +238,24 @@ router.get('/feedbacks', feedbackController.buscarTodos);
  */
 router.delete('/feedback/:id', feedbackController.excluirLogicamente);
 
-router.get('/resposta-formulario/formulario/:formularioId/cliente/:clienteId/produto/:produtoId', (req, res) => {
+router.get('/resposta-formulario/empresa/:empresaId/campanha/:campanhaId/venda/:vendaId', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
 
-// API para buscar dados do envio com base em formulário e cliente
-router.get('/resposta-formulario-get/formulario/:formularioId/cliente/:clienteId', async (req, res): Promise<any> => {
-  const { formularioId, clienteId } = req.params;
+
+
+router.get('/resposta-formulario-get/empresa/:empresaId/campanha/:campanhaId/vendas/:vendaId', async (req, res): Promise<any> => {
+  const { empresaId, vendaId, campanhaId } = req.params;
+
+  console.log(empresaId, vendaId, campanhaId)
 
   try {
     const envio = await prisma.envioFormulario.findFirst({
       where: {
-        formularioId,
-        clienteId,
-      },
-      include: {
-        cliente: true,
-        campanha: true,
-        usuario: true,
-        feedback: true,
-        formulario: {
-          include: {
-            perguntas: true, // Inclui as perguntas do formulário
-          },
-        }
-      },
+        empresaId: empresaId,
+        campanhaId: campanhaId,
+        vendaId: vendaId,
+      }
       
     });
 
@@ -276,5 +269,6 @@ router.get('/resposta-formulario-get/formulario/:formularioId/cliente/:clienteId
     res.status(500).json({ message: 'Erro interno no servidor' });
   }
 });
+
 
 export { router as feedbackRoutes };

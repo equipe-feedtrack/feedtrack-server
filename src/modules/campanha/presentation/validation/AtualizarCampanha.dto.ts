@@ -64,10 +64,6 @@ export class AtualizarCampanhaValidationDTO {
 
     @IsDateString()
     @IsOptional()
-    dataInicio?: Date;
-
-    @IsDateString()
-    @IsOptional()
     dataFim?: Date;
 
     @IsString()

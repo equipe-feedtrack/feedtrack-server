@@ -12,12 +12,8 @@ export class EnvioMap {
     const envioProps: IEnvio = {
       id: raw.id,
       status: raw.status,
-      feedbackId: null, 
-      produtoId: raw.produtoId ?? '',
-      clienteId: raw.clienteId ?? '',
-      formularioId: raw.formularioId ?? '',
       campanhaId: raw.campanhaId ?? '',
-      usuarioId: raw.usuarioId ?? '',
+      vendaId: raw.vendaId ?? '',
       empresaId: raw.empresaId ?? '', // <<< adicionado
       dataCriacao: raw.dataCriacao,
       dataEnvio: raw.dataEnvio,
@@ -40,10 +36,8 @@ export class EnvioMap {
       ultimaMensagemErro: envio.ultimaMensagemErro,
 
       // Conecta as relações com as outras entidades
-      cliente: { connect: { id: envio.clienteId } },
-      formulario: { connect: { id: envio.formularioId } },
       campanha: { connect: { id: envio.campanhaId } },
-      usuario: { connect: { id: envio.usuarioId } },
+      venda: { connect: { id: envio.vendaId } },
       empresa: { connect: { id: envio.empresaId } }, // <<< adicionado
     };
   }
