@@ -10,6 +10,7 @@ import { clienteRouter } from "@modules/gestao_clientes/presentation/gestao_clie
 import produtoRouter from "@modules/produtos/presentation/produto.routes";
 import { empresaRoutes } from "@modules/empresa/presentation/empresa.routes";
 import Express, { Router } from "express";
+import { vendaRoutes } from "@modules/venda/presentation/venda.routes";
 
 const apiv1Router: Router = Express.Router();
 
@@ -36,6 +37,8 @@ apiv1Router.use(usuarioRouter)
 apiv1Router.use(authRouter); // Added
 
 apiv1Router.use(empresaRoutes);
+
+apiv1Router.use(vendaRoutes)
 
 
 

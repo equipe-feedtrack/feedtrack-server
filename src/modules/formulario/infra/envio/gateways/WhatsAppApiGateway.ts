@@ -31,9 +31,10 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
    * @param conteudo O conteúdo da mensagem (ex: template).
    * @param link O link base para o formulário.
    */
-  public async enviar(destinatario: string, conteudo: string, formularioId: string, clienteId: string, produtoId: string): Promise<void> {
+  public async enviar(destinatario: string, conteudo: string, vendaId: string, campanhaId: string, empresaId: string): Promise<void> {
     console.log(`[WhatsAppApiGateway] Preparando para enviar mensagem para: ${destinatario}`);
-    const linkCompleto = `${this.feedbackUrl}/formulario/${formularioId}/cliente/${clienteId}/produto/${produtoId}`;
+    const linkCompleto = `${this.feedbackUrl}/empresa/${empresaId}/campanha/${campanhaId}/venda/${vendaId}`;
+
     const mensagemCompleta = `${conteudo}\n\nResponda aqui: ${linkCompleto}`;
 
     try {

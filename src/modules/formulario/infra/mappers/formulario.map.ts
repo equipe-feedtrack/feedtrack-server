@@ -6,6 +6,7 @@ import {
 import { FormularioResponseDTO } from '@modules/formulario/application/dto/formulario/FormularioResponseDTO';
 import { ListarFormulariosResponseDTO } from '@modules/formulario/application/dto/formulario/ListarFormulariosResponseDTO';
 import { Formulario } from '@modules/formulario/domain/formulario/formulario.entity';
+import { PerguntaMap } from './pergunta.map';
 
 export class FormularioMap {
   /**
@@ -18,7 +19,7 @@ export class FormularioMap {
       id: raw.id,
       titulo: raw.titulo, // Assumindo que o campo no Prisma é 'titulo'
       descricao: raw.descricao,
-      perguntas: raw., // No longer directly associated during creation
+      perguntas: [], // No longer directly associated during creation
       ativo: raw.ativo,
       empresaId: raw.empresaId,
       dataCriacao: raw.dataCriacao,
@@ -58,7 +59,7 @@ export class FormularioMap {
       dataCriacao: formulario.dataCriacao.toISOString(),
       dataAtualizacao: formulario.dataAtualizacao.toISOString(),
       // Delega a conversão de cada Pergunta para o PerguntaMap
-      perguntas: [],
+      perguntas: formulario.perguntas.map(PerguntaMap.toDTO),
     };
   }
 
@@ -73,7 +74,7 @@ export class FormularioMap {
       ativo: formulario.ativo,
       empresaId: formulario.empresaId,
       dataCriacao: formulario.dataCriacao.toISOString(),
-      perguntas: [],
+      perguntas: formulario.perguntas.map(PerguntaMap.toDTO),
     };
   }
 }

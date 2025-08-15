@@ -11,8 +11,8 @@ import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/
 export class EnvioController {
   constructor(
     private readonly dispararEnvioIndividualUseCase: DispararEnvioIndividualUseCase,
-    private readonly dispararEnvioEmMassaUseCase: DispararEnvioEmMassaUseCase,
-    private readonly retentarEnviosPendentesUseCase: RetentarEnviosPendentesUseCase,
+    // private readonly dispararEnvioEmMassaUseCase: DispararEnvioEmMassaUseCase,
+    // private readonly retentarEnviosPendentesUseCase: RetentarEnviosPendentesUseCase,
   ) {}
 
   /**
@@ -21,10 +21,10 @@ export class EnvioController {
    */
   public dispararIndividual = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { clienteId, campanhaId, usuarioId, produtoId } = req.body;
+      const { campanhaId, vendaId, empresaId } = req.body;
       
       
-      await this.dispararEnvioIndividualUseCase.execute({ clienteId, campanhaId, usuarioId, produtoId });
+      await this.dispararEnvioIndividualUseCase.execute({ campanhaId, vendaId, empresaId });
       res.status(200).json({ message: 'Envio individual disparado com sucesso.' });
     } catch (error) {
       next(error);
@@ -35,29 +35,29 @@ export class EnvioController {
    * @description Manipulador para disparar um envio em massa de um formulário.
    * Rota: POST /envios/massa
    */
-  public dispararEmMassa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { campanhaId, quantidade, intervalo, produtoId } = req.body;
-      await this.dispararEnvioEmMassaUseCase.execute(campanhaId, { quantidade, intervalo }, produtoId);
-      res.status(200).json({ message: 'Disparo em massa iniciado com sucesso.' });
-    } catch (error) {
-      next(error);
-    }
-  };
+  // public dispararEmMassa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  //   try {
+  //     const { campanhaId, quantidade, intervalo, produtoId } = req.body;
+  //     await this.dispararEnvioEmMassaUseCase.execute(campanhaId, { quantidade, intervalo }, produtoId);
+  //     res.status(200).json({ message: 'Disparo em massa iniciado com sucesso.' });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 
-  /**
-   * @description Manipulador para retentar envios pendentes (usado por jobs).
-   * Rota: POST /envios/retentar
-   */
-  public retentarPendentes = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { clienteId, campanhaId } = req.body;
-      // Passa os parâmetros opcionais para o use-case
-      await this.retentarEnviosPendentesUseCase.execute({ clienteId, campanhaId });
-      res.status(200).json({ message: 'Retentativa de envios pendentes concluída.' });
-    } catch (error) {
-      next(error);
-    }
-  };
+  // /**
+  //  * @description Manipulador para retentar envios pendentes (usado por jobs).
+  //  * Rota: POST /envios/retentar
+  //  */
+  // public retentarPendentes = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  //   try {
+  //     const { clienteId, campanhaId } = req.body;
+  //     // Passa os parâmetros opcionais para o use-case
+  //     await this.retentarEnviosPendentesUseCase.execute({ clienteId, campanhaId });
+  //     res.status(200).json({ message: 'Retentativa de envios pendentes concluída.' });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 }
 
