@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { DispararEnvioEmMassaUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case';
+import { DispararEnvioEmMassaRealtimeUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case';
 import { DispararEnvioIndividualUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case';
-import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/use-cases/envio/retentarEnviosPendentes.use-case';
+
 
 
 /**
@@ -11,8 +11,7 @@ import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/
 export class EnvioController {
   constructor(
     private readonly dispararEnvioIndividualUseCase: DispararEnvioIndividualUseCase,
-    // private readonly dispararEnvioEmMassaUseCase: DispararEnvioEmMassaUseCase,
-    // private readonly retentarEnviosPendentesUseCase: RetentarEnviosPendentesUseCase,
+    private readonly dispararEnvioEmMassaUseCase: DispararEnvioEmMassaRealtimeUseCase,
   ) {}
 
   /**
@@ -36,15 +35,23 @@ export class EnvioController {
    * @description Manipulador para disparar um envio em massa de um formulário.
    * Rota: POST /envios/massa
    */
-  // public dispararEmMassa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  //   try {
-  //     const { campanhaId, quantidade, intervalo, produtoId } = req.body;
-  //     await this.dispararEnvioEmMassaUseCase.execute(campanhaId, { quantidade, intervalo }, produtoId);
-  //     res.status(200).json({ message: 'Disparo em massa iniciado com sucesso.' });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+public dispararEmMassa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { campanhaId, intervalo, empresaId, produtoId } = req.body;
+
+    await this.dispararEnvioEmMassaUseCase.execute(
+      campanhaId,
+      empresaId,
+      produtoId,
+      { intervaloChecagemMinutos: intervalo }
+    );
+
+    res.status(200).json({ message: 'Disparo em massa iniciado com sucesso.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 
   // /**
   //  * @description Manipulador para retentar envios pendentes (usado por jobs).

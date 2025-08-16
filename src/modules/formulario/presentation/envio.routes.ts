@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { EnvioController } from './controller/envio.controller';
 
 // Use Cases
-import { DispararEnvioEmMassaUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case';
+import { DispararEnvioEmMassaRealtimeUseCase } from '../application/use-cases/envio/dispararEnvioEmMassa.use-case';
 import { DispararEnvioIndividualUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case';
 import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/use-cases/envio/retentarEnviosPendentes.use-case';
 
@@ -46,27 +46,21 @@ const dispararEnvioIndividualUseCase = new DispararEnvioIndividualUseCase(
   EmpresaRepository,
   vendaRepository
 );
-// const dispararEnvioEmMassaUseCase = new DispararEnvioEmMassaUseCase(
-//   envioRepository,
-//   campanhaRepository,
-//   emailGateway, // Injetando o gateway de e-mail
-//   whatsappGateway,// Injetando o gateway de WhatsApp
-//   EmpresaRepository,
-// );
-// const retentarEnviosPendentesUseCase = new RetentarEnviosPendentesUseCase(
-//   envioRepository,
-//   campanhaRepository,
-//   clienteRepository,
-//   emailGateway,
-//   whatsappGateway
-// );
+// instância correta:
+const dispararEnvioEmMassaUseCase = new DispararEnvioEmMassaRealtimeUseCase(
+  envioRepository,
+  vendaRepository,
+  campanhaRepository,
+  whatsappGateway,
+  emailGateway
+);
 
 // Controlador
 const envioController = new EnvioController(
   dispararEnvioIndividualUseCase,
-  // dispararEnvioEmMassaUseCase,
-  // retentarEnviosPendentesUseCase
+  dispararEnvioEmMassaUseCase
 );
+
 
 // ====================================================================
 // DEFINIÇÃO DAS ROTAS
@@ -147,7 +141,7 @@ envioRouter.post('/envio/individual', envioController.dispararIndividual);
  *       500:
  *         description: Erro interno do servidor.
  */
-// envioRouter.post('/envio/massa', envioController.dispararEmMassa);
+envioRouter.post('/envio/massa', envioController.dispararEmMassa);
 
 // Rota para retentativa de envios
 /**

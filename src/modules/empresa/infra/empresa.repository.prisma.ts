@@ -22,12 +22,25 @@ async save(empresa: Empresa): Promise<Empresa> {
 }
 
 
-  async findById(id: string): Promise<Empresa | null> {
-    const empresa = await prisma.empresa.findUnique({
-      where: { id },
-    });
-    return empresa ? EmpresaMap.toDomain(empresa) : null;
-  }
+async findById(id: string): Promise<Empresa | null> {
+  const empresa = await prisma.empresa.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      nome: true,
+      cnpj: true,
+      email: true,
+      status: true,
+      plano: true,
+      dataCriacao: true,
+      dataAtualizacao: true,
+      dataExclusao: true
+    }
+  });
+
+  return empresa ? EmpresaMap.toDomain(empresa) : null;
+}
+
 
   async findByCnpj(cnpj: string): Promise<Empresa | null> {
     const empresa = await prisma.empresa.findUnique({

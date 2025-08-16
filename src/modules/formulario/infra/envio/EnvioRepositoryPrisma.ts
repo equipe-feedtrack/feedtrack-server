@@ -77,15 +77,16 @@ export class EnvioRepositoryPrisma implements IEnvioRepository {
   * @returns Uma lista de entidades de domínio Envio pendentes.
   */
  
-  // async buscarPendentesPorCliente(clienteId: string): Promise<Envio[]> {
-  //   const rawEnvios = await this.prisma.envioFormulario.findMany({
-  //     where: {
-  //       status: 'PENDENTE',
-  //     },
-  //   });
-  //   return rawEnvios.map(EnvioMap.toDomain);
-  // }
+    public async checarSeEnvioJaFoiFeito(campanhaId: string, vendaId: string): Promise<boolean> {
+    const existe = await this.prisma.envioFormulario.findFirst({
+      where: {
+        campanhaId,
+        vendaId
+      }
+    });
 
+    return !!existe;
+  }
   /**
    * Busca envios pendentes para uma campanha específica.
    *
