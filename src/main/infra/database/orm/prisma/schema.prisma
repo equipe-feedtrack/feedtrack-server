@@ -265,7 +265,6 @@ model PerguntasOnFormularios {
   perguntaId   String     @map("pergunta_id")
   formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
   formularioId String     @map("formulario_id")
-  ordemNaLista Int        @map("ordem_na_lista")
 
   @@map("perguntas_on_formularios")
 }

@@ -1,7 +1,5 @@
-import { Pergunta } from "@modules/formulario/domain/pergunta/pergunta.entity";
-
 export interface ListarFormulariosInputDTO {
-  ativo?: boolean;
+  empresaId: string; // obrigatório
 }
 
 export interface PerguntaDTO {
@@ -11,13 +9,12 @@ export interface PerguntaDTO {
   // outros campos necessários
 }
 
-
 export interface ListarFormulariosResponseDTO {
   id: string;
   titulo: string;
-  descricao?: string ;
+  descricao?: string;
   ativo: boolean;
   empresaId: string;
-  dataCriacao: string; // A data é enviada como uma string no formato ISO 8601
-  perguntas: PerguntaDTO[]
+  dataCriacao: string; // ISO 8601
+  perguntas: PerguntaDTO[];
 }

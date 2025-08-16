@@ -35,26 +35,35 @@ export class CampanhaMap {
   /**
    * Converte o dado bruto do Prisma para a Entidade de Domínio Campanha.
    */
-  public static toDomain(raw: CampanhaPrismaDTO): Campanha {
-    const campanhaProps: ICampanha = {
-      id: raw.id,
-      titulo: raw.titulo,
-      descricao: raw.descricao ?? undefined,
-      tipoCampanha: this.tipoToDomain(raw.tipoCampanha),
-      segmentoAlvo: this.segmentoToDomain(raw.segmentoAlvo),
-      dataFim: raw.dataFim,
-      templateMensagem: raw.templateMensagem,
-      formularioId: raw.formularioId ?? '',
-      canalEnvio: raw.canalEnvio,
-      ativo: raw.ativo,
-      empresaId: raw.empresaId,
-      dataCriacao: raw.dataCriacao,
-      dataAtualizacao: raw.dataAtualizacao,
-      dataExclusao: raw.dataExclusao,
-    };
-
-    return Campanha.recuperar(campanhaProps);
+public static toDomain(raw: CampanhaPrismaDTO): Campanha {
+  if (!raw.tipoCampanha) {
+    throw new Error(`Campanha ${raw.id} não possui tipoCampanha definido.`);
   }
+  if (!raw.segmentoAlvo) {
+    throw new Error(`Campanha ${raw.id} não possui segmentoAlvo definido.`);
+  }
+
+  const campanhaProps: ICampanha = {
+    id: raw.id,
+    titulo: raw.titulo,
+    descricao: raw.descricao ?? undefined,
+    tipoCampanha: this.tipoToDomain(raw.tipoCampanha),
+    segmentoAlvo: this.segmentoToDomain(raw.segmentoAlvo),
+    dataFim: raw.dataFim,
+    templateMensagem: raw.templateMensagem,
+    formularioId: raw.formularioId ?? '',
+    canalEnvio: raw.canalEnvio,
+    ativo: raw.ativo,
+    empresaId: raw.empresaId,
+    dataCriacao: raw.dataCriacao,
+    dataAtualizacao: raw.dataAtualizacao,
+    dataExclusao: raw.dataExclusao,
+  };
+
+  return Campanha.recuperar(campanhaProps);
+}
+
+
 
   /**
    * Converte a Entidade de Domínio para o formato que o Prisma espera para persistência.

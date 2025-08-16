@@ -97,8 +97,6 @@ set produto(value: { nome?: string; valor?: number; descricao?: string } | undef
     this._produtoId = props.produtoId;
     this._empresaId = props.empresaId;
     this._dataVenda = props.dataVenda;
-    this._cliente = props.cliente;
-    this._produto = props.produto;
   }
 
 toJSON(): VendaProps {
@@ -108,8 +106,6 @@ toJSON(): VendaProps {
     produtoId: this._produtoId,
     empresaId: this._empresaId,
     dataVenda: this._dataVenda,
-    cliente: this._cliente,
-    produto: this._produto,
   };
 }
 
@@ -123,8 +119,6 @@ toJSON(): VendaProps {
     produtoId: props.produtoId,
     empresaId: props.empresaId,
     dataVenda: props.dataVenda,
-    cliente: props.cliente,
-    produto: props.produto,
     }
 
 

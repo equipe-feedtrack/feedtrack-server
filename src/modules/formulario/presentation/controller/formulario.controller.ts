@@ -43,7 +43,8 @@ export class FormularioController {
    */
   public listar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const formulariosDTO = await this._listarFormulariosUseCase.execute(req.query);
+      const { empresaId } = req.query;
+      const formulariosDTO = await this._listarFormulariosUseCase.execute({ empresaId: empresaId as string });
       res.status(200).json(formulariosDTO);
     } catch (error: any) {
       next(error);
@@ -56,8 +57,8 @@ export class FormularioController {
    */
   public buscarPorId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
-      const formularioDTO = await this._buscarFormularioPorIdUseCase.execute(id);
+      const { id, empresaId } = req.params;
+      const formularioDTO = await this._buscarFormularioPorIdUseCase.execute({id, empresaId});
 
       if (!formularioDTO) {
         res.status(404).json({ message: 'Formulário não encontrado.' });
@@ -96,8 +97,8 @@ export class FormularioController {
    */
   public deletar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
-      await this._deletarFormularioUseCase.execute(id);
+      const { id, empresaId } = req.params;
+      await this._deletarFormularioUseCase.execute({id, empresaId});
       res.status(204).send();
     } catch (error: any) {
       if (error instanceof FormularioException) {

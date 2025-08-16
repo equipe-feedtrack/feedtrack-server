@@ -128,7 +128,7 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     super(props.id); // Chamada ao construtor da Entity base
     this.titulo = props.titulo;
     this.descricao = props.descricao;
-    this.tipoCampanha = props.tipoCampanha;
+    this.tipoCampanha = props.tipoCampanha; 
     this.segmentoAlvo = props.segmentoAlvo;
     this.dataFim = props.dataFim ?? null;
     this.templateMensagem = props.templateMensagem;

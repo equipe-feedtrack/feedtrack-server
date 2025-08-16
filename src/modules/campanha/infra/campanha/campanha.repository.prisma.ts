@@ -6,12 +6,26 @@ import { ICampanhaRepository } from './campanha.repository.interface';
 export class CampanhaRepositoryPrisma implements ICampanhaRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async inserir(campanha: Campanha): Promise<void> {
-    const dadosParaPersistencia = CampanhaMap.toPersistence(campanha);
-    await this.prisma.campanha.create({
-      data: dadosParaPersistencia,
-    });
+async inserir(campanha: Campanha): Promise<void> {
+  const dadosParaPersistencia = CampanhaMap.toPersistence(campanha);
+  
+  // Garante que empresaId exista
+  if (!campanha.empresaId) {
+    throw new Error("empresaId é obrigatório para criar uma campanha");
   }
+
+  // Remove relações para lidar separadamente
+  const { empresa, formulario, ...dadosEscalares } = dadosParaPersistencia;
+
+  await this.prisma.campanha.create({
+    data: {
+      ...dadosEscalares,
+      empresa: { connect: { id: campanha.empresaId } }, // <- garante id válido
+      formulario: { connect: { id: campanha.formularioId } },
+    },
+  });
+}
+
 
   async atualizar(campanha: Campanha): Promise<void> {
     const dadosParaPersistencia = CampanhaMap.toPersistence(campanha);
@@ -40,19 +54,20 @@ export class CampanhaRepositoryPrisma implements ICampanhaRepository {
     return CampanhaMap.toDomain(campanhaPrisma);
   }
 
-  async listar(filtros?: any): Promise<Campanha[]> {
-    const whereClause: any = {};
+async listar(empresaId: string): Promise<Campanha[]> {
+  const campanhasPrisma = await this.prisma.campanha.findMany({
+    where: { empresaId },
+    orderBy: { dataCriacao: 'desc' },
+  });
 
-    if (filtros?.empresaId) {
-      whereClause.empresaId = filtros.empresaId;
-    }
+  // ❌ Pode quebrar: campanhasPrisma.map(CampanhaMap.toDomain)
+  // ✅ Correto:
+  return campanhasPrisma.map(c => CampanhaMap.toDomain(c));
+}
 
-    const campanhasPrisma = await this.prisma.campanha.findMany({
-        where: whereClause,
-        orderBy: { dataCriacao: 'desc' }
-    });
-    return campanhasPrisma.map(campanha => CampanhaMap.toDomain(campanha));
-  }
+
+
+
 
   async deletar(id: string): Promise<void> {
     await this.prisma.campanha.delete({

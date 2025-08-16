@@ -22,8 +22,8 @@ export class DispararEnvioEmMassaUseCase {
     private readonly EmailGateway: IEmailGateway,
   ) {}
 
-  public async execute(campanhaId: string, config: DisparoEmMassaConfig, produtoId: string): Promise<void> {
-    const campanha = await this.campanhaRepository.recuperarPorUuid(campanhaId);
+  public async execute(campanhaId: string, config: DisparoEmMassaConfig, empresaId: string, produtoId: string): Promise<void> {
+    const campanha = await this.campanhaRepository.recuperarPorUuid(campanhaId, empresaId);
     if (!campanha) {
       throw new Error("Campanha não encontrada.");
     }
@@ -33,12 +33,9 @@ export class DispararEnvioEmMassaUseCase {
     let enviosPendentes = [];
     for (const cliente of clientes) {
       const envio = Envio.criar({
-        clienteId: cliente.id,
         campanhaId: campanha.id,
-        formularioId: campanha.formularioId,
-        usuarioId: "system-user-uuid",
-        produtoId,
-        empresaId: campanha.empresaId
+        empresaId: campanha.empresaId,
+        
       });
       enviosPendentes.push(envio);
     }

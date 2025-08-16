@@ -14,7 +14,7 @@ export class AtualizarCampanhaUseCase implements IUseCase<AtualizarCampanhaInput
 
   async execute(input: AtualizarCampanhaInputDTO): Promise<CampanhaResponseDTO> {
     // 1. Recuperar a entidade
-    const campanha = await this._campanhaRepository.recuperarPorUuid(input.id);
+    const campanha = await this._campanhaRepository.recuperarPorUuid(input.id, input.empresaId);
     if (!campanha) {
       throw new CampanhaNaoEncontradaException();
     }

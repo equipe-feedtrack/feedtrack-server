@@ -33,7 +33,7 @@ export class DispararEnvioIndividualUseCase {
     if (!empresa) {
       throw new Error("Empresa não encontrado.");
     }
-    const campanha = await this.campanhaRepository.recuperarPorUuid(campanhaId);
+    const campanha = await this.campanhaRepository.recuperarPorUuid(campanhaId, empresaId);
     if (!campanha) {
       throw new Error("Campanha não encontrada.");
     }
