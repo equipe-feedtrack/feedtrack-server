@@ -117,7 +117,7 @@ campanhaRouter.get('/campanhas',  campanhaController.listar);
  *       500:
  *         description: Erro interno do servidor.
  */
-campanhaRouter.get('/campanha/:id', campanhaController.buscarPorId);
+campanhaRouter.get('/campanha/:id/empresa/:empresaId', campanhaController.buscarPorId);
 
 /**
  * @swagger

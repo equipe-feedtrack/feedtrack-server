@@ -41,7 +41,7 @@ private substituirPlaceholders(template: string, dados: {
     const empresa = await this.EmpresaRepository.findById(empresaId);
     if (!empresa) throw new Error("Empresa não encontrada.");
 
-    const campanha = await this.campanhaRepository.recuperarPorUuid(campanhaId, empresaId);
+    const campanha = await this.campanhaRepository.recuperarParcial(campanhaId, empresaId);
     if (!campanha) throw new Error("Campanha não encontrada.");
 
     const venda = await this.VendaRepository.findById(vendaId);
@@ -51,7 +51,7 @@ private substituirPlaceholders(template: string, dados: {
 
     try {
       // Substituir placeholders
-      const conteudoFinal = this.substituirPlaceholders(campanha.templateMensagem, {
+      const conteudoFinal = this.substituirPlaceholders(campanha.templateMensagem ?? '', {
         nomeCliente: venda.cliente?.nome ?? "Cliente",
         nomeProduto: venda.produto?.nome ?? "Produto",
         nomeEmpresa: empresa.props.nome ?? "Empresa",

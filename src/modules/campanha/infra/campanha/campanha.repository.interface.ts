@@ -42,4 +42,6 @@ export interface ICampanhaRepository {
    * @param empresaId O ID da empresa associada.
    */
   deletar(id: string, empresaId: string): Promise<void>;
+
+  recuperarParcial(id: string, empresaId: string): Promise<Partial<Campanha> | null>;
 }

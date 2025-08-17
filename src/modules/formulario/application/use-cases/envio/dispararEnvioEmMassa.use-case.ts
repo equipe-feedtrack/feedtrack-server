@@ -5,12 +5,9 @@ import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { CanalEnvio } from "@prisma/client";
 
 export interface DisparoEmMassaRealtimeConfig {
-  intervaloChecagemMinutos: number; // quanto tempo esperar entre cada verificação de novas vendas
+  intervaloChecagemMinutos: number; // usado apenas se quiser delay entre execuções via CRON
 }
 
-/**
- * @description Dispara mensagens automaticamente para cada nova venda enquanto a campanha estiver ativa.
- */
 export class DispararEnvioEmMassaRealtimeUseCase {
   constructor(
     private readonly envioRepository: IEnvioRepository,
@@ -31,11 +28,15 @@ export class DispararEnvioEmMassaRealtimeUseCase {
       .replace(/\[Nome da Empresa\]/g, `*${dados.nomeEmpresa ?? ''}*`);
   }
 
+  /**
+   * @description Executa apenas uma checagem de vendas novas e dispara os envios necessários.
+   * Este método deve ser chamado periodicamente via CRON.
+   */
   public async execute(
     campanhaId: string,
     empresaId: string,
     produtoId: string,
-    config: DisparoEmMassaRealtimeConfig
+    config?: DisparoEmMassaRealtimeConfig
   ): Promise<void> {
 
     const campanha = await this.campanhaRepository.recuperarPorUuid(campanhaId, empresaId);
@@ -43,49 +44,41 @@ export class DispararEnvioEmMassaRealtimeUseCase {
 
     console.log(`Iniciando disparo em tempo real para campanha ${campanhaId}.`);
 
-    // Mantém registro de vendas já enviadas
-    const vendasEnviadas = new Set<string>();
+    // Busca vendas novas
+    const vendas = await this.vendaRepository.buscarNovasVendas(empresaId, produtoId);
 
-    while (!campanha.dataFim || new Date() < campanha.dataFim) {
-      // Buscar vendas novas
-      const vendas = await this.vendaRepository.buscarNovasVendas(empresaId, produtoId);
+    for (const venda of vendas) {
+      // Verifica se já existe envio
+      const jaExisteEnvio = await this.envioRepository.checarSeEnvioJaFoiFeito(campanhaId, venda.id);
+      if (jaExisteEnvio) continue;
 
-      for (const venda of vendas) {
-        if (vendasEnviadas.has(venda.id)) continue; // evita duplicidade
+      const envio = Envio.criar({ campanhaId, empresaId, vendaId: venda.id });
 
-        const envio = Envio.criar({ campanhaId, empresaId, vendaId: venda.id });
+      try {
+        const conteudoFinal = this.substituirPlaceholders(campanha.templateMensagem, {
+          nomeCliente: venda.cliente?.nome ?? "Cliente",
+          nomeProduto: venda.produto?.nome ?? "Produto",
+          nomeEmpresa: venda.empresa?.nome ?? "Empresa",
+        });
 
-        try {
-          const conteudoFinal = this.substituirPlaceholders(campanha.templateMensagem, {
-            nomeCliente: venda.cliente?.nome ?? "Cliente",
-            nomeProduto: venda.produto?.nome ?? "Produto",
-            nomeEmpresa: venda.empresa?.nome ?? "Empresa",
-          });
-
-          if (campanha.canalEnvio === CanalEnvio.EMAIL) {
-            if (!venda.cliente?.email) throw new Error("Email do cliente não fornecido.");
-            await this.EmailGateway.enviar(venda.cliente.email, conteudoFinal, venda.id, venda.clienteId, produtoId);
-          } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-            if (!venda.cliente?.telefone) throw new Error("Telefone do cliente não fornecido.");
-            await this.whatsAppGateway.enviar(venda.cliente.telefone, conteudoFinal, venda.id, venda.clienteId, produtoId);
-          } else {
-            throw new Error("Canal de envio inválido na campanha.");
-          }
-
-          envio.marcarComoEnviado();
-          vendasEnviadas.add(venda.id);
-
-        } catch (error: any) {
-          envio.registrarFalha(error.message);
+        if (campanha.canalEnvio === CanalEnvio.EMAIL) {
+          if (!venda.cliente?.email) throw new Error("Email do cliente não fornecido.");
+          await this.EmailGateway.enviar(venda.cliente.email, conteudoFinal, venda.id, venda.clienteId, produtoId);
+        } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
+          if (!venda.cliente?.telefone) throw new Error("Telefone do cliente não fornecido.");
+          await this.whatsAppGateway.enviar(venda.cliente.telefone, conteudoFinal, venda.id, venda.clienteId, produtoId);
+        } else {
+          throw new Error("Canal de envio inválido na campanha.");
         }
 
-        await this.envioRepository.salvar(envio);
+        envio.marcarComoEnviado();
+      } catch (error: any) {
+        envio.registrarFalha(error.message);
       }
 
-      // Espera o intervalo definido antes de buscar novas vendas
-      await new Promise(res => setTimeout(res, config.intervaloChecagemMinutos * 60 * 1000));
+      await this.envioRepository.salvar(envio);
     }
 
-    console.log("Campanha finalizada, disparo em tempo real encerrado.");
+    console.log("Disparo em massa concluído.");
   }
 }

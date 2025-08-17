@@ -50,25 +50,24 @@ public listar = async (req: Request, res: Response, next: NextFunction): Promise
 };
 
 
-  public buscarPorId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { id } = req.params;
-      const empresaId = (req as any).user?.empresaId;
+public buscarPorId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id, empresaId } = req.params; // <- adicionado empresaId
 
-      const campanhaDTO = await this._buscarCampanhaPorIdUseCase.execute({ id, empresaId });
-      if (!campanhaDTO) {
-        throw new CampanhaNaoEncontradaException();
-      }
-
-      res.status(200).json(campanhaDTO);
-    } catch (error: any) {
-      if (error instanceof CampanhaNaoEncontradaException) {
-        res.status(404).json({ message: error.message });
-        return;
-      }
-      next(error);
+    const campanhaDTO = await this._buscarCampanhaPorIdUseCase.execute({ id, empresaId });
+    if (!campanhaDTO) {
+      throw new CampanhaNaoEncontradaException();
     }
-  };
+
+    res.status(200).json(campanhaDTO);
+  } catch (error: any) {
+    if (error instanceof CampanhaNaoEncontradaException) {
+      res.status(404).json({ message: error.message });
+      return;
+    }
+    next(error);
+  }
+};
 
   public atualizar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

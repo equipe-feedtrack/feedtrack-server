@@ -244,31 +244,6 @@ router.get('/resposta-formulario/empresa/:empresaId/campanha/:campanhaId/venda/:
 
 
 
-router.get('/resposta-formulario-get/empresa/:empresaId/campanha/:campanhaId/vendas/:vendaId', async (req, res): Promise<any> => {
-  const { empresaId, vendaId, campanhaId } = req.params;
-
-  console.log(empresaId, vendaId, campanhaId)
-
-  try {
-    const envio = await prisma.envioFormulario.findFirst({
-      where: {
-        empresaId: empresaId,
-        campanhaId: campanhaId,
-        vendaId: vendaId,
-      }
-      
-    });
-
-    if (!envio) {
-      return res.status(404).json({ message: 'Envio não encontrado para esse formulário e cliente' });
-    }
-
-    res.json(envio);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erro interno no servidor' });
-  }
-});
 
 
 export { router as feedbackRoutes };

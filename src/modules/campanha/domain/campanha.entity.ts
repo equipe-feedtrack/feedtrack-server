@@ -3,21 +3,15 @@ import {
   CriarCampanhaProps,
   ICampanha,
   RecuperarCampanhaProps,
-  SegmentoAlvo,
-  TipoCampanha,
 } from "./campanha.types";
 import { randomUUID } from "crypto";
 import { CanalEnvio } from "@prisma/client";
 class Campanha extends Entity<ICampanha> implements ICampanha {
   private _titulo: string;
   private _descricao?: string;
-  private _tipoCampanha: TipoCampanha;
-  private _segmentoAlvo: SegmentoAlvo;
   private _canalEnvio: CanalEnvio;
-  private _dataFim: Date | null;
   private _templateMensagem: string;
   private _formularioId: string;
-  private _ativo: boolean;
   private _empresaId: string;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
@@ -30,23 +24,11 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
   get descricao(): string | undefined {
     return this._descricao;
   }
-  get tipoCampanha(): TipoCampanha {
-    return this._tipoCampanha;
-  }
-  get segmentoAlvo(): SegmentoAlvo {
-    return this._segmentoAlvo;
-  }
-  get dataFim(): Date | null {
-    return this._dataFim;
-  }
   get templateMensagem(): string {
     return this._templateMensagem;
   }
   get formularioId(): string {
     return this._formularioId;
-  }
-  get ativo(): boolean {
-    return this._ativo;
   }
   get empresaId(): string {
     return this._empresaId;
@@ -77,24 +59,13 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this._descricao = value;
   }
 
-  private set tipoCampanha(value: TipoCampanha) {
-    this._tipoCampanha = value;
+private set templateMensagem(value: string) {
+  if (!value || value.trim().length === 0) {
+    throw new Error("Template da mensagem não pode ser vazio.");
   }
+  this._templateMensagem = value;
+}
 
-  private set segmentoAlvo(value: SegmentoAlvo) {
-    this._segmentoAlvo = value;
-  }
-
-  private set dataFim(value: Date | null) {
-    this._dataFim = value;
-  }
-
-  private set templateMensagem(value: string) {
-    if (!value || value.trim().length === 0) {
-      throw new Error("Template da mensagem não pode ser vazio."); // Ou CampanhaTemplateVazioException
-    }
-    this._templateMensagem = value;
-  }
 
   private set formularioId(value: string) {
     // Setter para formularioId (obrigatório)
@@ -102,9 +73,6 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
       throw new Error("ID do formulário não pode ser vazio.");
     }
     this._formularioId = value;
-  }
-  private set ativo(value: boolean) {
-    this._ativo = value;
   }
   private set empresaId(value: string) {
     this._empresaId = value;
@@ -123,50 +91,46 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     this._canalEnvio = value;
   }
 
+    private _formulario?: {
+    id: string;
+    perguntas: { texto: string; tipo: string; opcoes: string[] }[];
+  };
+
+  // Getter
+  get formulario() {
+    return this._formulario;
+  }
+
+  // Setter privado
+  private set formulario(value: typeof this._formulario) {
+    this._formulario = value;
+  }
+
   // Construtor privado: Garante que a entidade seja criada em um estado válido
   private constructor(props: ICampanha) {
     super(props.id); // Chamada ao construtor da Entity base
     this.titulo = props.titulo;
     this.descricao = props.descricao;
-    this.tipoCampanha = props.tipoCampanha; 
-    this.segmentoAlvo = props.segmentoAlvo;
-    this.dataFim = props.dataFim ?? null;
-    this.templateMensagem = props.templateMensagem;
+    this.templateMensagem = props.templateMensagem ?? '';
     this.formularioId = props.formularioId;
     this.canalEnvio = props.canalEnvio;
-    this.ativo = props.ativo; // 'ativo' é sempre boolean e será tratado na fábrica
     this.empresaId = props.empresaId;
     this.dataCriacao = props.dataCriacao;
     this.dataAtualizacao = props.dataAtualizacao;
     this.dataExclusao = props.dataExclusao ?? null;
     this.canalEnvio = props.canalEnvio || "EMAIL"; // Default canal de envio, pode ser ajustado conforme necessário
 
-    // Validações adicionais após atribuição (ex: dataFim não pode ser anterior a dataInicio)
-    this.validarInvariantes();
   }
 
-  // Método para validações complexas da entidade (invariantes)
-  private validarInvariantes(): void {
-    if (this.dataFim && this.dataFim < this.dataCriacao) {
-      throw new Error(
-        "Data de fim da campanha não pode ser anterior à data de início."
-      ); // Ou CampanhaDataInvalidaException
-    }
-    // Outras validações
-  }
 
   public static criar(props: CriarCampanhaProps, id?: string): Campanha {
     const campanhaCompleta: ICampanha = {
       id: id || randomUUID(),
       titulo: props.titulo,
       descricao: props.descricao,
-      tipoCampanha: props.tipoCampanha,
-      segmentoAlvo: props.segmentoAlvo,
-      dataFim: props.dataFim ?? null, // Default null se não fornecido na criação
       canalEnvio: props.canalEnvio || "EMAIL", // Default canal de envio, pode ser ajustado conforme necessário
       templateMensagem: props.templateMensagem,
       formularioId: props.formularioId,
-      ativo: true, // Nova campanha é ativa por padrão
       empresaId: props.empresaId,
       dataCriacao: new Date(),
       dataAtualizacao: new Date(),
@@ -179,35 +143,6 @@ class Campanha extends Entity<ICampanha> implements ICampanha {
     return new Campanha(props);
   }
 
-  // --- Métodos de Comportamento da Campanha ---
-  public ativar(): void {
-    if (this.ativo) {
-      throw new Error("Campanha já está ativa.");
-    }
-    this.ativo = true;
-    this.dataAtualizacao = new Date();
-  }
-
-  public desativar(): void {
-    if (!this.ativo) {
-      throw new Error("Campanha já está inativa.");
-    }
-    this.ativo = false;
-    this.dataExclusao = new Date();
-    this.dataAtualizacao = new Date();
-  }
-
-  public atualizarPeriodo(dataCriacao: Date, dataFim: Date | null): void {
-    this.dataCriacao = dataCriacao;
-    this.dataFim = dataFim ?? null;
-    this.validarInvariantes(); // Revalida após mudança de datas
-    this.dataAtualizacao = new Date();
-  }
-
-  public atualizarTemplate(novoTemplate: string): void {
-    this.templateMensagem = novoTemplate;
-    this.dataAtualizacao = new Date();
-  }
 }
 
 export { Campanha };

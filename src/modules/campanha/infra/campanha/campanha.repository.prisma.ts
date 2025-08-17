@@ -8,6 +8,8 @@ export class CampanhaRepositoryPrisma implements ICampanhaRepository {
 
 async inserir(campanha: Campanha): Promise<void> {
   const dadosParaPersistencia = CampanhaMap.toPersistence(campanha);
+
+  console.log("Dados para persistência:", dadosParaPersistencia);
   
   // Garante que empresaId exista
   if (!campanha.empresaId) {
@@ -44,15 +46,32 @@ async inserir(campanha: Campanha): Promise<void> {
     });
   }
 
-  async recuperarPorUuid(id: string): Promise<Campanha | null> {
-    const campanhaPrisma = await this.prisma.campanha.findUnique({
-      where: { id },
-    });
+async recuperarPorUuid(id: string, empresaId: string): Promise<Campanha | null> {
+  console.log("DADOS RECUPERADOS", empresaId);
 
-    if (!campanhaPrisma) return null;
+  const campanhaPrisma = await this.prisma.campanha.findFirst({
+    where: { id, empresaId },
+    include: {
+      formulario: {
+        include: {
+          perguntas: {
+            include: {
+              pergunta: true // inclui tipo, texto, opcoes
+            }
+          }
+        }
+      }
+    }
+  });
 
-    return CampanhaMap.toDomain(campanhaPrisma);
-  }
+  if (!campanhaPrisma) return null;
+
+  console.log("campanhaPrisma:", campanhaPrisma);
+
+  return CampanhaMap.toDomainWithFormulario(campanhaPrisma);
+}
+
+
 
 async listar(empresaId: string): Promise<Campanha[]> {
   const campanhasPrisma = await this.prisma.campanha.findMany({
@@ -81,4 +100,19 @@ async listar(empresaId: string): Promise<Campanha[]> {
     });
     return count > 0;
   }
+
+  async recuperarParcial(id: string, empresaId: string): Promise<Partial<Campanha> | null> {
+  const campanha = await this.prisma.campanha.findFirst({
+    where: { id, empresaId },
+    select: {
+      id: true,
+      canalEnvio: true,
+      templateMensagem: true,
+    },
+  });
+
+  if (!campanha) return null;
+
+  return campanha; // Retorna um objeto parcial, sem instanciar a entidade completa
+}
 }

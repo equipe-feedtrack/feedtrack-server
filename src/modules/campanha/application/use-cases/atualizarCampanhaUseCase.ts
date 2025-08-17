@@ -20,13 +20,6 @@ export class AtualizarCampanhaUseCase implements IUseCase<AtualizarCampanhaInput
     }
 
 
-    if (input.ativo !== undefined) {
-      if (input.ativo) {
-        campanha.ativar();
-      } else {
-        campanha.desativar();
-      }
-    }
 
     // 3. Persistir a entidade atualizada
     await this._campanhaRepository.atualizar(campanha);

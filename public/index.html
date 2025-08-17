@@ -261,14 +261,15 @@
             }
 
             try {
-                // Busca os dados da venda (cliente + produto + formulário)
-                const res = await fetch(
-                    `/api/v1/resposta-formulario-get/empresa/${empresaId}/campanha/${campanhaId}/vendas/${vendaId}`
-                );
+                const res = await fetch(`/api/v1/campanha/${empresaId}/empresa/${campanhaId}`); // <-- aqui pegamos o JSON da resposta
 
-                if (!res.ok) throw new Error('Falha ao buscar dados da venda');
+
+
+
+                // if (!res.ok) throw new Error('Falha ao buscar dados da venda');
 
                 const data = await res.json();
+                console.log("RESPOSTA", data);
 
                 // Preenche os nomes
                 clienteNome = data.cliente?.nome || 'N/A';
