@@ -83,10 +83,17 @@ router.post('/feedback', feedbackController.criar);
 
 /**
  * @swagger
- * /feedback/manual:
+ * /feedback/manual/empresa/{empresaId}:
  *   post:
  *     summary: Cria um novo feedback manual
  *     tags: [Feedbacks]
+ *     parameters:
+ *       - in: path
+ *         name: empresaId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID da empresa.
  *     requestBody:
  *       required: true
  *       content:
@@ -94,19 +101,20 @@ router.post('/feedback', feedbackController.criar);
  *           schema:
  *             type: object
  *             required:
- *               - clienteNome
- *               - produtoNome
+ *               - cliente_nome
+ *               - produto_nome
  *               - respostas
+ *               - vendaId
  *             properties:
- *               clienteNome:
+ *               cliente_nome:
  *                 type: string
  *                 description: Nome do cliente.
- *               produtoNome:
+ *               produto_nome:
  *                 type: string
  *                 description: Nome do produto.
- *               funcionarioNome:
+ *               vendaId:
  *                 type: string
- *                 description: Nome do funcionário que atendeu (opcional).
+ *                 description: ID da venda.
  *               respostas:
  *                 type: array
  *                 description: Array de respostas do feedback.
@@ -120,7 +128,7 @@ router.post('/feedback', feedbackController.criar);
  *       500:
  *         description: Erro interno do servidor.
  */
-router.post('/feedback/manual', feedbackController.criarManual);
+router.post('/feedback/manual/empresa/:empresaId', feedbackController.criarManual);
 
 /**
  * @swagger

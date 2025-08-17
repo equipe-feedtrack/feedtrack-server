@@ -319,7 +319,6 @@ model Feedback {
   dataExclusao     DateTime? @map("data_exclusao")
   cliente_nome     String?
   produto_nome     String?
-  funcionario_nome String?
   vendaId          String    @map("venda_id")
   
 

@@ -56,7 +56,14 @@ async recuperarPorUuid(id: string, empresaId: string): Promise<Campanha | null> 
         include: {
           perguntas: {
             include: {
-              pergunta: true // inclui tipo, texto, opcoes
+              pergunta: {
+                select: {
+                  id: true,
+                  tipo: true,
+                  texto: true,
+                  opcoes: true,
+                }
+              } // inclui tipo, texto, opcoes
             }
           }
         }

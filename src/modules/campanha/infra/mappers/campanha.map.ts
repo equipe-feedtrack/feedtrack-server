@@ -96,6 +96,7 @@ public static toDomainWithFormulario(raw: any): Campanha {
     campanha['formulario'] = {
       id: raw.formulario.id,
       perguntas: raw.formulario.perguntas.map((p: any) => ({
+        id: p.pergunta.id,
         texto: p.pergunta.texto,
         tipo: p.pergunta.tipo,
         opcoes: p.pergunta.opcoes ?? [],

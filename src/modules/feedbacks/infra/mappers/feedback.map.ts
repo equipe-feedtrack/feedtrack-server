@@ -33,7 +33,6 @@ export class FeedbackMap {
     return {
       id: feedback.id,
       formularioId: feedback.formularioId,
-      envioId: feedback.envioId ?? null, // Adicionado para consistência
       respostas: feedback.respostas as Prisma.InputJsonValue,
       dataCriacao: feedback.dataCriacao,
       dataExclusao: feedback.dataExclusao ?? null,
@@ -51,7 +50,7 @@ public static toResponseDTO(feedback: Feedback): FeedbackResponseDTO {
   return {
     id: feedback.id,
     formularioId: feedback.formularioId,
-    envioId: feedback.envioId ?? null,
+    vendaId: feedback.vendaId,
     respostas: feedback.respostas,
     dataCriacao: feedback.dataCriacao.toISOString(),
     dataExclusao: feedback.dataExclusao ? feedback.dataExclusao.toISOString() : undefined,

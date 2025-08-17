@@ -14,30 +14,26 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
   async salvar(feedback: Feedback): Promise<void> {
     const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
 
-    const envioId = feedback.envioId;
-
-    if (!envioId) {
-      throw new Error("EnvioId é obrigatório para upsert no Feedback.");
-    }
-
-    await this.prisma.feedback.upsert({
-      where: { vendaId },
-      create: dadosParaPersistencia,
-      update: {
-        respostas: dadosParaPersistencia.respostas,
-        dataExclusao: dadosParaPersistencia.dataExclusao,
-        empresaId: dadosParaPersistencia.empresaId,
-      },
+    await this.prisma.feedback.create({
+      data: dadosParaPersistencia,
     });
   }
 
   async salvarManual(feedback: Feedback): Promise<void> {
     const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
 
-    // Aqui não precisa de envioId nem upsert, só create normal
-    await this.prisma.feedback.create({
-      data: dadosParaPersistencia,
-    });
+const venda = await this.prisma.venda.findUnique({
+  where: { id: dadosParaPersistencia.vendaId },
+  select: { empresaId: true }
+});
+if (!venda) throw new Error("Venda não encontrada.");
+
+await this.prisma.feedback.create({
+  data: {
+    ...dadosParaPersistencia,
+    empresaId: venda.empresaId, // usa o FK correto
+  },
+});
   }
 
   /**

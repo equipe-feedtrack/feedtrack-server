@@ -6,7 +6,6 @@ import { randomUUID } from "crypto";
 
 class Feedback extends Entity<IFeedback> implements IFeedback {
   private _formularioId: string | null;
-  private _envioId: string | null;
   private _respostas: Record<string, any>[];
   private _dataCriacao: Date;
   private _dataExclusao: Date | null;
@@ -19,7 +18,6 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   // Getters
   get formularioId(): string | null { return this._formularioId; }
   get vendaId(): string { return this._vendaId; }
-  get envioId(): string | null { return this._envioId; }
   get respostas(): Record<string, any>[] { return this._respostas; }
   get dataCriacao(): Date { return this._dataCriacao; }
   get dataExclusao(): Date | null { return this._dataExclusao; }
@@ -31,9 +29,6 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   // Setters privados
   private set formularioId(value: string | null) {
     this._formularioId = value;
-  }
-  private set envioId(value: string | null) {
-    this._envioId = value;
   }
   private set vendaId(value: string) {
     this._vendaId = value;
@@ -68,7 +63,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
     this.produtoNome = props.produtoNome ?? null;
     this.empresaId = props.empresaId;
 
-    if (this.formularioId && this.envioId) {
+    if (this.formularioId) {
         this.validarInvariantes();
     }
   }
@@ -183,7 +178,28 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
     return new Feedback(feedbackCompleto);
   }
 
-  public static criarManual(props: CriarFeedbackManualProps, ): Feedback {
+  public static criarManual(props: CriarFeedbackManualProps): Feedback {
+
+    if (!props.clienteNome) {
+      throw new FeedbackExceptions.ClienteNomeObrigatorio();
+    }
+
+    if (!props.produtoNome) {
+      throw new FeedbackExceptions.ProdutoNomeObrigatorio();
+    }
+
+    if (!props.vendaId) {
+      throw new FeedbackExceptions.VendaIdObrigatorio();
+    }
+
+    if (!props.empresaId) {
+      throw new FeedbackExceptions.EmpresaIdObrigatorio();
+    }
+
+    if (!props.respostas || props.respostas.length === 0) {
+      throw new FeedbackExceptions.RespostaInvalida("Respostas do feedback não podem ser vazias.");
+    }
+
     const feedbackCompleto: IFeedback = {
       id: randomUUID(),
       formularioId: null,
