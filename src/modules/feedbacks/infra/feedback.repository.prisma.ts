@@ -77,7 +77,7 @@ await this.prisma.feedback.create({
    */
 
 
-  async buscarTodos(empresaId?: string): Promise<Feedback[]> {
+  async buscarTodos(empresaId: string): Promise<Feedback[]> {
     const whereClause: any = {};
 
     if (empresaId) {

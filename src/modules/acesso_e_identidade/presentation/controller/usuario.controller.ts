@@ -18,6 +18,11 @@ export class UsuarioController {
   ) {}
 
   async criar(req: Request, res: Response): Promise<Response> {
+    req.body.empresaId = req.params.empresaId;
+
+    console.log("CHEGOU aqui");
+
+
     try {
       const usuario = await this.criarUsuarioUseCase.execute(req.body);
       return res.status(201).json(usuario);

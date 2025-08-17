@@ -62,6 +62,5 @@ export interface FeedbackResponseDTO {
   dataExclusao?: string; // ISO string ou undefined
   clienteNome?: string | null;
   produtoNome?: string | null;
-  funcionarioNome?: string | null;
   empresaId: string;
 }

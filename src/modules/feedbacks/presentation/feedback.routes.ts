@@ -221,7 +221,7 @@ router.get('/feedback/:envioId', feedbackController.buscarPorEnvioId);
  *       500:
  *         description: Erro interno do servidor.
  */
-router.get('/feedbacks', feedbackController.buscarTodos);
+router.get('/feedbacks/empresa/:empresaId', feedbackController.buscarTodos);
 
 /**
  * @swagger

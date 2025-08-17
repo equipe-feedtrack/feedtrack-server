@@ -56,7 +56,6 @@ public static toResponseDTO(feedback: Feedback): FeedbackResponseDTO {
     dataExclusao: feedback.dataExclusao ? feedback.dataExclusao.toISOString() : undefined,
     clienteNome: feedback.clienteNome,
     produtoNome: feedback.produtoNome,
-    funcionarioNome: feedback.funcionarioNome,
     empresaId: feedback.empresaId,
   };
 }

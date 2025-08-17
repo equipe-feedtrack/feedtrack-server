@@ -49,8 +49,49 @@ async findById(id: string): Promise<Empresa | null> {
     return empresa ? EmpresaMap.toDomain(empresa) : null;
   }
 
-  async findAll(): Promise<Empresa[]> {
-    const empresas = await prisma.empresa.findMany();
-    return empresas.map(EmpresaMap.toDomain);
+async findAll(): Promise<any> {
+  const empresas = await prisma.empresa.findMany({
+    include: {
+      usuarios: true,
+      campanhas: true,
+      formularios: true,
+      envios: true,
+      feedbacks: true,
+      clientes: true,
+      produtos: true,
+      vendas: true,
+      funcionarios: true,
+      perguntas: true,
+      
+    },
+  });
+
+  return EmpresaMap.allWithRelationsCount(empresas);
+}
+
+
+
+async update(id: string, dados: Partial<Empresa>): Promise<Empresa> {
+  // Garante que cnpj vazio seja null
+  if (dados.props?.cnpj !== undefined && !dados.props.cnpj?.trim()) {
+    dados.props.cnpj = undefined;
+  }
+
+  const updated = await prisma.empresa.update({
+    where: { id },
+    data: {
+      ...dados,                // espalha todos os campos fornecidos
+      dataAtualizacao: new Date(), // atualiza timestamp
+    },
+  });
+
+  return EmpresaMap.toDomain(updated);
+}
+
+
+  async delete(id: string): Promise<void> {
+    await prisma.empresa.delete({
+      where: { id },
+    });
   }
 }
