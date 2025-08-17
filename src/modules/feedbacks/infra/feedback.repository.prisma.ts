@@ -21,7 +21,7 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
     }
 
     await this.prisma.feedback.upsert({
-      where: { envioId },
+      where: { vendaId },
       create: dadosParaPersistencia,
       update: {
         respostas: dadosParaPersistencia.respostas,
@@ -79,17 +79,7 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
    * @param envioId O ID do envio associado ao feedback.
    * @returns A entidade de domínio Feedback ou null se não for encontrado.
    */
-  async buscarPorEnvioId(envioId: string): Promise<Feedback | null> {
-    const raw = await this.prisma.feedback.findUnique({
-      where: { envioId },
-    });
 
-    if (!raw) {
-      return null;
-    }
-
-    return FeedbackMap.toDomain(raw);
-  }
 
   async buscarTodos(empresaId?: string): Promise<Feedback[]> {
     const whereClause: any = {};

@@ -245,6 +245,7 @@
         let clienteNome = '';
         let produtoNome = '';
         let funcionarioNome = '';
+        let vendaId = ''; // Declarada aqui para ser acessível no evento de submit
 
         async function fetchFormularioData() {
             // Captura os IDs da URL uma única vez
@@ -253,7 +254,7 @@
 
             const empresaId = pathSegments[pathSegments.indexOf("empresa") + 1] || "";
             const campanhaId = pathSegments[pathSegments.indexOf("campanha") + 1] || "";
-            const vendaId = pathSegments[pathSegments.indexOf("venda") + 1] || "";
+            vendaId = pathSegments[pathSegments.indexOf("venda") + 1] || ""; // Atribui à variável de escopo mais alto
 
             if (!empresaId || !campanhaId || !vendaId) {
                 loader.innerHTML = "<p>Erro: IDs de empresa, campanha ou venda não encontrados na URL.</p>";
@@ -261,25 +262,30 @@
             }
 
             try {
-                const res = await fetch(`/api/v1/campanha/${empresaId}/empresa/${campanhaId}`); // <-- aqui pegamos o JSON da resposta
+                // Realiza as duas buscas em paralelo para otimizar o tempo de carregamento
+                const [campanhaRes, vendaRes] = await Promise.all([
+                    fetch(`/api/v1/campanha/${empresaId}/empresa/${campanhaId}`),
+                    fetch(`/api/v1/venda/${vendaId}`) // Novo fetch para os dados da venda
+                ]);
 
+                if (!campanhaRes.ok) throw new Error('Falha ao buscar dados da campanha');
+                if (!vendaRes.ok) throw new Error('Falha ao buscar dados da venda');
+                
+                const campanhaData = await campanhaRes.json();
+                const vendaData = await vendaRes.json();
 
+                console.log("DADOS DA CAMPANHA:", campanhaData);
+                console.log("DADOS DA VENDA:", vendaData);
 
-
-                // if (!res.ok) throw new Error('Falha ao buscar dados da venda');
-
-                const data = await res.json();
-                console.log("RESPOSTA", data);
-
-                // Preenche os nomes
-                clienteNome = data.cliente?.nome || 'N/A';
-                produtoNome = data.produto?.nome || 'desconhecido';
+                // Preenche os nomes usando os dados da venda
+                clienteNome = vendaData.cliente?.nome || 'N/A';
+                produtoNome = vendaData.produto?.nome || 'desconhecido';
                 produtoNomeEl.textContent = produtoNome;
-                funcionarioNome = data.cliente?.vendedorResponsavel || 'N/A';
+                funcionarioNome = vendaData.cliente?.vendedorResponsavel || 'N/A';
 
-                // Renderiza as perguntas do formulário
+                // Renderiza as perguntas do formulário usando os dados da campanha
                 perguntasContainer.innerHTML = ''; // limpa container
-                for (const [index, pergunta] of(data.formulario?.perguntas || []).entries()) {
+                for (const [index, pergunta] of (campanhaData.formulario?.perguntas || []).entries()) {
                     const div = document.createElement("div");
                     div.className = "pergunta";
                     div.style.animationDelay = `${index * 0.1}s`;
@@ -368,8 +374,8 @@
                 formFeedback.style.display = 'block';
 
             } catch (err) {
-                console.error("Erro ao carregar dados da venda:", err);
-                loader.innerHTML = "<p>Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.</p>";
+                console.error("Erro ao carregar dados:", err);
+                loader.innerHTML = `<p>Ocorreu um erro ao carregar os dados. Tente novamente mais tarde. (${err.message})</p>`;
             }
         }
 
@@ -392,14 +398,14 @@
             });
 
             const payload = {
+                vendaId, // Adicionado o vendaId ao payload
                 clienteNome,
                 produtoNome,
-                funcionarioNome,
                 respostas
             };
 
             try {
-                const res = await fetch("/api/v1/feedback/manual", {
+                const res = await fetch("/api/v1/feedback/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
@@ -415,7 +421,13 @@
 
             } catch (err) {
                 console.error(err);
-                alert("Erro ao enviar feedback: " + err.message);
+                // Revert to a custom message box instead of alert
+                const errorDiv = document.createElement('div');
+                errorDiv.textContent = "Erro ao enviar feedback: " + err.message;
+                errorDiv.style.color = 'red';
+                errorDiv.style.marginTop = '10px';
+                formFeedback.appendChild(errorDiv);
+
                 submitButton.disabled = false;
                 submitButton.textContent = "Enviar Feedback";
             }

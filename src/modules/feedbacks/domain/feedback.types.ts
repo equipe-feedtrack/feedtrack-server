@@ -1,13 +1,12 @@
 interface IFeedback {
   id: string;
-  formularioId: string | null; // Pode ser null se não estiver associado a um formulário
-  envioId: string | null; // Adicionado para consistência com a entidade
+  formularioId: string | null; 
   respostas: Record<string, any>[];
+  vendaId: string;
   dataCriacao: Date;
   dataExclusao?: Date | null;
   clienteNome?: string | null;
   produtoNome?: string | null;
-  funcionarioNome?: string | null;
   empresaId: string;
 }
 
@@ -20,7 +19,7 @@ type CriarFeedbackProps = Omit<IFeedback, "id" | "dataCriacao" | "dataExclusao">
 /**
  * Dados necessários para criar um novo feedback manual.
  */
-type CriarFeedbackManualProps = Pick<IFeedback, "clienteNome" | "produtoNome" | "funcionarioNome" | "respostas" | "empresaId">;
+type CriarFeedbackManualProps = Pick<IFeedback, "clienteNome" | "produtoNome" | "respostas" | "empresaId" | "vendaId">;
 
 
 /**

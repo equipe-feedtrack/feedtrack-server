@@ -14,13 +14,12 @@ export class FeedbackMap {
     const props: RecuperarFeedbackProps = {
       id: raw.id,
       formularioId: raw.formularioId,
-      envioId: raw.envioId ?? null, // Adicionado para consistência
       respostas: raw.respostas as Record<string, any>[],
       dataCriacao: raw.dataCriacao,
       dataExclusao: raw.dataExclusao ?? null,
       clienteNome: raw.cliente_nome,
       produtoNome: raw.produto_nome,
-      funcionarioNome: raw.funcionario_nome,
+      vendaId: raw.vendaId,
       empresaId: raw.empresaId,
     };
     return Feedback.recuperar(props);
@@ -40,7 +39,7 @@ export class FeedbackMap {
       dataExclusao: feedback.dataExclusao ?? null,
       cliente_nome: feedback.clienteNome,
       produto_nome: feedback.produtoNome,
-      funcionario_nome: feedback.funcionarioNome,
+      vendaId: feedback.vendaId,
       empresaId: feedback.empresaId,
     };
   }

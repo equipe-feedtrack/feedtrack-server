@@ -320,14 +320,14 @@ model Feedback {
   cliente_nome     String?
   produto_nome     String?
   funcionario_nome String?
+  vendaId          String    @map("venda_id")
+  
 
   empresaId       String
   empresa         Empresa   @relation(fields: [empresaId], references: [id])
 
   formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
   formularioId String?     @map("formulario_id")
-
-  envioId String?          @unique @map("envio_id")
 
   @@map("feedbacks")
 }

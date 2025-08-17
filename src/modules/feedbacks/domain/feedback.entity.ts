@@ -10,6 +10,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   private _respostas: Record<string, any>[];
   private _dataCriacao: Date;
   private _dataExclusao: Date | null;
+  private _vendaId: string;
   private _clienteNome: string | null;
   private _produtoNome: string | null;
   private _funcionarioNome: string | null;
@@ -17,6 +18,7 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
 
   // Getters
   get formularioId(): string | null { return this._formularioId; }
+  get vendaId(): string { return this._vendaId; }
   get envioId(): string | null { return this._envioId; }
   get respostas(): Record<string, any>[] { return this._respostas; }
   get dataCriacao(): Date { return this._dataCriacao; }
@@ -32,6 +34,9 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   }
   private set envioId(value: string | null) {
     this._envioId = value;
+  }
+  private set vendaId(value: string) {
+    this._vendaId = value;
   }
   private set respostas(value: Record<string, any>[]) {
     if (!value || value.length === 0) {
@@ -55,13 +60,12 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   private constructor(props: IFeedback) {
     super(props.id);
     this.formularioId = props.formularioId;
-    this.envioId = props.envioId ?? null; // Adicionado para consistência
+    this.vendaId = props.vendaId;
     this._respostas = props.respostas;
     this.dataCriacao = props.dataCriacao;
     this.dataExclusao = props.dataExclusao ?? null;
     this.clienteNome = props.clienteNome ?? null;
     this.produtoNome = props.produtoNome ?? null;
-    this.funcionarioNome = props.funcionarioNome ?? null;
     this.empresaId = props.empresaId;
 
     if (this.formularioId && this.envioId) {
@@ -116,9 +120,6 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
   }
 
   public static criar(props: CriarFeedbackProps, id?: string): Feedback {
-    if (!props.envioId || typeof props.envioId !== 'string') {
-      throw new Error("ID do envio é obrigatório para criar um feedback.");
-    }
     if (!props.formularioId || typeof props.formularioId !== 'string') {
       throw new Error("ID do formulário é obrigatório para criar um feedback.");
     }
@@ -171,26 +172,27 @@ class Feedback extends Entity<IFeedback> implements IFeedback {
     const feedbackCompleto: IFeedback = {
       id: id || randomUUID(),
       formularioId: props.formularioId || null,
-      envioId: props.envioId,
       respostas: respostasValidadas,
       dataCriacao: new Date(),
       dataExclusao: null,
+      vendaId: props.vendaId,
+      clienteNome: props.clienteNome ?? null,
+      produtoNome: props.produtoNome ?? null,
       empresaId: props.empresaId,
     };
     return new Feedback(feedbackCompleto);
   }
 
-  public static criarManual(props: CriarFeedbackManualProps, id?: string): Feedback {
+  public static criarManual(props: CriarFeedbackManualProps, ): Feedback {
     const feedbackCompleto: IFeedback = {
-      id: id || randomUUID(),
+      id: randomUUID(),
       formularioId: null,
-      envioId: null,
       respostas: props.respostas,
       dataCriacao: new Date(),
       dataExclusao: null,
       clienteNome: props.clienteNome,
       produtoNome: props.produtoNome,
-      funcionarioNome: props.funcionarioNome,
+      vendaId: props.vendaId,
       empresaId: props.empresaId,
     };
     return new Feedback(feedbackCompleto);

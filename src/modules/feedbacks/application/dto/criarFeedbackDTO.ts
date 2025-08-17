@@ -27,6 +27,7 @@ export class RespostaDTO {
 export class CriarFeedbackDTO implements CriarFeedbackProps {
   formularioId: string;
   envioId: string;
+  vendaId: string;
   respostas: RespostaDTO[];
   empresaId: string;
 
