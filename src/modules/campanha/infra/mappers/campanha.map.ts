@@ -1,60 +1,41 @@
 import {
   Campanha as CampanhaPrisma,
-  TipoCampanha as TipoCampanhaPrisma,
-  SegmentoAlvo as SegmentoAlvoPrisma,
-  CanalEnvio as CanalEnvioPrisma,
+  CanalEnvio,
   Prisma,
 } from '@prisma/client';
 
 import { Campanha } from '@modules/campanha/domain/campanha.entity';
 import { ICampanha, TipoCampanha, SegmentoAlvo } from '@modules/campanha/domain/campanha.types';
-import { CampanhaResponseDTO } from '@modules/campanha/application/dto/CampanhaResponseDTO';
+import { CampanhaCompletaResponseDTO, CampanhaResponseDTO } from '@modules/campanha/application/dto/CampanhaResponseDTO';
 
 // Define um tipo para o objeto CampanhaPrisma que pode ser usado nas conversões.
 type CampanhaPrismaDTO = CampanhaPrisma;
 
+
+
+
 export class CampanhaMap {
 
-  // Funções privadas para mapear enums de forma segura, evitando acoplamento frágil.
-  private static tipoToDomain(tipo: TipoCampanhaPrisma): TipoCampanha {
-    return tipo as unknown as TipoCampanha; // Mapeamento direto se os nomes forem idênticos
-  }
+public static toDomain(raw: CampanhaPrismaDTO): Campanha {
 
-  private static tipoToPersistence(tipo: TipoCampanha): TipoCampanhaPrisma {
-    return tipo as unknown as TipoCampanhaPrisma;
-  }
 
-  private static segmentoToDomain(segmento: SegmentoAlvoPrisma): SegmentoAlvo {
-    return segmento as unknown as SegmentoAlvo;
-  }
+  const campanhaProps: ICampanha = {
+    id: raw.id,
+    titulo: raw.titulo,
+    descricao: raw.descricao ?? undefined,
+    templateMensagem: raw.templateMensagem ?? '',
+    formularioId: raw.formularioId ?? '',
+    canalEnvio: raw.canalEnvio,
+    empresaId: raw.empresaId,
+    dataCriacao: raw.dataCriacao,
+    dataAtualizacao: raw.dataAtualizacao,
+    dataExclusao: raw.dataExclusao,
+  };
 
-  private static segmentoToPersistence(segmento: SegmentoAlvo): SegmentoAlvoPrisma {
-    return segmento as unknown as SegmentoAlvoPrisma;
-  }
+  return Campanha.recuperar(campanhaProps);
+}
 
-  /**
-   * Converte o dado bruto do Prisma para a Entidade de Domínio Campanha.
-   */
-  public static toDomain(raw: CampanhaPrismaDTO): Campanha {
-    const campanhaProps: ICampanha = {
-      id: raw.id,
-      titulo: raw.titulo,
-      descricao: raw.descricao ?? undefined,
-      tipoCampanha: this.tipoToDomain(raw.tipoCampanha),
-      segmentoAlvo: this.segmentoToDomain(raw.segmentoAlvo),
-      dataFim: raw.dataFim,
-      templateMensagem: raw.templateMensagem,
-      formularioId: raw.formularioId ?? '',
-      canalEnvio: raw.canalEnvio,
-      ativo: raw.ativo,
-      empresaId: raw.empresaId,
-      dataCriacao: raw.dataCriacao,
-      dataAtualizacao: raw.dataAtualizacao,
-      dataExclusao: raw.dataExclusao,
-    };
 
-    return Campanha.recuperar(campanhaProps);
-  }
 
   /**
    * Converte a Entidade de Domínio para o formato que o Prisma espera para persistência.
@@ -64,12 +45,8 @@ export class CampanhaMap {
       id: campanha.id,
       titulo: campanha.titulo,
       descricao: campanha.descricao,
-      tipoCampanha: this.tipoToPersistence(campanha.tipoCampanha),
-      segmentoAlvo: this.segmentoToPersistence(campanha.segmentoAlvo),
       canalEnvio: campanha.canalEnvio,
-      dataFim: campanha.dataFim,
       templateMensagem: campanha.templateMensagem,
-      ativo: campanha.ativo,
       dataCriacao: campanha.dataCriacao,
       dataAtualizacao: campanha.dataAtualizacao,
       dataExclusao: campanha.dataExclusao,
@@ -89,16 +66,54 @@ export class CampanhaMap {
       id: campanha.id,
       titulo: campanha.titulo,
       descricao: campanha.descricao,
-      tipoCampanha: campanha.tipoCampanha,
-      segmentoAlvo: campanha.segmentoAlvo,
-      dataFim: campanha.dataFim ? new Date(campanha.dataFim).toISOString() : null,
       templateMensagem: campanha.templateMensagem,
       formularioId: campanha.formularioId,
       canalEnvio: campanha.canalEnvio,
-      ativo: campanha.ativo,
       empresaId: campanha.empresaId,
       dataCriacao: new Date(campanha.dataCriacao).toISOString(),
       dataAtualizacao: new Date(campanha.dataAtualizacao).toISOString(),
     };
   }
+
+    public static toDomainParcial(raw: Partial<CampanhaPrismaDTO>): Partial<Campanha> {
+    if (!raw.id) throw new Error("ID da campanha é obrigatório.");
+    return {
+      id: raw.id,
+      canalEnvio: raw.canalEnvio,
+      templateMensagem: raw.templateMensagem ?? '',
+      empresaId: raw.empresaId,
+    } as Partial<Campanha>;
+  }
+
+public static toDomainWithFormulario(raw: any): Campanha {
+  const campanha = this.toDomain({
+    ...raw,
+    templateMensagem: raw.templateMensagem ?? '',
+  });
+
+  // Preencher o formulário com perguntas
+  if (raw.formulario) {
+    campanha['formulario'] = {
+      id: raw.formulario.id,
+      perguntas: raw.formulario.perguntas.map((p: any) => ({
+        id: p.pergunta.id,
+        texto: p.pergunta.texto,
+        tipo: p.pergunta.tipo,
+        opcoes: p.pergunta.opcoes ?? [],
+      })),
+    };
+  }
+
+  return campanha;
+}
+
+public static toResponseWithFormulario(campanha: Campanha): CampanhaCompletaResponseDTO {
+  return {
+    ...this.toResponseDTO(campanha),
+    formulario: campanha.formulario ?? undefined,
+  };
+}
+
+
+
 }

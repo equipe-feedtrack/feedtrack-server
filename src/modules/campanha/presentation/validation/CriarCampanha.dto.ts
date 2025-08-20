@@ -59,17 +59,6 @@ export class CriarCampanhaValidationDTO {
     @IsOptional()
     descricao?: string;
 
-    @IsEnum(TipoCampanha)
-    @IsNotEmpty()
-    tipoCampanha: TipoCampanha;
-
-    @IsEnum(SegmentoAlvo)
-    @IsNotEmpty()
-    segmentoAlvo: SegmentoAlvo;
-
-
-    
-
     @IsString()
     @IsNotEmpty()
     templateMensagem: string;

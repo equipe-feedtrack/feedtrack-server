@@ -1,87 +1,82 @@
 import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.repository.interface";
-import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { IEmailGateway, IEnvioRepository, IWhatsAppGateway } from "@modules/formulario/infra/envio/IEnvioRepository";
-import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repository.interface";
+import { IVendaRepository } from "@modules/venda/infra/venda.repository.interface";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { CanalEnvio } from "@prisma/client";
 
-interface DisparoEmMassaConfig {
-  quantidade: number;
-  intervalo: number; // Em horas
+export interface DisparoEmMassaRealtimeConfig {
+  intervaloChecagemMinutos: number; // usado apenas se quiser delay entre execuções via CRON
 }
 
-/**
- * @description Use Case para disparar Envios de formulário em massa.
- * Ele recupera clientes, cria entidades de Envio e as envia em lotes.
- */
-export class DispararEnvioEmMassaUseCase {
+export class DispararEnvioEmMassaRealtimeUseCase {
   constructor(
     private readonly envioRepository: IEnvioRepository,
-    private readonly clienteRepository: IClienteRepository,
+    private readonly vendaRepository: IVendaRepository,
     private readonly campanhaRepository: ICampanhaRepository,
     private readonly whatsAppGateway: IWhatsAppGateway,
-    private readonly EmailGateway: IEmailGateway,
+    private readonly EmailGateway: IEmailGateway
   ) {}
 
-  public async execute(campanhaId: string, config: DisparoEmMassaConfig, produtoId: string): Promise<void> {
-    const campanha = await this.campanhaRepository.recuperarPorUuid(campanhaId);
-    if (!campanha) {
-      throw new Error("Campanha não encontrada.");
-    }
+  private substituirPlaceholders(template: string, dados: {
+    nomeCliente?: string;
+    nomeProduto?: string;
+    nomeEmpresa?: string;
+  }): string {
+    return template
+      .replace(/\[Nome do Cliente\]/g, `*${dados.nomeCliente ?? ''}*`)
+      .replace(/\[Nome do Produto\]/g, `*${dados.nomeProduto ?? ''}*`)
+      .replace(/\[Nome da Empresa\]/g, `*${dados.nomeEmpresa ?? ''}*`);
+  }
 
-    const clientes = await this.clienteRepository.buscarClientesParaCampanha(campanha.segmentoAlvo);
+  /**
+   * @description Executa apenas uma checagem de vendas novas e dispara os envios necessários.
+   * Este método deve ser chamado periodicamente via CRON.
+   */
+  public async execute(
+    campanhaId: string,
+    empresaId: string,
+    produtoId: string,
+    config?: DisparoEmMassaRealtimeConfig
+  ): Promise<void> {
 
-    let enviosPendentes = [];
-    for (const cliente of clientes) {
-      const envio = Envio.criar({
-        clienteId: cliente.id,
-        campanhaId: campanha.id,
-        formularioId: campanha.formularioId,
-        usuarioId: "system-user-uuid",
-        produtoId,
-        empresaId: campanha.empresaId
-      });
-      enviosPendentes.push(envio);
-    }
-    
-    console.log(`Iniciando disparo em massa para ${enviosPendentes.length} clientes. Lote: ${config.quantidade}, Intervalo: ${config.intervalo}h`);
+    const campanha = await this.campanhaRepository.recuperarPorUuid(campanhaId, empresaId);
+    if (!campanha) throw new Error("Campanha não encontrada.");
 
-    for (let i = 0; i < enviosPendentes.length; i += config.quantidade) {
-      const lote = enviosPendentes.slice(i, i + config.quantidade);
-      console.log(`Processando lote de ${lote.length} envios.`);
+    console.log(`Iniciando disparo em tempo real para campanha ${campanhaId}.`);
 
-      const operacoesDeEnvio = lote.map(async envio => {
-        try {
-          // Lógica de envio por e-mail ou WhatsApp com base na Campanha
-         const conteudo = campanha.templateMensagem;
-         const campanhaId = envio.campanhaId;
-         const formularioId = envio.formularioId;
-         const clienteId = envio.clienteId;
-         
-         const clienteParaEnvio = clientes.find(c => c.id === envio.clienteId);
-          if (!clienteParaEnvio) { 
-            envio.registrarFalha(`Cliente com ID ${envio.clienteId} não encontrado na lista de clientes da campanha.`);
-            return; // Pula para o próximo item do array
-          }
+    // Busca vendas novas
+    const vendas = await this.vendaRepository.buscarNovasVendas(empresaId, produtoId);
 
-          if (campanha.canalEnvio === CanalEnvio.EMAIL) {
-              await this.EmailGateway.enviar(clienteParaEnvio.email, conteudo, formularioId, clienteId, produtoId);
-          } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
-              await this.whatsAppGateway.enviar(clienteParaEnvio.telefone, conteudo, formularioId, clienteId, produtoId );
-          } else {
-              throw new Error("Canal de envio inválido na campanha.");
-          }
-          envio.marcarComoEnviado();
-        } catch (error: any) {
-          envio.registrarFalha(error.message);
+    for (const venda of vendas) {
+      // Verifica se já existe envio
+      const jaExisteEnvio = await this.envioRepository.checarSeEnvioJaFoiFeito(campanhaId, venda.id);
+      if (jaExisteEnvio) continue;
+
+      const envio = Envio.criar({ campanhaId, empresaId, vendaId: venda.id });
+
+      try {
+        const conteudoFinal = this.substituirPlaceholders(campanha.templateMensagem, {
+          nomeCliente: venda.cliente?.nome ?? "Cliente",
+          nomeProduto: venda.produto?.nome ?? "Produto",
+          nomeEmpresa: venda.empresa?.nome ?? "Empresa",
+        });
+
+        if (campanha.canalEnvio === CanalEnvio.EMAIL) {
+          if (!venda.cliente?.email) throw new Error("Email do cliente não fornecido.");
+          await this.EmailGateway.enviar(venda.cliente.email, conteudoFinal, venda.id, venda.clienteId, produtoId);
+        } else if (campanha.canalEnvio === CanalEnvio.WHATSAPP) {
+          if (!venda.cliente?.telefone) throw new Error("Telefone do cliente não fornecido.");
+          await this.whatsAppGateway.enviar(venda.cliente.telefone, conteudoFinal, venda.id, venda.clienteId, produtoId);
+        } else {
+          throw new Error("Canal de envio inválido na campanha.");
         }
-      });
 
-      await Promise.all(operacoesDeEnvio);
-      await this.envioRepository.salvarVarios(lote);
-
-      if (i + config.quantidade < enviosPendentes.length) {
-        console.log(`Aguardando ${config.intervalo} horas para o próximo lote...`);
+        envio.marcarComoEnviado();
+      } catch (error: any) {
+        envio.registrarFalha(error.message);
       }
+
+      await this.envioRepository.salvar(envio);
     }
 
     console.log("Disparo em massa concluído.");

@@ -12,6 +12,7 @@ export interface IEnvioRepository {
   // buscarPendentesPorCliente(clienteId: string): Promise<Envio[]>;
   buscarPendentesPorCampanha(campanhaId: string): Promise<Envio[]>;
   buscarPendentes(): Promise<Envio[]>;
+  checarSeEnvioJaFoiFeito(campanhaId: string, vendaId: string): Promise<boolean>;
 }
 
 // src/application/gateways/IWhatsAppGateway.ts

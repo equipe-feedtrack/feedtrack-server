@@ -27,6 +27,7 @@ export class RespostaDTO {
 export class CriarFeedbackDTO implements CriarFeedbackProps {
   formularioId: string;
   envioId: string;
+  vendaId: string;
   respostas: RespostaDTO[];
   empresaId: string;
 
@@ -55,12 +56,11 @@ export class CriarFeedbackDTO implements CriarFeedbackProps {
 export interface FeedbackResponseDTO {
   id: string;
   formularioId: string | null;
-  envioId: string | null;
+  vendaId: string;
   respostas: Record<string, any>[]; // Array de respostas
   dataCriacao: string; // ISO string
   dataExclusao?: string; // ISO string ou undefined
   clienteNome?: string | null;
   produtoNome?: string | null;
-  funcionarioNome?: string | null;
   empresaId: string;
 }

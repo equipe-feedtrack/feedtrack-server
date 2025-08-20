@@ -6,7 +6,6 @@ export interface CriarCampanhaInputDTO {
   descricao?: string;
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
-  dataFim: Date | null;
   templateMensagem: string;
   formularioId: string;
   canalEnvio: CanalEnvio;

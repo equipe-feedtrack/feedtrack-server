@@ -14,13 +14,12 @@ export class FeedbackMap {
     const props: RecuperarFeedbackProps = {
       id: raw.id,
       formularioId: raw.formularioId,
-      envioId: raw.envioId ?? null, // Adicionado para consistência
       respostas: raw.respostas as Record<string, any>[],
       dataCriacao: raw.dataCriacao,
       dataExclusao: raw.dataExclusao ?? null,
       clienteNome: raw.cliente_nome,
       produtoNome: raw.produto_nome,
-      funcionarioNome: raw.funcionario_nome,
+      vendaId: raw.vendaId,
       empresaId: raw.empresaId,
     };
     return Feedback.recuperar(props);
@@ -34,13 +33,12 @@ export class FeedbackMap {
     return {
       id: feedback.id,
       formularioId: feedback.formularioId,
-      envioId: feedback.envioId ?? null, // Adicionado para consistência
       respostas: feedback.respostas as Prisma.InputJsonValue,
       dataCriacao: feedback.dataCriacao,
       dataExclusao: feedback.dataExclusao ?? null,
       cliente_nome: feedback.clienteNome,
       produto_nome: feedback.produtoNome,
-      funcionario_nome: feedback.funcionarioNome,
+      vendaId: feedback.vendaId,
       empresaId: feedback.empresaId,
     };
   }
@@ -52,13 +50,12 @@ public static toResponseDTO(feedback: Feedback): FeedbackResponseDTO {
   return {
     id: feedback.id,
     formularioId: feedback.formularioId,
-    envioId: feedback.envioId ?? null,
+    vendaId: feedback.vendaId,
     respostas: feedback.respostas,
     dataCriacao: feedback.dataCriacao.toISOString(),
     dataExclusao: feedback.dataExclusao ? feedback.dataExclusao.toISOString() : undefined,
     clienteNome: feedback.clienteNome,
     produtoNome: feedback.produtoNome,
-    funcionarioNome: feedback.funcionarioNome,
     empresaId: feedback.empresaId,
   };
 }

@@ -6,7 +6,7 @@ import { BuscarPerguntaPorIdUseCase } from '@modules/formulario/application/use-
 import { CriarPerguntaUseCase } from '@modules/formulario/application/use-cases/pergunta/criarPerguntaUseCase';
 import { DeletarPerguntaUseCase } from '@modules/formulario/application/use-cases/pergunta/DeletarPerguntaUseCase';
 import { PerguntaException } from '@modules/formulario/domain/pergunta/pergunta.exception';
-import { ListarPerguntasInputDTO, ListarPerguntasUseCase } from '@modules/formulario/application/use-cases/pergunta/listar-perguntas.usecase';
+import { ListarPerguntasUseCase } from '@modules/formulario/application/use-cases/pergunta/listar-perguntas.usecase';
 
 /**
  * Controller responsável por gerir as requisições HTTP para o recurso de Perguntas.
@@ -39,8 +39,8 @@ export class PerguntaController {
    */
   public buscarPorId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
-      const perguntaDTO = await this._buscarPerguntaPorIdUseCase.execute(id);
+      const { id, empresaId} = req.params;
+      const perguntaDTO = await this._buscarPerguntaPorIdUseCase.execute({id, empresaId});
 
       if (!perguntaDTO) {
         res.status(404).json({ message: 'Pergunta não encontrada.' });
@@ -52,23 +52,23 @@ export class PerguntaController {
     }
   };
 
-  
-   public listar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { ativo } = req.query;
-      const filtros: ListarPerguntasInputDTO = {};
+public listar = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try {
+    const { empresaId } = req.query;
 
-      if (ativo !== undefined) {
-        // Converte a string 'true'/'false' da query para um booleano
-        filtros.ativo = ativo === 'true';
-      }
-      
-      const perguntasDTO = await this._listarPerguntasUseCase.execute(filtros);
-      res.status(200).json(perguntasDTO);
-    } catch (error: any) {
-      next(error);
+    if (!empresaId) {
+      return res.status(400).json({ message: "Parâmetro 'empresa' é obrigatório." });
     }
+
+    const empresa = String(empresaId);
+    const perguntasDTO = await this._listarPerguntasUseCase.execute(empresa);
+    return res.status(200).json(perguntasDTO);
+  } catch (error: any) {
+    next(error);
   }
+};
+
+
 
   /**
    * Lida com a requisição para atualizar uma pergunta existente.
@@ -96,8 +96,8 @@ export class PerguntaController {
    */
   public deletar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
-      await this._deletarPerguntaUseCase.execute(id);
+      const { id, empresaId } = req.params;
+      await this._deletarPerguntaUseCase.execute({id, empresaId});
       res.status(204).send();
     } catch (error: any) {
       if (error instanceof PerguntaException) {

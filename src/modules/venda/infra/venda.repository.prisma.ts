@@ -6,71 +6,94 @@ import { VendaMap } from "./mappers/venda.map";
 const prisma = new PrismaClient();
 
 export class VendaRepositoryPrisma implements IVendaRepository {
-async save(venda: Venda): Promise<Venda> {
-  console.log("[venda id]", venda)
-  const vendaPersistence = VendaMap.toPersistence(venda);
+  async save(venda: Venda): Promise<Venda> {
+    const vendaPersistence = VendaMap.toPersistence(venda);
 
-  // Verifica se a empresa existe
-  const empresaExists = await prisma.empresa.findUnique({
-    where: { id: vendaPersistence.empresaId },
-  });
+    const empresaExists = await prisma.empresa.findUnique({
+      where: { id: vendaPersistence.empresaId },
+    });
 
-  if (!empresaExists) {
-    throw new Error(`Empresa com id ${vendaPersistence.empresaId} não existe.`);
+    if (!empresaExists) {
+      throw new Error(
+        `Empresa com id ${vendaPersistence.empresaId} não existe.`
+      );
+    }
+
+    const createdVenda = await prisma.venda.create({ data: vendaPersistence });
+    return VendaMap.toDomain(createdVenda);
   }
 
-  const createdVenda = await prisma.venda.create({
-    data: vendaPersistence,
-  });
+  async findById(id: string): Promise<Venda | null> {
+    const venda = await prisma.venda.findUnique({ 
+      where: { id },
+      include: {
+        cliente: {
+          select: {
+            nome: true,
+            telefone: true,
+            email: true
+          }
+        },
+        produto: {
+          select: {
+            nome: true
+          }
+        },
+        empresa: {
+          select: {
+            nome: true
+          }
+        }
+      }
+    
+    });
+    return venda ? VendaMap.toDomain(venda) : null;
+  }
+  async findAll(empresaId: string): Promise<Venda[]> {
+    const vendas = await prisma.venda.findMany({
+      where: { empresaId }, // remove o filtro por id
+      select: {
+        id: true, // garante que o id venha
+        clienteId: true,
+        produtoId: true,
+        // ... outros campos
+      },
+    });
 
-  return VendaMap.toDomain(createdVenda);
-}
-
-
-async findById(id: string): Promise<any> {
-  console.log("[venda id]", id)
-  const venda = await prisma.venda.findUnique({
-    where: { id },
-    include: {
-      cliente: { select: { email: true, telefone: true } },
-      produto: { select: { nome: true, valor: true, descricao: true } }
-    }
-  });
-
-  console.log("[venda]", venda)
-
-  if (!venda) return null;
-
-  return VendaMap.toDomain(venda);
-
-
-//   return Venda.create({
-//     id: venda.id,
-//     clienteId: venda.clienteId,
-//     produtoId: venda.produtoId,
-//     empresaId: venda.empresaId,
-//     dataVenda: venda.dataVenda,
-//     cliente: venda.cliente
-//   ? {
-//       email: venda.cliente.email ?? undefined,
-//       telefone: venda.cliente.telefone ?? undefined
-//     }
-//   : undefined,
-// produto: venda.produto
-//   ? {
-//       nome: venda.produto.nome ?? undefined,
-//       valor: venda.produto.valor ?? undefined,
-//       descricao: venda.produto.descricao ?? undefined
-//     }
-//   : undefined
-
-//   });
-}
-
-
-
-  async findAll(): Promise<Venda[]> {
-    const vendas = await prisma.venda.findMany();
     return vendas.map(VendaMap.toDomain);
   }
+  
+async buscarNovasVendas(empresaId: string, produtoId: string): Promise<Venda[]> {
+  const vendas = await prisma.venda.findMany({
+    where: {
+      empresaId,
+      produtoId,
+      // você pode adicionar mais filtros, por exemplo, vendas criadas recentemente
+      // dataVenda: { gte: new Date(/* última verificação */) }
+    },
+    include: {
+      cliente: {
+        select: {
+          nome: true,
+          telefone: true,
+          email: true,
+        },
+      },
+      produto: {
+        select: {
+          nome: true,
+        },
+      },
+      empresa: {
+        select: {
+          nome: true,
+        },
+      },
+    },
+  });
+
+  return vendas.map(VendaMap.toDomain);
+}
+
+
 }

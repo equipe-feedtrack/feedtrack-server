@@ -7,11 +7,11 @@ import { FormularioMap } from "@modules/formulario/infra/mappers/formulario.map"
 import { CriarFormularioInputDTO } from "../../dto/formulario/CriarFormularioDTO";
 
 export class CriarFormularioUseCase implements IUseCase<CriarFormularioInputDTO, FormularioResponseDTO> {
-  private readonly _formularioRepository: IFormularioRepository<Formulario>;
+  private readonly _formularioRepository: IFormularioRepository;
   private readonly _perguntaRepository: IPerguntaRepository;
 
   constructor(
-    formularioRepository: IFormularioRepository<Formulario>,
+    formularioRepository: IFormularioRepository,
     perguntaRepository: IPerguntaRepository
   ) {
     this._formularioRepository = formularioRepository;
@@ -20,7 +20,7 @@ export class CriarFormularioUseCase implements IUseCase<CriarFormularioInputDTO,
 
   async execute(input: CriarFormularioInputDTO): Promise<FormularioResponseDTO> {
     // 1. Validação e Recuperação das Perguntas
-    const perguntasRecuperadas = await this._perguntaRepository.buscarMuitosPorId(input.idsPerguntas);
+    const perguntasRecuperadas = await this._perguntaRepository.buscarMuitosPorId(input.idsPerguntas, input.empresaId);
     if (perguntasRecuperadas.length !== input.idsPerguntas.length) {
       throw new Error("Uma ou mais IDs de perguntas fornecidas são inválidas.");
     }
@@ -35,7 +35,7 @@ export class CriarFormularioUseCase implements IUseCase<CriarFormularioInputDTO,
     });
 
     // 3. Persistência no Banco de Dados
-    await this._formularioRepository.inserir(formulario);
+    await this._formularioRepository.inserir(formulario, input.empresaId);
 
     // 4. Retorno do DTO de Saída
     return FormularioMap.toResponseDTO(formulario);

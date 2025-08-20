@@ -75,6 +75,7 @@
     "express": "^5.1.0",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.1",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.5",
     "reflect-metadata": "^0.2.2",
     "sqlite": "^5.1.1"

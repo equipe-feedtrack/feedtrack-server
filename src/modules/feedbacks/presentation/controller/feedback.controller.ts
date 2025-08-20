@@ -40,8 +40,17 @@ export class FeedbackController {
    */
   public criarManual = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const body: CriarFeedbackManualProps = req.body;
-      const feedback = await this.criarFeedbackManualUseCase.execute(body);
+      const { empresaId } = req.params;
+      const { clienteNome, produtoNome, respostas, vendaId } = req.body;
+
+      const feedback = await this.criarFeedbackManualUseCase.execute({
+        clienteNome: clienteNome,
+        produtoNome: produtoNome,
+        respostas,
+        vendaId,
+        empresaId
+      });
+
       res.status(201).json(feedback);
     } catch (error) {
       next(error);
@@ -68,8 +77,11 @@ export class FeedbackController {
   };
 
   public buscarTodos = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+
+    const empresaId = req.params.empresaId;
+
     try {
-      const feedbacks = await this.buscarTodosFeedbacksUseCase.execute();
+      const feedbacks = await this.buscarTodosFeedbacksUseCase.execute(empresaId);
       res.status(200).json(feedbacks);
     } catch (error) {
       next(error);

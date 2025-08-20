@@ -5,6 +5,8 @@ export interface AtualizarCampanhaInputDTO {
   formularioId?: string;
   tipoCampanha?: string;
   segmentoAlvo?: string;
+  empresaId: string;
+  canalEnvio?: string;
   templateMensagem?: string;
   dataFim?: Date | null;
   ativo?: boolean; // Adicionado para permitir a atualização do status

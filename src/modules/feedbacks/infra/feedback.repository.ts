@@ -4,5 +4,5 @@ export interface IFeedbackRepository {
   salvar(feedback: Feedback): Promise<void>;
   salvarManual(feedback: Feedback): Promise<void>;
   recuperarPorUuid(id: string): Promise<Feedback | null>;
-  buscarTodos(): Promise<Feedback[]>
+  buscarTodos(empresaId: string): Promise<Feedback[]>
 }
