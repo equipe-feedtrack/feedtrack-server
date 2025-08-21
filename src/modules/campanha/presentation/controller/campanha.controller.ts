@@ -54,6 +54,9 @@ public buscarPorId = async (req: Request, res: Response, next: NextFunction): Pr
   try {
     const { id, empresaId } = req.params; // <- adicionado empresaId
 
+    console.log('Parametros recebidos:', { id, empresaId });
+
+
     const campanhaDTO = await this._buscarCampanhaPorIdUseCase.execute({ id, empresaId });
     if (!campanhaDTO) {
       throw new CampanhaNaoEncontradaException();

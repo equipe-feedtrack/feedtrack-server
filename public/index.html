@@ -265,7 +265,7 @@
             try {
                 // Realiza as duas buscas em paralelo para otimizar o tempo de carregamento
                 const [campanhaRes, vendaRes] = await Promise.all([
-                    fetch(`/api/v1/campanha/${empresaId}/empresa/${campanhaId}`),
+                    fetch(`/api/v1/campanha/${campanhaId}/empresa/${empresaId}`),
                     fetch(`/api/v1/venda/${vendaId}`) // Novo fetch para os dados da venda
                 ]);
 

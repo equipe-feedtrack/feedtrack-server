@@ -50,7 +50,7 @@ async recuperarPorUuid(id: string, empresaId: string): Promise<Campanha | null> 
   console.log("DADOS RECUPERADOS", empresaId);
 
   const campanhaPrisma = await this.prisma.campanha.findFirst({
-    where: { id, empresaId },
+    where: { empresaId ,id },
     include: {
       formulario: {
         include: {

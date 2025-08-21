@@ -6,7 +6,7 @@ export class EmailGateway implements IEmailGateway {
   private readonly feedbackUrl: string;
 
   constructor() {
-    this.feedbackUrl = 'http://localhost:3000/api/v1/resposta-formulario'; // URL base do serviço de feedback
+    this.feedbackUrl = 'https://server.feedtrack.site/api/v1/resposta-formulario'; // URL base do serviço de feedback
   }
 
   /**
