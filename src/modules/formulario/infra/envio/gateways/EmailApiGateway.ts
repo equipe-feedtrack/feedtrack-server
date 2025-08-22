@@ -6,17 +6,18 @@ export class EmailGateway implements IEmailGateway {
   private readonly feedbackUrl: string;
 
   constructor() {
-    this.feedbackUrl = 'http://localhost:3000/api/v1/resposta-formulario'; // URL base do serviço de feedback
+    this.feedbackUrl = 'https://server.feedtrack.site/api/v1/resposta-formulario'; // URL base do serviço de feedback
   }
 
   /**
    * Envia um e-mail usando a API externa de envio FeedTrack.
    */
-  async enviar(destinatario: string, conteudo: string, formularioId: string, clienteId: string, produtoId: string): Promise<void> {
+  async enviar(destinatario: string, conteudo: string, vendaId: string, empresaId: string, campanhaId: string): Promise<void> {
     console.log(`[EmailGateway] Preparando para enviar e-mail para: ${destinatario}`);
 
     try {
-      const linkCompleto = `${this.feedbackUrl}/formulario/${formularioId}/cliente/${clienteId}/produto/${produtoId}`;
+      const linkCompleto = `${this.feedbackUrl}/empresa/${empresaId}/campanha/${campanhaId}/venda/${vendaId}`;
+
 
       // Corpo HTML mais elaborado e com identidade FeedTrack
       const mensagemCompleta = `

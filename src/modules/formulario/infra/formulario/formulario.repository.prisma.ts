@@ -3,58 +3,71 @@ import { Formulario } from "../../domain/formulario/formulario.entity";
 import { FormularioMap } from "../mappers/formulario.map";
 import { IFormularioRepository } from "./formulario.repository.interface";
 
-
-export class FormularioRepositoryPrisma implements IFormularioRepository<Formulario> {
+export class FormularioRepositoryPrisma implements IFormularioRepository {
   constructor(private prisma: PrismaClient) {}
-  
-  
-  async inserir(formulario: Formulario): Promise<void> {
-    const dadosFormulario = FormularioMap.toPersistence(formulario);
 
-    await this.prisma.formulario.create({
-      data: dadosFormulario,
-    });
+async inserir(formulario: Formulario): Promise<void> {
+  const dadosFormulario = FormularioMap.toPersistence(formulario);
+
+  await this.prisma.formulario.create({
+    data: {
+      ...dadosFormulario,
+      perguntas: {
+        create: formulario.perguntas.map((p) => ({
+          pergunta: { connect: { id: p.id } },
+        })),
+      },
+    },
+  });
+}
+
+
+async recuperarPorUuid(id: string, empresaId: string): Promise<Formulario | null> {
+  const formularioDb = await this.prisma.formulario.findFirst({
+    where: {
+      id,
+      empresaId,
+    },
+    include: {
+      perguntas: {
+        include: {
+          pergunta: true,
+        },
+      },
+    },
+  });
+
+  if (!formularioDb) return null;
+
+  return FormularioMap.toDomain(formularioDb);
+}
+
+
+  // Lista todos os formulários de uma empresa
+  async listar(empresaId: string): Promise<Formulario[]> {
+const formulariosDb = await this.prisma.formulario.findMany({
+  where: { empresaId },
+  include: {
+    perguntas: {
+      include: {
+        pergunta: true, // isso traz os dados completos da pergunta
+      },
+    },
+  },
+});
+
+
+
+    return formulariosDb.map(FormularioMap.toDomain);
   }
 
-
-  recuperarTodos(): Promise<Formulario[]> {
-    throw new Error("Method not implemented.");
-  }
-  
-  async recuperarPorUuid(id: string): Promise<Formulario | null> {
-    const formularioDb = await this.prisma.formulario.findUnique({
-      where: { id },
-    });
-
-    if (!formularioDb) return null;
-
-    return FormularioMap.toDomain(formularioDb);
-  }
-  
-  async listar(filtros?: { ativo?: boolean, empresaId?: string }): Promise<Formulario[]> {
-    const whereClause: any = {};
-
-    if (filtros?.ativo !== undefined) {
-      whereClause.ativo = filtros.ativo;
-    }
-    if (filtros?.empresaId) {
-      whereClause.empresaId = filtros.empresaId;
-    }
-
-    const formulariosDb = await this.prisma.formulario.findMany({
-      where: whereClause,
-    });
-    return formulariosDb.map(form => FormularioMap.toDomain(form));
-  }
-
-
-   async atualizar(formulario: Formulario): Promise<void> {
+  async atualizar(formulario: Formulario): Promise<void> {
     const dadosFormulario = FormularioMap.toPersistence(formulario);
     const { id, ...dadosEscalares } = dadosFormulario;
 
     await this.prisma.formulario.update({
-        where: { id: formulario.id },
-        data: dadosEscalares
+      where: { id: formulario.id },
+      data: dadosEscalares,
     });
   }
 

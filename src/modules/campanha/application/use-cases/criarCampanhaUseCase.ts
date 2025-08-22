@@ -9,11 +9,11 @@ import { CampanhaMap } from "@modules/campanha/infra/mappers/campanha.map";
 
 export class CriarCampanhaUseCase implements IUseCase<CriarCampanhaInputDTO, CampanhaResponseDTO> {
   private readonly _campanhaRepository: ICampanhaRepository;
-  private readonly _formularioRepository: IFormularioRepository<Formulario>;
+  private readonly _formularioRepository: IFormularioRepository;
 
   constructor(
     campanhaRepository: ICampanhaRepository,
-    formularioRepository: IFormularioRepository<Formulario>
+    formularioRepository: IFormularioRepository
   ) {
     this._campanhaRepository = campanhaRepository;
     this._formularioRepository = formularioRepository;
@@ -21,7 +21,7 @@ export class CriarCampanhaUseCase implements IUseCase<CriarCampanhaInputDTO, Cam
 
   async execute(input: CriarCampanhaInputDTO): Promise<CampanhaResponseDTO> {
     // 1. Validar se o formulário associado existe
-    const formularioExiste = await this._formularioRepository.existe(input.formularioId);
+    const formularioExiste = await this._formularioRepository.existe(input.formularioId, input.empresaId);
     if (!formularioExiste) {
       throw new Error(`Formulário com ID ${input.formularioId} não encontrado.`);
     }

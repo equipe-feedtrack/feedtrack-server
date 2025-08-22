@@ -3,9 +3,10 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
 
 enum StatusUsuario {
   ATIVO
@@ -121,7 +122,6 @@ model Usuario {
   empresa          Empresa       @relation(fields: [empresaId], references: [id])
 
   funcionario      Funcionario?  @relation("UsuarioFuncionario")
-  enviosFormulario EnvioFormulario[]
   logsAtividade    LogAtividade[]
 
   @@map("usuarios")
@@ -181,7 +181,6 @@ model Cliente {
   empresa             Empresa       @relation(fields: [empresaId], references: [id])
 
   vendas           Venda[]
-  enviosFormulario EnvioFormulario[]
 
   @@map("clientes")
 }
@@ -200,26 +199,28 @@ model Produto {
   empresa         Empresa   @relation(fields: [empresaId], references: [id])
 
   vendas          Venda[]
-  enviosFormulario EnvioFormulario[]
 
   @@map("produtos")
 }
 
 model Venda {
-  id            String    @id @default(uuid())
-  dataVenda     DateTime  @default(now()) @map("data_venda")
+  id        String    @id 
+  dataVenda DateTime  @default(now()) @map("data_venda")
   
-  clienteId     String
-  cliente       Cliente   @relation(fields: [clienteId], references: [id])
+  clienteId String
+  cliente   Cliente   @relation(fields: [clienteId], references: [id])
 
-  produtoId     String
-  produto       Produto   @relation(fields: [produtoId], references: [id])
+  produtoId String
+  produto   Produto   @relation(fields: [produtoId], references: [id])
 
-  empresaId     String
-  empresa       Empresa   @relation(fields: [empresaId], references: [id])
+  empresaId String
+  empresa   Empresa   @relation(fields: [empresaId], references: [id])
+
+  envioid   EnvioFormulario[]
 
   @@map("vendas")
 }
+
 
 model Pergunta {
   id              String    @id @default(uuid())
@@ -252,7 +253,6 @@ model Formulario {
   perguntas PerguntasOnFormularios[]
   campanhas Campanha[]
   feedbacks Feedback[]
-  envios    EnvioFormulario[]
 
   empresa   Empresa @relation(fields: [empresaId], references: [id])
 
@@ -265,7 +265,6 @@ model PerguntasOnFormularios {
   perguntaId   String     @map("pergunta_id")
   formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
   formularioId String     @map("formulario_id")
-  ordemNaLista Int        @map("ordem_na_lista")
 
   @@map("perguntas_on_formularios")
 }
@@ -274,11 +273,7 @@ model Campanha {
   id               String       @id @default(uuid())
   titulo           String
   descricao        String?
-  tipoCampanha     TipoCampanha @map("tipo_campanha")
-  segmentoAlvo     SegmentoAlvo @map("segmento_alvo")
   canalEnvio       CanalEnvio   @default(EMAIL) @map("canal_envio")
-  dataInicio       DateTime     @map("data_inicio")
-  dataFim          DateTime?    @map("data_fim")
   templateMensagem String       @map("template_mensagem")
   ativo            Boolean      @default(true)
   dataCriacao      DateTime     @default(now()) @map("data_criacao")
@@ -304,22 +299,15 @@ model EnvioFormulario {
   dataCriacao        DateTime         @default(now()) @map("data_criacao")
   dataEnvio          DateTime?        @map("data_envio")
 
-  formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
-  formularioId String?     @map("formulario_id")
-  cliente      Cliente?    @relation(fields: [clienteId], references: [id], onDelete: SetNull)
-  clienteId    String?     @map("cliente_id")
   campanha     Campanha?   @relation(fields: [campanhaId], references: [id], onDelete: SetNull)
   campanhaId   String?     @map("campanha_id")
-  usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  usuarioId    String     @map("usuario_id")
-  
-  produto      Produto?    @relation(fields: [produtoId], references: [id], onDelete: SetNull)
-  produtoId    String?     @map("produto_id")
+
+  venda     Venda?   @relation(fields: [vendaId], references: [id], onDelete: SetNull)
+  vendaId   String?     @map("venda_id")
 
   empresaId String
   empresa   Empresa @relation(fields: [empresaId], references: [id])
 
-  feedback     Feedback?   @relation(name: "EnvioFormularioToFeedback")
 
   @@map("envios_formulario")
 }
@@ -331,16 +319,14 @@ model Feedback {
   dataExclusao     DateTime? @map("data_exclusao")
   cliente_nome     String?
   produto_nome     String?
-  funcionario_nome String?
+  vendaId          String    @map("venda_id")
+  
 
   empresaId       String
   empresa         Empresa   @relation(fields: [empresaId], references: [id])
 
   formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
   formularioId String?     @map("formulario_id")
-
-  envio   EnvioFormulario? @relation(name: "EnvioFormularioToFeedback", fields: [envioId], references: [id], onDelete: SetNull)
-  envioId String?          @unique @map("envio_id")
 
   @@map("feedbacks")
 }

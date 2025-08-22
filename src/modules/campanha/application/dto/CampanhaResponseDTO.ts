@@ -4,16 +4,25 @@ import { CanalEnvio } from '@prisma/client';
 export interface CampanhaResponseDTO {
   id: string;
   titulo: string;
+<<<<<<< HEAD
   descricao: string | null;
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
   dataInicio: string; // String ISO
+=======
+  descricao?: string;
+>>>>>>> develop
   canalEnvio: CanalEnvio;
-  dataFim: string | null; // String ISO
   templateMensagem: string;
   formularioId: string;
-  ativo: boolean;
   empresaId: string;
   dataCriacao: string; // String ISO
   dataAtualizacao: string; // String ISO
+}
+
+export interface CampanhaCompletaResponseDTO extends CampanhaResponseDTO {
+  formulario?: {
+    id: string;
+    perguntas: { texto: string; tipo: string; opcoes: string[] }[];
+  };
 }

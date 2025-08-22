@@ -7,11 +7,11 @@ import { Formulario } from "@modules/formulario/domain/formulario/formulario.ent
 import { FormularioMap } from "@modules/formulario/infra/mappers/formulario.map";
 
 export class AtualizarFormularioUseCase implements IUseCase<AtualizarFormularioInputDTO, FormularioResponseDTO> {
-  private readonly _formularioRepository: IFormularioRepository<Formulario>;
+  private readonly _formularioRepository: IFormularioRepository;
   private readonly _perguntaRepository: IPerguntaRepository;
 
   constructor(
-    formularioRepository: IFormularioRepository<Formulario>,
+    formularioRepository: IFormularioRepository,
     perguntaRepository: IPerguntaRepository
   ) {
     this._formularioRepository = formularioRepository;
@@ -20,7 +20,7 @@ export class AtualizarFormularioUseCase implements IUseCase<AtualizarFormularioI
 
   async execute(input: AtualizarFormularioInputDTO): Promise<FormularioResponseDTO> {
     // 1. Recuperar a entidade existente.
-    const formulario = await this._formularioRepository.recuperarPorUuid(input.id);
+    const formulario = await this._formularioRepository.recuperarPorUuid(input.id, input.empresaId);
     if (!formulario) {
       throw new Error(`Formulário com ID ${input.id} não encontrado.`);
     }
@@ -33,7 +33,7 @@ export class AtualizarFormularioUseCase implements IUseCase<AtualizarFormularioI
 
     // 3. Sincronizar a lista de perguntas, se fornecida.
     if (Array.isArray(input.idsPerguntas)) {
-      const perguntasRecuperadas = await this._perguntaRepository.buscarMuitosPorId(input.idsPerguntas);
+      const perguntasRecuperadas = await this._perguntaRepository.buscarMuitosPorId(input.idsPerguntas, input.empresaId);
       if (perguntasRecuperadas.length !== input.idsPerguntas.length) {
         throw new Error("Uma ou mais IDs de perguntas fornecidas são inválidas.");
       }
@@ -48,7 +48,7 @@ export class AtualizarFormularioUseCase implements IUseCase<AtualizarFormularioI
     }
 
     // 4. Persistir a entidade atualizada.
-    await this._formularioRepository.atualizar(formulario);
+    await this._formularioRepository.atualizar(formulario, input.empresaId);
 
     // 5. Retornar o DTO de resposta.
     return FormularioMap.toResponseDTO(formulario);

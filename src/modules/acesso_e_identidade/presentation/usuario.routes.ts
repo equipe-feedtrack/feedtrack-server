@@ -52,7 +52,8 @@ const usuarioRouter = Router();
  *       500:
  *         description: Erro interno do servidor.
  */
-usuarioRouter.post('/usuario', validationMiddleware(CriarUsuarioValidationDTO), async (req, res, next) => {
+usuarioRouter.post('/usuario/:empresaId', validationMiddleware(CriarUsuarioValidationDTO), async (req, res, next) => {
+  console.log("CHEGOU aqui")
   try {
     await usuarioController.criar(req, res);
   } catch (error) {
@@ -72,7 +73,7 @@ usuarioRouter.post('/usuario', validationMiddleware(CriarUsuarioValidationDTO), 
  *       500:
  *         description: Erro interno do servidor.
  */
-usuarioRouter.get('/usuarios', async (req, res, next) => {
+usuarioRouter.get('/usuarios/', async (req, res, next) => {
   try {
     await usuarioController.buscarTodos(req, res);
   } catch (error) {

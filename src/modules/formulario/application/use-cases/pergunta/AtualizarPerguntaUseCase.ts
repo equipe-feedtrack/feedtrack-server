@@ -13,7 +13,7 @@ export class AtualizarPerguntaUseCase implements IUseCase<AtualizarPerguntaInput
 
   async execute(input: AtualizarPerguntaInputDTO): Promise<PerguntaResponseDTO> {
     // 1. Recuperar a entidade existente do banco de dados.
-    const pergunta = await this._perguntaRepository.recuperarPorUuid(input.id);
+    const pergunta = await this._perguntaRepository.recuperarPorUuid(input.id, input.empresaId);
     if (!pergunta) {
       throw new Error(`Pergunta com ID ${input.id} não encontrada.`);
     }

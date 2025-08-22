@@ -14,30 +14,26 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
   async salvar(feedback: Feedback): Promise<void> {
     const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
 
-    const envioId = feedback.envioId;
-
-    if (!envioId) {
-      throw new Error("EnvioId é obrigatório para upsert no Feedback.");
-    }
-
-    await this.prisma.feedback.upsert({
-      where: { envioId },
-      create: dadosParaPersistencia,
-      update: {
-        respostas: dadosParaPersistencia.respostas,
-        dataExclusao: dadosParaPersistencia.dataExclusao,
-        empresaId: dadosParaPersistencia.empresaId,
-      },
+    await this.prisma.feedback.create({
+      data: dadosParaPersistencia,
     });
   }
 
   async salvarManual(feedback: Feedback): Promise<void> {
     const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
 
-    // Aqui não precisa de envioId nem upsert, só create normal
-    await this.prisma.feedback.create({
-      data: dadosParaPersistencia,
-    });
+const venda = await this.prisma.venda.findUnique({
+  where: { id: dadosParaPersistencia.vendaId },
+  select: { empresaId: true }
+});
+if (!venda) throw new Error("Venda não encontrada.");
+
+await this.prisma.feedback.create({
+  data: {
+    ...dadosParaPersistencia,
+    empresaId: venda.empresaId, // usa o FK correto
+  },
+});
   }
 
   /**
@@ -79,19 +75,9 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
    * @param envioId O ID do envio associado ao feedback.
    * @returns A entidade de domínio Feedback ou null se não for encontrado.
    */
-  async buscarPorEnvioId(envioId: string): Promise<Feedback | null> {
-    const raw = await this.prisma.feedback.findUnique({
-      where: { envioId },
-    });
 
-    if (!raw) {
-      return null;
-    }
 
-    return FeedbackMap.toDomain(raw);
-  }
-
-  async buscarTodos(empresaId?: string): Promise<Feedback[]> {
+  async buscarTodos(empresaId: string): Promise<Feedback[]> {
     const whereClause: any = {};
 
     if (empresaId) {

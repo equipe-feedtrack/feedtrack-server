@@ -19,15 +19,19 @@ export enum SegmentoAlvo {
 export interface ICampanha {
   id: string;
   titulo: string;
+<<<<<<< HEAD
   descricao: string | null;
   tipoCampanha: TipoCampanha;
   segmentoAlvo: SegmentoAlvo;
   dataInicio: Date;
   dataFim: Date | null;
   templateMensagem: string;
+=======
+  descricao?: string;
+  templateMensagem?: string ;
+>>>>>>> develop
   canalEnvio: CanalEnvio; // Canal de envio da campanha
   formularioId: string;
-  ativo: boolean; // Campanha é ativa ou inativa
   empresaId: string;
   dataCriacao: Date;
   dataAtualizacao: Date;
