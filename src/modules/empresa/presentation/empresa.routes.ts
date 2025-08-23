@@ -10,7 +10,7 @@ empresaRoutes.get("/empresas", empresaController.getAll);
 
 empresaRoutes.get("/empresa/:id", empresaController.getById);
 
-empresaRoutes.put("/empresa/:id", empresaController.update);
+empresaRoutes.patch("/empresa/:id", empresaController.update);
 
 empresaRoutes.delete("/empresa/:id", empresaController.delete);
 

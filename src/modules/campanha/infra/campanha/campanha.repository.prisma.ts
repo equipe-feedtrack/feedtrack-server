@@ -50,9 +50,12 @@ async recuperarPorUuid(id: string, empresaId: string): Promise<Campanha | null> 
   console.log("DADOS RECUPERADOS", empresaId);
 
   const campanhaPrisma = await this.prisma.campanha.findFirst({
-    where: { id, empresaId },
+    where: { empresaId ,id },
     include: {
       formulario: {
+        select:{
+          titulo: true
+        },
         include: {
           perguntas: {
             include: {
@@ -86,8 +89,7 @@ async listar(empresaId: string): Promise<Campanha[]> {
     orderBy: { dataCriacao: 'desc' },
   });
 
-  // ❌ Pode quebrar: campanhasPrisma.map(CampanhaMap.toDomain)
-  // ✅ Correto:
+
   return campanhasPrisma.map(c => CampanhaMap.toDomain(c));
 }
 

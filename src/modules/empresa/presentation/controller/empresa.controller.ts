@@ -46,22 +46,31 @@ export class EmpresaController {
   }
 
   // Atualiza uma empresa existente
-  async update(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
-    const { nome, cnpj, email } = req.body;
+async update(req: Request, res: Response): Promise<Response> {
+  const { id } = req.params;
+  const { nome, cnpj, email } = req.body;
 
-    try {
-      const empresa = await empresaRepository.findById(id);
-      if (!empresa) {
-        return res.status(404).json({ message: "Empresa não encontrada." });
-      }
-
-      const empresaAtualizada = await empresaRepository.update(id, { props: { ...empresa.props, nome, email, cnpj } });
-      return res.status(200).json(empresaAtualizada);
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+  try {
+    const empresa = await empresaRepository.findById(id);
+    if (!empresa) {
+      return res.status(404).json({ message: "Empresa não encontrada." });
     }
+
+    // Atualiza apenas os campos fornecidos
+    const novosProps = { ...empresa.props };
+    if (nome !== undefined) novosProps.nome = nome;
+    if (cnpj !== undefined) novosProps.cnpj = cnpj;
+    if (email !== undefined) novosProps.email = email;
+
+    const empresaAtualizada = await empresaRepository.update(id, { props: novosProps });
+
+    return res.status(200).json(empresaAtualizada);
+  } catch (error: any) {
+    console.error("[Erro ao atualizar empresa]", error);
+    return res.status(500).json({ message: "Erro interno ao atualizar empresa." });
   }
+}
+
 
   // Remove uma empresa existente
   async delete(req: Request, res: Response): Promise<Response> {
