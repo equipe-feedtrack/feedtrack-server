@@ -53,6 +53,9 @@ async recuperarPorUuid(id: string, empresaId: string): Promise<Campanha | null> 
     where: { empresaId ,id },
     include: {
       formulario: {
+        select:{
+          titulo: true
+        },
         include: {
           perguntas: {
             include: {
@@ -86,8 +89,7 @@ async listar(empresaId: string): Promise<Campanha[]> {
     orderBy: { dataCriacao: 'desc' },
   });
 
-  // ❌ Pode quebrar: campanhasPrisma.map(CampanhaMap.toDomain)
-  // ✅ Correto:
+
   return campanhasPrisma.map(c => CampanhaMap.toDomain(c));
 }
 
