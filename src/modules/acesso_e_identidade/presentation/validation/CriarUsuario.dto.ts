@@ -42,9 +42,6 @@ export class CriarUsuarioValidationDTO {
   @IsString()
   @IsNotEmpty()
   empresaId: string;
-
-
-
   
 
 

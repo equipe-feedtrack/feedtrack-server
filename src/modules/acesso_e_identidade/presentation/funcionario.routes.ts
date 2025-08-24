@@ -7,7 +7,7 @@ import { BuscarFuncionarioPorUsuarioIdUseCase } from '../application/use-cases/b
 import { AtualizarFuncionarioUseCase } from '../application/use-cases/atualizarFuncionarioUseCase';
 import { DeletarFuncionarioUseCase } from '../application/use-cases/deletarFuncionarioUseCase';
 import { FuncionarioController } from '../presentation/controller/funcionario.controller';
-import { validationMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
+import { authenticateToken, validationMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 import { CriarFuncionarioValidationDTO } from './validation/CriarFuncionario.dto';
 import { AtualizarFuncionarioValidationDTO } from './validation/AtualizarFuncionario.dto';
 import { BuscarTodosFuncionariosUseCase } from '../application/use-cases/buscarTodosFuncionariosUseCase';
@@ -55,7 +55,8 @@ const funcionarioRouter = Router();
  */
 funcionarioRouter.post(
   '/funcionario', 
-  validationMiddleware(CriarFuncionarioValidationDTO), 
+  validationMiddleware(CriarFuncionarioValidationDTO),
+  authenticateToken, 
   async (req, res, next) => {
     try {
       await funcionarioController.criar(req, res);
@@ -78,7 +79,7 @@ funcionarioRouter.post(
  *       500:
  *         description: Erro interno do servidor.
  */
-funcionarioRouter.get('/funcionarios', async (req, res, next) => {
+funcionarioRouter.get('/funcionarios', authenticateToken, async (req, res, next) => {
   try {
     await funcionarioController.buscarTodos(req, res);
   } catch (error) {
@@ -108,7 +109,7 @@ funcionarioRouter.get('/funcionarios', async (req, res, next) => {
  *       500:
  *         description: Erro interno do servidor.
  */
-funcionarioRouter.get('/funcionarios/:id', async (req, res, next) => {
+funcionarioRouter.get('/funcionarios/:id', authenticateToken, async (req, res, next) => {
   try {
     await funcionarioController.buscarPorId(req, res);
   } catch (error) {
@@ -138,7 +139,7 @@ funcionarioRouter.get('/funcionarios/:id', async (req, res, next) => {
  *       500:
  *         description: Erro interno do servidor.
  */
-funcionarioRouter.get('/funcionarios/usuario/:usuarioId', async (req, res, next) => {
+funcionarioRouter.get('/funcionarios/usuario/:usuarioId',authenticateToken, async (req, res, next) => {
   try {
     await funcionarioController.buscarPorUsuarioId(req, res);
   } catch (error) {
@@ -176,7 +177,7 @@ funcionarioRouter.get('/funcionarios/usuario/:usuarioId', async (req, res, next)
  *       500:
  *         description: Erro interno do servidor.
  */
-funcionarioRouter.put('/funcionarios/:id', validationMiddleware(AtualizarFuncionarioValidationDTO), async (req, res, next) => {
+funcionarioRouter.put('/funcionarios/:id', validationMiddleware(AtualizarFuncionarioValidationDTO), authenticateToken, async (req, res, next) => {
   try {
     await funcionarioController.atualizar(req, res);
   } catch (error) {
@@ -206,7 +207,7 @@ funcionarioRouter.put('/funcionarios/:id', validationMiddleware(AtualizarFuncion
  *       500:
  *         description: Erro interno do servidor.
  */
-funcionarioRouter.delete('/funcionarios/:id', async (req, res, next) => {
+funcionarioRouter.delete('/funcionarios/:id', authenticateToken, async (req, res, next) => {
   try {
     await funcionarioController.deletar(req, res);
   } catch (error) {

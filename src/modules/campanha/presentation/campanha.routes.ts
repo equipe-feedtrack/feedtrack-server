@@ -8,7 +8,7 @@ import { BuscarCampanhaPorIdUseCase } from '../application/use-cases/buscarCampa
 import { AtualizarCampanhaUseCase } from '../application/use-cases/atualizarCampanhaUseCase';
 import { DeletarCampanhaUseCase } from '../application/use-cases/deletarCampanhaUseCase';
 import { CampanhaController } from './controller/campanha.controller';
-import { validationMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
+import { authenticateToken, validationMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 import { CriarCampanhaValidationDTO } from './validation/CriarCampanha.dto';
 import { AtualizarCampanhaValidationDTO } from './validation/AtualizarCampanha.dto';
 
@@ -70,7 +70,7 @@ const campanhaRouter = Router();
  *       500:
  *         description: Erro interno do servidor.
  */
-campanhaRouter.post('/campanha', validationMiddleware(CriarCampanhaValidationDTO), campanhaController.criar);
+campanhaRouter.post('/campanha', authenticateToken, validationMiddleware(CriarCampanhaValidationDTO), campanhaController.criar);
 
 /**
  * @swagger
@@ -90,7 +90,7 @@ campanhaRouter.post('/campanha', validationMiddleware(CriarCampanhaValidationDTO
  *       500:
  *         description: Erro interno do servidor.
  */
-campanhaRouter.get('/campanhas',  campanhaController.listar);
+campanhaRouter.get('/campanhas', authenticateToken, campanhaController.listar);
 
 /**
  * @swagger
@@ -117,7 +117,7 @@ campanhaRouter.get('/campanhas',  campanhaController.listar);
  *       500:
  *         description: Erro interno do servidor.
  */
-campanhaRouter.get('/campanha/:id/empresa/:empresaId', campanhaController.buscarPorId);
+campanhaRouter.get('/campanha/:id/empresa/:empresaId', authenticateToken, campanhaController.buscarPorId);
 
 /**
  * @swagger
@@ -152,7 +152,7 @@ campanhaRouter.get('/campanha/:id/empresa/:empresaId', campanhaController.buscar
  *       500:
  *         description: Erro interno do servidor.
  */
-campanhaRouter.put('/atualizar-campanha/:id', validationMiddleware(AtualizarCampanhaValidationDTO), campanhaController.atualizar);
+campanhaRouter.put('/atualizar-campanha/:id', authenticateToken, validationMiddleware(AtualizarCampanhaValidationDTO), campanhaController.atualizar);
 
 /**
  * @swagger
@@ -175,6 +175,6 @@ campanhaRouter.put('/atualizar-campanha/:id', validationMiddleware(AtualizarCamp
  *       500:
  *         description: Erro interno do servidor.
  */
-campanhaRouter.delete('/deletar-campanha/:id', campanhaController.deletar);
+campanhaRouter.delete('/deletar-campanha/:id', authenticateToken, campanhaController.deletar);
 
 export { campanhaRouter };

@@ -11,6 +11,7 @@ import { BuscarProdutoPorIdUseCase } from '../application/use-cases/buscar_produ
 import { CriarProdutoUseCase } from '../application/use-cases/criar_produto';
 import { ProdutoRepositoryPrisma } from '../infra/produto.repository.prisma';
 import { ReativarProdutoUseCase } from '../application/use-cases/reativar_produto';
+import { authenticateToken } from '@shared/presentation/http/middlewares/validation.middleware';
 
 // --- INICIALIZAÇÃO DE DEPENDÊNCIAS ---
 // O PrismaClient deve ser instanciado uma única vez na aplicação.
@@ -103,7 +104,7 @@ const produtoRouter = Router();
  *       500:
  *         description: Erro interno do servidor.
  */
-produtoRouter.post('/produto', produtoController.criarProduto);
+produtoRouter.post('/produto', authenticateToken, produtoController.criarProduto);
 
 /**
  * @swagger
@@ -151,7 +152,7 @@ produtoRouter.post('/produto', produtoController.criarProduto);
  *       500:
  *         description: Erro interno do servidor.
  */
-produtoRouter.get('/produto/:id', produtoController.buscarProdutoPorId);
+produtoRouter.get('/produto/:id', authenticateToken, produtoController.buscarProdutoPorId);
 
 /**
  * @swagger
@@ -203,7 +204,7 @@ produtoRouter.get('/produto/:id', produtoController.buscarProdutoPorId);
  *       500:
  *         description: Erro interno do servidor.
  */
-produtoRouter.get('/produtos', produtoController.listarProdutos);
+produtoRouter.get('/produtos', authenticateToken, produtoController.listarProdutos);
 
 /**
  * @swagger
@@ -273,7 +274,7 @@ produtoRouter.get('/produtos', produtoController.listarProdutos);
  *       500:
  *         description: Erro interno do servidor.
  */
-produtoRouter.put('/atualizar-produto/:id', produtoController.atualizarProduto);
+produtoRouter.put('/atualizar-produto/:id', authenticateToken, produtoController.atualizarProduto);
 
 /**
  * @swagger
@@ -296,7 +297,7 @@ produtoRouter.put('/atualizar-produto/:id', produtoController.atualizarProduto);
  *       500:
  *         description: Erro interno do servidor.
  */
-produtoRouter.delete('/deletar-produto/:id', produtoController.deletarProduto);
+produtoRouter.delete('/deletar-produto/:id', authenticateToken, produtoController.deletarProduto);
 
 /**
  * @swagger
@@ -344,6 +345,6 @@ produtoRouter.delete('/deletar-produto/:id', produtoController.deletarProduto);
  *       500:
  *         description: Erro interno do servidor.
  */
-produtoRouter.patch('/reativar-produto/:id', produtoController.reativarProduto);
+produtoRouter.patch('/reativar-produto/:id', authenticateToken, produtoController.reativarProduto);
 
 export default produtoRouter;

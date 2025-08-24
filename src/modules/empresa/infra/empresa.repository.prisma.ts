@@ -69,23 +69,32 @@ async findAll(): Promise<any> {
 }
 
 
-
 async update(id: string, dados: Partial<Empresa>): Promise<Empresa> {
   // Garante que cnpj vazio seja null
   if (dados.props?.cnpj !== undefined && !dados.props.cnpj?.trim()) {
     dados.props.cnpj = undefined;
   }
 
+  // Desenrola os campos de props
+  const dataParaPrisma: any = {};
+  if (dados.props?.nome !== undefined) dataParaPrisma.nome = dados.props.nome;
+  if (dados.props?.cnpj !== undefined) dataParaPrisma.cnpj = dados.props.cnpj;
+  if (dados.props?.email !== undefined) dataParaPrisma.email = dados.props.email;
+  if (dados.props?.status !== undefined) dataParaPrisma.status = dados.props.status;
+  if (dados.props?.plano !== undefined) dataParaPrisma.plano = dados.props.plano;
+  if (dados.props?.dataExclusao !== undefined) dataParaPrisma.dataExclusao = dados.props.dataExclusao;
+
+  // Atualiza timestamp
+  dataParaPrisma.dataAtualizacao = new Date();
+
   const updated = await prisma.empresa.update({
     where: { id },
-    data: {
-      ...dados,                // espalha todos os campos fornecidos
-      dataAtualizacao: new Date(), // atualiza timestamp
-    },
+    data: dataParaPrisma,
   });
 
   return EmpresaMap.toDomain(updated);
 }
+
 
 
   async delete(id: string): Promise<void> {

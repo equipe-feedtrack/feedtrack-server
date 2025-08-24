@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { UsuarioRepositoryPrisma } from '../infra/usuario/usuario.repository.prisma';
 import { LoginUseCase } from '../application/use-cases/loginUseCase';
+import { authenticateToken } from '@shared/presentation/http/middlewares/validation.middleware';
 
 const prismaClient = new PrismaClient();
 const usuarioRepository = new UsuarioRepositoryPrisma(prismaClient);

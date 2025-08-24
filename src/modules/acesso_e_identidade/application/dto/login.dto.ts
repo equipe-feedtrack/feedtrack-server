@@ -10,4 +10,5 @@ export interface LoginOutputDTO {
     email: string | null;
     tipo: string; // ou seu enum TipoUsuario
     empresaId: string;
+    token: string;
 }

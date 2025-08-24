@@ -13,6 +13,7 @@ import { AtualizarClienteUseCase } from "../application/use-cases/atualizar_clie
 import { DeletarClienteUseCase } from "../application/use-cases/deletar_cliente";
 import { ClienteController } from "./controller/gestao_clientes.controller";
 import { Router } from "express";
+import { authenticateToken } from "@shared/presentation/http/middlewares/validation.middleware";
 
 // 1. Instanciar o Prisma Client
 const PrismaRepository = new PrismaClient();
@@ -146,7 +147,7 @@ const clienteRouter = Router();
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.post('/cliente', clienteController.criar);
+clienteRouter.post('/cliente', authenticateToken, clienteController.criar);
 
 /**
  * @swagger
@@ -218,7 +219,7 @@ clienteRouter.post('/cliente', clienteController.criar);
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.get('/clientes',clienteController.listar);
+clienteRouter.get('/clientes', authenticateToken,clienteController.listar);
 
 /**
  * @swagger
@@ -290,7 +291,7 @@ clienteRouter.get('/clientes',clienteController.listar);
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.get('/cliente/:id', clienteController.buscarPorId);
+clienteRouter.get('/cliente/:id', authenticateToken, clienteController.buscarPorId);
 
 /**
  * @swagger
@@ -406,7 +407,7 @@ clienteRouter.get('/cliente/:id', clienteController.buscarPorId);
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.put('/atualizar-cliente/:id', clienteController.atualizar);
+clienteRouter.put('/atualizar-cliente/:id', authenticateToken, clienteController.atualizar);
 
 /**
  * @swagger
@@ -429,7 +430,7 @@ clienteRouter.put('/atualizar-cliente/:id', clienteController.atualizar);
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.delete('/deletar-cliente/:id', clienteController.deletar);
+clienteRouter.delete('/deletar-cliente/:id', authenticateToken, clienteController.deletar);
 
 
 export { clienteRouter };

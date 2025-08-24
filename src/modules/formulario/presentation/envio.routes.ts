@@ -18,6 +18,7 @@ import { WhatsAppApiGateway } from '../infra/envio/gateways/WhatsAppApiGateway';
 import { EmailGateway } from '../infra/envio/gateways/EmailApiGateway';
 import { VendaRepositoryPrisma } from '@modules/venda/infra/venda.repository.prisma';
 import { EmpresaRepositoryPrisma } from '@modules/empresa/infra/empresa.repository.prisma';
+import { authenticateToken } from '@shared/presentation/http/middlewares/validation.middleware';
 
 
 // --- INICIALIZAÇÃO DE DEPENDÊNCIAS ---
@@ -104,7 +105,7 @@ const envioRouter = Router();
  *         description: Erro interno do servidor.
  */
 // Rota para disparo individual
-envioRouter.post('/envio/individual', envioController.dispararIndividual);
+envioRouter.post('/envio/individual', authenticateToken, envioController.dispararIndividual);
 
 // Rota para disparo em massa
 /**
@@ -141,7 +142,7 @@ envioRouter.post('/envio/individual', envioController.dispararIndividual);
  *       500:
  *         description: Erro interno do servidor.
  */
-envioRouter.post('/envio/massa', envioController.dispararEmMassa);
+envioRouter.post('/envio/massa', authenticateToken, envioController.dispararEmMassa);
 
 // Rota para retentativa de envios
 /**

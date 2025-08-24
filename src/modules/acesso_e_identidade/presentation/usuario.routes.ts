@@ -7,7 +7,7 @@ import { BuscarUsuarioPorNomeUsuarioUseCase } from '../application/use-cases/bus
 import { AtualizarUsuarioUseCase } from '../application/use-cases/atualizarUsuarioUseCase';
 import { DeletarUsuarioUseCase } from '../application/use-cases/deletarUsuarioUseCase';
 import { UsuarioController } from '../presentation/controller/usuario.controller';
-import { validationMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
+import { authenticateToken, validationMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 import { CriarUsuarioValidationDTO } from './validation/CriarUsuario.dto';
 import { AtualizarUsuarioValidationDTO } from './validation/AtualizarUsuario.dto';
 import { BuscarTodosUsuariosUseCase } from '../application/use-cases/buscarTodosUsuariosUseCase';
@@ -73,7 +73,7 @@ usuarioRouter.post('/usuario/:empresaId', validationMiddleware(CriarUsuarioValid
  *       500:
  *         description: Erro interno do servidor.
  */
-usuarioRouter.get('/usuarios/', async (req, res, next) => {
+usuarioRouter.get('/usuarios/', authenticateToken, async (req, res, next) => {
   try {
     await usuarioController.buscarTodos(req, res);
   } catch (error) {
@@ -103,7 +103,7 @@ usuarioRouter.get('/usuarios/', async (req, res, next) => {
  *       500:
  *         description: Erro interno do servidor.
  */
-usuarioRouter.get('/usuarios/:id', async (req, res, next) => {
+usuarioRouter.get('/usuarios/:id', authenticateToken, async (req, res, next) => {
   try {
     await usuarioController.buscarPorId(req, res);
   } catch (error) {
@@ -133,7 +133,7 @@ usuarioRouter.get('/usuarios/:id', async (req, res, next) => {
  *       500:
  *         description: Erro interno do servidor.
  */
-usuarioRouter.get('/usuarios/nome/:nomeUsuario', async (req, res, next) => {
+usuarioRouter.get('/usuarios/nome/:nomeUsuario', authenticateToken, async (req, res, next) => {
   try {
     await usuarioController.buscarPorNomeUsuario(req, res);
   } catch (error) {
@@ -171,7 +171,7 @@ usuarioRouter.get('/usuarios/nome/:nomeUsuario', async (req, res, next) => {
  *       500:
  *         description: Erro interno do servidor.
  */
-usuarioRouter.put('/atualizar-usuario/:id', validationMiddleware(AtualizarUsuarioValidationDTO), async (req, res, next) => {
+usuarioRouter.put('/atualizar-usuario/:id', validationMiddleware(AtualizarUsuarioValidationDTO), authenticateToken, async (req, res, next) => {
   try {
     await usuarioController.atualizar(req, res);
   } catch (err) {
@@ -201,7 +201,7 @@ usuarioRouter.put('/atualizar-usuario/:id', validationMiddleware(AtualizarUsuari
  *       500:
  *         description: Erro interno do servidor.
  */
-usuarioRouter.delete('/usuarios/:id', async (req, res, next) => {
+usuarioRouter.delete('/usuarios/:id', authenticateToken, async (req, res, next) => {
   try {
     await usuarioController.deletar(req, res);
   } catch (error) {

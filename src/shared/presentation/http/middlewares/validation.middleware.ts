@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
+import jwt from 'jsonwebtoken';
 
 export function validationMiddleware<T>(type: any): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -18,4 +19,27 @@ export function validationMiddleware<T>(type: any): (req: Request, res: Response
       }
     });
   };
+}
+
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
+
+export function authenticateToken(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Formato esperado: Bearer TOKEN_JWT
+
+  // Se o token não existir, retorna 401 (Unauthorized)
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  // Verifica o token
+  jwt.verify(token, JWT_SECRET, (err, payload) => {
+    if (err) {
+      return res.sendStatus(403); // Token inválido ou expirado
+    }
+
+    // Salva o payload do usuário no objeto da requisição
+    (req as any).user = payload;
+    next(); // Continua para a próxima função (a rota)
+  });
 }
