@@ -12,8 +12,43 @@ export class EmpresaController {
     cnpj = cnpj?.trim() ? cnpj : undefined;
 
     try {
-      const { empresa, usuario } = await criarEmpresaUseCase.execute({ nome, cnpj, email, plano });
-      return res.status(201).json({ empresa, usuario: UsuarioMap.toDTO(usuario) });
+      const { empresa, usuario } = await criarEmpresaUseCase.execute({
+        nome,
+        cnpj,
+        email,
+        plano,
+      });
+
+      // Conteúdo do e-mail
+      const html = `
+        <h2>Bem-vindo(a) à FeedTrack 🚀</h2>
+        <p>Sua empresa <b>${empresa.props.nome}</b> foi criada com sucesso!</p>
+        <p>Aqui estão os dados do seu usuário principal:</p>
+        <ul>
+          <li><b>Nome:</b> ${usuario.nomeUsuario}</li>
+          <li><b>Email:</b> ${usuario.email}</li>
+          <li><b>Tipo de usuário:</b> ${usuario.tipo}</li>
+        </ul>
+        <p>Agora você já pode acessar o sistema e começar a usar.</p>
+        <p>Atenciosamente,<br/>Equipe FeedTrack</p>
+      `;
+
+      // Envia o e-mail
+      await fetch("https://sendemails-lqua.onrender.com/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: email, // e-mail da empresa
+          subject: "📢 FeedTrack - Dados do seu usuário",
+          html,
+        }),
+      });
+
+      return res
+        .status(201)
+        .json({ empresa, usuario: UsuarioMap.toDTO(usuario) });
     } catch (error: any) {
       if (error.code === "P2002" && error.meta?.target?.includes("cnpj")) {
         return res.status(400).json({ message: "CNPJ já cadastrado." });
@@ -21,7 +56,6 @@ export class EmpresaController {
       return res.status(500).json({ message: error.message });
     }
   }
-
   async getAll(req: Request, res: Response): Promise<Response> {
     try {
       const empresas = await empresaRepository.findAll();
