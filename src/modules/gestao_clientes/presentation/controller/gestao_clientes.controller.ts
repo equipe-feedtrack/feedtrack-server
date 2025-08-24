@@ -108,6 +108,7 @@ export class ClienteController {
   public deletar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
+      console.log("TESTE")
       await this._deletarClienteUseCase.execute(id);
       // Retorna uma resposta 204 No Content, indicando sucesso sem corpo de resposta.
       res.status(204).send();

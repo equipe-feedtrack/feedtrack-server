@@ -11,8 +11,17 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
   constructor(prismaClient: PrismaClient) {
     super(prismaClient);
   }
-  deletar?(id: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async deletar(id: string): Promise<boolean> {
+    try {
+      const clienteDeletado = await this._datasource.cliente.delete({
+        where: { id },
+      });
+
+      return !!clienteDeletado;
+    } catch (error) {
+      // Se não encontrou, retorna false
+      return false;
+    }
   }
 
 

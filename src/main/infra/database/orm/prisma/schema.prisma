@@ -171,6 +171,7 @@ model Cliente {
   nome                String
   telefone            String?
   email               String?
+  estado              String?
   cidade              String?
   status              StatusUsuario
   dataCriacao         DateTime      @default(now()) @map("data_criacao")

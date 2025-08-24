@@ -85,5 +85,9 @@ export class ProdutoRepositoryPrisma extends PrismaRepository implements IProdut
     return produtosPrisma.map(ProdutoMap.toDomain);
   }
 
-  // ... (outros métodos da interface IProdutoRepository) ...
+  async deletar(id: string): Promise<void> {
+    await this._datasource.produto.delete({
+      where: { id },
+    });
+}
 }

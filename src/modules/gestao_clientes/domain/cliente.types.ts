@@ -12,6 +12,7 @@ interface ICliente extends IDatasControle {
   nome: string;
   email?: string;
   telefone: string;
+  estado: string | null;
   cidade: string | null;
   status: StatusCliente;
   empresaId: string;

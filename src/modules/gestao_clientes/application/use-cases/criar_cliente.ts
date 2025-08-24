@@ -20,6 +20,7 @@ export class CriarClienteUseCase implements IUseCase<CriarClienteInputDTO, Clien
       nome: input.nome,
       email: input.email ?? '',
       telefone: input.telefone,
+      estado: input.estado,
       cidade: input.cidade,
       empresaId: input.empresaId
     });

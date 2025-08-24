@@ -3,8 +3,7 @@ import { IClienteRepository } from "@modules/gestao_clientes/infra/cliente.repos
 import { IUseCase } from "@shared/application/use-case/usecase.interface";
 
 /**
- * Caso de Uso para realizar a exclusão lógica de um Cliente.
- * Altera o status do cliente para INATIVO e registra a data de exclusão.
+ * Caso de Uso para excluir fisicamente um Cliente do banco de dados.
  */
 export class DeletarClienteUseCase implements IUseCase<string, void> {
   private readonly _clienteRepository: IClienteRepository;
@@ -14,7 +13,7 @@ export class DeletarClienteUseCase implements IUseCase<string, void> {
   }
 
   /**
-   * Executa a exclusão lógica do cliente.
+   * Executa a exclusão definitiva do cliente.
    * @param id O ID (UUID) do cliente a ser deletado.
    * @returns Uma promessa que resolve como void se a operação for bem-sucedida.
    * @throws {ClienteExceptions.ClienteNaoEncontrado} Se o cliente com o ID fornecido não for encontrado.
@@ -28,13 +27,7 @@ export class DeletarClienteUseCase implements IUseCase<string, void> {
       throw new ClienteExceptions.ClienteNaoEncontrado(id);
     }
 
-    // 3. Realizar a exclusão lógica na entidade de domínio
-    // Este método deve definir o status para INATIVO e a dataExclusao.
-    cliente.inativar();
-
-    // 4. Persistir a entidade Cliente atualizada
-    await this._clienteRepository.atualizar(cliente);
-
-    // Não há retorno explícito para uma exclusão lógica bem-sucedida.
+    // 3. Excluir definitivamente do banco
+    await this._clienteRepository.deletar(id);
   }
 }

@@ -23,8 +23,5 @@ export interface IProdutoRepository {
 
   listar(filtros?: any): Promise<Produto[]>;
 
-  // Você pode adicionar outros métodos comuns de repositório aqui:
-  // listar?(filtros?: any): Promise<IProduto[]>;
-  // existe?(id: string): Promise<boolean>;
-  // deletar?(id: string): Promise<boolean>;
+  deletar(id: string): Promise<void>;
 }

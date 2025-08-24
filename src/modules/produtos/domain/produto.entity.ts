@@ -188,7 +188,7 @@ class Produto extends Entity<IProduto> implements IProduto {
         this.dataAtualizacao = new Date();
     }
 
-    public inativar(): void {
+    public excluir(): void {
         if (!this.ativo) throw new Error("Produto já está inativo.");
         this.ativo = false;
         this.dataExclusao = new Date(); // Exclusão lógica

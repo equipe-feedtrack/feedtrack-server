@@ -5,6 +5,7 @@ export interface ClienteResponseDTO {
     nome: string;
     email: string | null;
     telefone: string | null;
+    estado: string | null;
     cidade: string | null;
     status: StatusCliente | undefined;
     empresaId: string;

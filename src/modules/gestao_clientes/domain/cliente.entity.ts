@@ -9,6 +9,7 @@ class Cliente extends Entity<ICliente> {
   private _nome: string;
   private _email: string | null;
   private _telefone: string;
+  private _estado: string | null;
   private _cidade: string | null;
   private _status: StatusCliente;
   private _dataCriacao: Date;
@@ -48,6 +49,15 @@ class Cliente extends Entity<ICliente> {
     }
     this._telefone = value;
   }
+
+  public get estado(): string | null {
+    return this._estado;
+  }
+
+  private set estado(value: string | null) {
+    this._estado = value?.trim() ?? '';
+  }
+
 
   public get cidade(): string | null  {
     return this._cidade;
@@ -107,6 +117,7 @@ class Cliente extends Entity<ICliente> {
     this.nome = cliente.nome;
     this.email = cliente.email ?? null;
     this.telefone = cliente.telefone;
+    this.estado = cliente.estado;
     this.cidade = cliente.cidade;
     this.status = cliente.status;
     this.dataCriacao = cliente.dataCriacao;
@@ -122,6 +133,7 @@ class Cliente extends Entity<ICliente> {
             nome: props.nome,
             email: props.email,
             telefone: props.telefone,
+            estado: props.estado,
             cidade: props.cidade,
             empresaId: props.empresaId,
             status: StatusCliente.ATIVO,

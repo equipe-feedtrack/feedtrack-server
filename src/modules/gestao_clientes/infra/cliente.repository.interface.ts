@@ -52,5 +52,5 @@ export interface IClienteRepository {
    * @param id O ID do Cliente a ser excluído.
    * @returns Verdadeiro se a exclusão for bem-sucedida, falso caso contrário.
    */
-  deletar?(id: string): Promise<boolean>;
+  deletar(id: string): Promise<boolean>;
 }

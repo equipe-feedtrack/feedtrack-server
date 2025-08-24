@@ -28,7 +28,7 @@ export class AtualizarProdutoUseCase {
       if (input.ativo) {
         produto.ativar();
       } else {
-        produto.inativar();
+        produto.excluir();
       }
     }
     

@@ -3,5 +3,6 @@ export interface CriarClienteInputDTO {
   email: string | null;
   telefone: string;
   cidade: string | null;
+  estado: string | null;
   empresaId: string;
 }
