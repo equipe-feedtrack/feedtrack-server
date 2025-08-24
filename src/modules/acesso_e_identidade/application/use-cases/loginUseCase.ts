@@ -5,7 +5,7 @@ import { LoginInputDTO, LoginOutputDTO } from '../dto/login.dto';
 import { UsuarioNaoEncontradoException } from '../exceptions/usuario.exception';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export class LoginUseCase implements IUseCase<LoginInputDTO, LoginOutputDTO> {
   constructor(private usuarioRepository: IUsuarioRepository) {}
