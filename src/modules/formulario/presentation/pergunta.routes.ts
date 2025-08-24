@@ -7,6 +7,7 @@ import { AtualizarPerguntaUseCase } from '../application/use-cases/pergunta/Atua
 import { DeletarPerguntaUseCase } from '../application/use-cases/pergunta/DeletarPerguntaUseCase';
 import { PerguntaController } from './controller/pergunta.controller';
 import { ListarPerguntasUseCase } from '../application/use-cases/pergunta/listar-perguntas.usecase';
+import { authMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 
 
 // ====================================================================
@@ -97,7 +98,7 @@ const perguntaRouter = Router();
  *       500:
  *         description: Erro interno do servidor.
  */
-perguntaRouter.post('/pergunta', perguntaController.criar);
+perguntaRouter.post('/pergunta', authMiddleware, perguntaController.criar);
 
 /**
  * @swagger
@@ -146,7 +147,7 @@ perguntaRouter.post('/pergunta', perguntaController.criar);
  *       500:
  *         description: Erro interno do servidor.
  */
-perguntaRouter.get('/perguntas', perguntaController.listar);
+perguntaRouter.get('/perguntas', authMiddleware, perguntaController.listar);
 
 /**
  * @swagger
@@ -259,7 +260,7 @@ perguntaRouter.get('/pergunta/:id', perguntaController.buscarPorId);
  *         description: Erro interno do servidor.
  */
 
-perguntaRouter.put('/atualizar-pergunta/:id', perguntaController.atualizar);
+perguntaRouter.put('/atualizar-pergunta/:id', authMiddleware, perguntaController.atualizar);
 
 /**
  * @swagger
@@ -282,6 +283,6 @@ perguntaRouter.put('/atualizar-pergunta/:id', perguntaController.atualizar);
  *       500:
  *         description: Erro interno do servidor.
  */
-perguntaRouter.delete('/deletar-pergunta/:id', perguntaController.deletar);
+perguntaRouter.delete('/deletar-pergunta/:id', authMiddleware, perguntaController.deletar);
 
 export { perguntaRouter };

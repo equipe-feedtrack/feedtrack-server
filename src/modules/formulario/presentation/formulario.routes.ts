@@ -8,6 +8,7 @@ import { BuscarFormularioPorIdUseCase } from '../application/use-cases/formulari
 import { AtualizarFormularioUseCase } from '../application/use-cases/formulario/atualizarFormularioUseCase';
 import { FormularioController } from './controller/formulario.controller';
 import { DeletarFormularioUseCase } from '../application/use-cases/formulario/deletarFormularioUseCase';
+import { authMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 
 // ====================================================================
 // INJEÇÃO DE DEPENDÊNCIA (Exemplo de como as peças se conectam)
@@ -119,7 +120,7 @@ const formularioRouter = Router();
  *       500:
  *         description: Erro interno do servidor.
  */
-formularioRouter.post('/formulario',formularioController.criar);
+formularioRouter.post('/formulario',authMiddleware, formularioController.criar);
 
 /**
  * @swagger
@@ -173,7 +174,7 @@ formularioRouter.post('/formulario',formularioController.criar);
  *       500:
  *         description: Erro interno do servidor.
  */
-formularioRouter.get('/formularios',  formularioController.listar);
+formularioRouter.get('/formularios', authMiddleware,  formularioController.listar);
 
 /**
  * @swagger
@@ -234,7 +235,7 @@ formularioRouter.get('/formularios',  formularioController.listar);
  *       500:
  *         description: Erro interno do servidor.
  */
-formularioRouter.get('/formulario/:id',  formularioController.buscarPorId);
+formularioRouter.get('/formulario/:id', authMiddleware,  formularioController.buscarPorId);
 
 /**
  * @swagger
@@ -318,7 +319,7 @@ formularioRouter.get('/formulario/:id',  formularioController.buscarPorId);
  *       500:
  *         description: Erro interno do servidor.
  */
-formularioRouter.put('/update-formulario/:id', formularioController.atualizar);
+formularioRouter.put('/update-formulario/:id', authMiddleware, formularioController.atualizar);
 
 /**
  * @swagger
@@ -341,6 +342,6 @@ formularioRouter.put('/update-formulario/:id', formularioController.atualizar);
  *       500:
  *         description: Erro interno do servidor.
  */
-formularioRouter.delete('/delete-formulario/:id', formularioController.deletar);
+formularioRouter.delete('/delete-formulario/:id', authMiddleware, formularioController.deletar);
 
 export { formularioRouter };

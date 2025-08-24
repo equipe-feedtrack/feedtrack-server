@@ -5,6 +5,7 @@ import { VendaRepositoryPrisma } from "../infra/venda.repository.prisma";
 import { RecuperarVendaPorIdUseCase } from "../application/use-cases/recuperar-venda-por-id.use-case";
 import { RecuperarTodasVendasUseCase } from "../application/use-cases/recuperar-todas-vendas.use-case"; 
 import { CriarVendaUseCase } from "../application/use-cases/criarVendaUseCase"; 
+import { authMiddleware } from "@shared/presentation/http/middlewares/validation.middleware";
 
 const vendaRoutes = Router();
 
@@ -22,8 +23,8 @@ const vendaController = new VendaController(
 );
 
 // Rotas
-vendaRoutes.post("/venda", vendaController.create.bind(vendaController)); // criar venda
-vendaRoutes.get("/venda/:id", vendaController.findById.bind(vendaController)); // buscar por id
-vendaRoutes.get("/vendas", vendaController.findAll.bind(vendaController)); // listar todas
+vendaRoutes.post("/venda", authMiddleware, vendaController.create.bind(vendaController)); // criar venda
+vendaRoutes.get("/venda/:id", authMiddleware,  vendaController.findById.bind(vendaController)); // buscar por id
+vendaRoutes.get("/vendas", authMiddleware, vendaController.findAll.bind(vendaController)); // listar todas
 
 export { vendaRoutes };
