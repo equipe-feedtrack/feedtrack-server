@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { UsuarioRepositoryPrisma } from '../infra/usuario/usuario.repository.prisma';
 import { LoginUseCase } from '../application/use-cases/loginUseCase';
+import jwt from "jsonwebtoken";
 
 const prismaClient = new PrismaClient();
 const usuarioRepository = new UsuarioRepositoryPrisma(prismaClient);
@@ -37,9 +38,32 @@ const authRouter = Router();
 authRouter.post('/login', async (req, res, next) => {
   try {
     const { nomeUsuario, senha } = req.body;
-    console.log(nomeUsuario, senha)
-    const output = await loginUseCase.execute({ nomeUsuario, senha });
-    res.json(output);
+
+    // Verifica usuário no caso de uso
+    const usuario = await loginUseCase.execute({ nomeUsuario, senha });
+
+    if (!usuario) {
+      return res.status(401).json({ message: "Usuário ou senha inválidos" });
+    }
+
+    // Cria o payload que vai dentro do token
+    const payload = {
+      id: usuario.id,
+      nomeUsuario: usuario.nomeUsuario,
+      tipo: usuario.tipo // se tiver papel/tipo de usuário
+    };
+
+    // Gera o token
+    const token = jwt.sign(payload, process.env.JWT_SECRET || "seu_segredo_aqui", {
+      expiresIn: "1h", // expira em 1 hora (pode mudar)
+    });
+
+    // Retorna usuário + token
+    res.json({
+      message: "Login realizado com sucesso",
+      token,
+      usuario,
+    });
   } catch (error) {
     next(error);
   }
