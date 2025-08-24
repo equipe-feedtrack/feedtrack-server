@@ -1,0 +1,2 @@
+DATABASE_URL=postgresql://postgres:feedtrackdb@168.231.95.166:5440/feedtrack?schema=public
+JWT_SECRET=feedtrack_melhor_do_mundo
