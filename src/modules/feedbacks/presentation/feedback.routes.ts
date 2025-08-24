@@ -10,6 +10,7 @@ import { FeedbackController } from './controller/feedback.controller';
 import { BuscarTodosFeedbacksUseCase } from '../application/use-cases/buscarTodosFeedbacksUseCase';
 import path from 'path';
 import { CriarFeedbackManualUseCase } from '../application/use-cases/criarFeedbackManualUseCase';
+import { authMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -178,7 +179,7 @@ router.post('/feedback/manual/empresa/:empresaId', feedbackController.criarManua
  *       500:
  *         description: Erro interno do servidor.
  */
-router.get('/feedback/:envioId', feedbackController.buscarPorEnvioId);
+router.get('/feedback/:envioId', authMiddleware, feedbackController.buscarPorEnvioId);
 
 /**
  * @swagger
@@ -221,7 +222,7 @@ router.get('/feedback/:envioId', feedbackController.buscarPorEnvioId);
  *       500:
  *         description: Erro interno do servidor.
  */
-router.get('/feedbacks/empresa/:empresaId', feedbackController.buscarTodos);
+router.get('/feedbacks/empresa/:empresaId', authMiddleware, feedbackController.buscarTodos);
 
 /**
  * @swagger
@@ -244,7 +245,7 @@ router.get('/feedbacks/empresa/:empresaId', feedbackController.buscarTodos);
  *       500:
  *         description: Erro interno do servidor.
  */
-router.delete('/feedback/:id', feedbackController.excluirLogicamente);
+router.delete('/feedback/:id', authMiddleware, feedbackController.excluirLogicamente);
 
 router.get('/resposta-formulario/empresa/:empresaId/campanha/:campanhaId/venda/:vendaId', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'index.html'));

@@ -119,7 +119,7 @@ model Usuario {
   data_exclusao    DateTime?
 
   empresaId        String
-  empresa          Empresa       @relation(fields: [empresaId], references: [id])
+  empresa          Empresa       @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   funcionario      Funcionario?  @relation("UsuarioFuncionario")
   logsAtividade    LogAtividade[]
@@ -140,7 +140,7 @@ model Funcionario {
   usuario         Usuario       @relation("UsuarioFuncionario", fields: [usuarioId], references: [id], onDelete: Cascade)
 
   empresaId       String
-  empresa         Empresa       @relation(fields: [empresaId], references: [id])
+  empresa         Empresa       @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   @@map("funcionarios")
 }
@@ -161,7 +161,7 @@ model LogAtividade {
   entidadeAlvoTipo EntidadeAlvoTipo? @map("entidade_alvo_tipo")
 
   empresaId String
-  empresa   Empresa @relation(fields: [empresaId], references: [id])
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   @@map("logs_atividade")
 }
@@ -178,7 +178,7 @@ model Cliente {
   dataExclusao        DateTime?     @map("data_exclusao")
 
   empresaId           String
-  empresa             Empresa       @relation(fields: [empresaId], references: [id])
+  empresa             Empresa       @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   vendas           Venda[]
 
@@ -196,7 +196,7 @@ model Produto {
   dataExclusao    DateTime? @map("data_exclusao")
 
   empresaId       String
-  empresa         Empresa   @relation(fields: [empresaId], references: [id])
+  empresa         Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   vendas          Venda[]
 
@@ -214,7 +214,7 @@ model Venda {
   produto   Produto   @relation(fields: [produtoId], references: [id])
 
   empresaId String
-  empresa   Empresa   @relation(fields: [empresaId], references: [id])
+  empresa   Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   envioid   EnvioFormulario[]
 
@@ -233,7 +233,7 @@ model Pergunta {
   dataExclusao    DateTime? @map("data_exclusao")
 
   empresaId String
-  empresa   Empresa @relation(fields: [empresaId], references: [id])
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   formularios PerguntasOnFormularios[]
 
@@ -254,7 +254,7 @@ model Formulario {
   campanhas Campanha[]
   feedbacks Feedback[]
 
-  empresa   Empresa @relation(fields: [empresaId], references: [id])
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   @@map("formularios")
 }
@@ -281,7 +281,7 @@ model Campanha {
   dataExclusao     DateTime?    @map("data_exclusao")
 
   empresaId        String
-  empresa          Empresa      @relation(fields: [empresaId], references: [id])
+  empresa          Empresa      @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
   formularioId String?     @map("formulario_id")
@@ -306,7 +306,7 @@ model EnvioFormulario {
   vendaId   String?     @map("venda_id")
 
   empresaId String
-  empresa   Empresa @relation(fields: [empresaId], references: [id])
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
 
   @@map("envios_formulario")
@@ -323,7 +323,7 @@ model Feedback {
   
 
   empresaId       String
-  empresa         Empresa   @relation(fields: [empresaId], references: [id])
+  empresa         Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   formulario   Formulario? @relation(fields: [formularioId], references: [id], onDelete: SetNull)
   formularioId String?     @map("formulario_id")

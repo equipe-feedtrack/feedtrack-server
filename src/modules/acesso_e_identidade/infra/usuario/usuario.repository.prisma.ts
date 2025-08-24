@@ -62,8 +62,10 @@ async inserir(usuario: Usuario): Promise<Usuario> {
     return UsuarioMap.toDomain(usuario);
   }
 
-  async buscarTodos(): Promise<Usuario[]> {
-    const usuarios = await this.prisma.usuario.findMany();
+  async buscarTodos(empresaId: string): Promise<Usuario[]> {
+console.log("empresaId recebido:", empresaId);
+const usuarios = await this.prisma.usuario.findMany({ where: { empresaId } });
+console.log("usuarios encontrados:", usuarios.length);
     return usuarios.map(UsuarioMap.toDomain);
   }
 

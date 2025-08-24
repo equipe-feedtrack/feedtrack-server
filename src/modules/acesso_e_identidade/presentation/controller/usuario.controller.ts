@@ -44,14 +44,17 @@ export class UsuarioController {
     }
   }
 
-  async buscarTodos(req: Request, res: Response): Promise<Response> {
-    try {
-      const usuarios = await this.buscarTodosUsuariosUseCase.execute();
-      return res.status(200).json(usuarios);
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
-    }
+async buscarTodos(req: Request, res: Response): Promise<Response> {
+  try {
+    const empresaId  = req.params.empresaId; 
+    console.log("EMPRESA", empresaId)
+    const usuarios = await this.buscarTodosUsuariosUseCase.execute({ empresaId });
+    console.log(usuarios)
+    return res.status(200).json(usuarios);
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
   }
+}
 
   async buscarPorNomeUsuario(req: Request, res: Response): Promise<Response> {
     try {

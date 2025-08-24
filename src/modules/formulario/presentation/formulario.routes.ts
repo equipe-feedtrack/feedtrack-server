@@ -319,7 +319,7 @@ formularioRouter.get('/formulario/:id', authMiddleware,  formularioController.bu
  *       500:
  *         description: Erro interno do servidor.
  */
-formularioRouter.put('/update-formulario/:id', authMiddleware, formularioController.atualizar);
+formularioRouter.patch('/update-formulario/:id', authMiddleware, formularioController.atualizar);
 
 /**
  * @swagger

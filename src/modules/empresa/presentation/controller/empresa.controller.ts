@@ -26,6 +26,7 @@ export class EmpresaController {
         <p>Aqui estão os dados do seu usuário principal:</p>
         <ul>
           <li><b>Nome:</b> ${usuario.nomeUsuario}</li>
+          <li><b>Senha Padrão:</b>admin123</li>
           <li><b>Email:</b> ${usuario.email}</li>
           <li><b>Tipo de usuário:</b> ${usuario.tipo}</li>
         </ul>

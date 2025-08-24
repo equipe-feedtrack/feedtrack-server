@@ -73,7 +73,7 @@ usuarioRouter.post('/usuario/:empresaId', authMiddleware, validationMiddleware(C
  *       500:
  *         description: Erro interno do servidor.
  */
-usuarioRouter.get('/usuarios/empresa/:empresaId', authMiddleware, async (req, res, next) => {
+usuarioRouter.get('/usuarios/:empresaId', authMiddleware, async (req, res, next) => {
   try {
     await usuarioController.buscarTodos(req, res);
   } catch (error) {
