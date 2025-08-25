@@ -1,6 +1,9 @@
-import { Usuario as UsuarioPrisma } from '@prisma/client';
-import { Usuario } from '@modules/acesso_e_identidade/domain/usuario/usuario.entity';
-import { StatusUsuario, TipoUsuario } from '@modules/acesso_e_identidade/domain/usuario/usuario.types';
+import { Usuario as UsuarioPrisma } from "@prisma/client";
+import { Usuario } from "@modules/acesso_e_identidade/domain/usuario/usuario.entity";
+import {
+  StatusUsuario,
+  TipoUsuario,
+} from "@modules/acesso_e_identidade/domain/usuario/usuario.types";
 
 export class UsuarioMap {
   public static toDomain(usuarioPrisma: UsuarioPrisma): Usuario {
@@ -9,6 +12,8 @@ export class UsuarioMap {
       nomeUsuario: usuarioPrisma.nome_usuario,
       senhaHash: usuarioPrisma.senha_hash,
       email: usuarioPrisma.email || null, // Pode ser null se não houver email
+      tokenRecuperacao: usuarioPrisma.tokenRecuperacao,
+      tokenRecuperacaoExpiracao: usuarioPrisma.tokenRecuperacaoExpiracao,
       tipo: usuarioPrisma.tipo as TipoUsuario,
       status: usuarioPrisma.status as StatusUsuario,
       empresaId: usuarioPrisma.empresaId,
@@ -19,8 +24,6 @@ export class UsuarioMap {
   }
 
   public static toPersistence(usuario: Usuario): any {
-
-
     return {
       id: usuario.id,
       nome_usuario: usuario.nomeUsuario,
@@ -29,6 +32,8 @@ export class UsuarioMap {
       email: usuario.email, // Adicionei email aqui, se necessário
       status: usuario.status,
       empresaId: usuario.empresaId,
+      tokenRecuperacao: usuario.tokenRecuperacao,
+      tokenRecuperacaoExpiracao: usuario.tokenRecuperacaoExpiracao,
       data_criacao: usuario.dataCriacao,
       data_atualizacao: usuario.dataAtualizacao,
       data_exclusao: usuario.dataExclusao,
@@ -46,5 +51,3 @@ export class UsuarioMap {
     };
   }
 }
-
-

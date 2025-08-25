@@ -31,7 +31,8 @@ export class CriarEmpresaUseCase {
     const createdUsuario = await criarUsuarioEmpresaUseCase.execute({
       empresaId: createdEmpresa.id,
       nomeEmpresa: createdEmpresa.props.nome,
-      tipo: TipoUsuario.ADMIN
+      tipo: TipoUsuario.ADMIN,
+      email: createdEmpresa.props.email
     });
 
     return {empresa: createdEmpresa, usuario: createdUsuario};

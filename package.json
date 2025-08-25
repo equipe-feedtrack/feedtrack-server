@@ -41,8 +41,9 @@
     "@prisma/client": "^6.12.0",
     "@types/body-parser": "^1.19.6",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^22.15.3",
+    "@types/node": "^22.17.2",
     "@types/nodemailer": "^6.4.19",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
@@ -73,11 +74,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.1",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.5",
     "reflect-metadata": "^0.2.2",
-    "sqlite": "^5.1.1"
+    "sqlite": "^5.1.1",
+    "tsyringe": "^4.10.0"
   }
 }

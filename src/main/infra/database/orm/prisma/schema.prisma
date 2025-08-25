@@ -114,6 +114,8 @@ model Usuario {
   email            String?       @unique
   tipo             TipoUsuario
   status           StatusUsuario
+  tokenRecuperacao String?       @map("token_recuperacao")
+  tokenRecuperacaoExpiracao DateTime? @map("token_recuperacao_expiracao")
   data_criacao     DateTime      @default(now())
   data_atualizacao DateTime      @updatedAt
   data_exclusao    DateTime?

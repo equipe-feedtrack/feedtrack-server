@@ -19,6 +19,8 @@ export interface IUsuario extends IDatasControle {
   email: string | null;
   status: StatusUsuario;
   empresaId: string;
+  tokenRecuperacao?: string | null;
+  tokenRecuperacaoExpiracao?: Date | null;
 }
 
 export type CriarUsuarioProps = Omit<IUsuario, 'id' | 'status' | 'dataCriacao' | 'dataAtualizacao' | 'dataExclusao'>

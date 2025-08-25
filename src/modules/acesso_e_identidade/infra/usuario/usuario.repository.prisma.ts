@@ -34,28 +34,20 @@ async inserir(usuario: Usuario): Promise<Usuario> {
     return UsuarioMap.toDomain(usuario);
   }
 
-  async buscarPorNomeUsuario(nomeUsuario: string): Promise<Usuario | null> {
+ async buscarPorEmail(email: string | undefined | null): Promise<Usuario | null> {
+  if (!email) return null; // evita erro do Prisma
 
-      if (!nomeUsuario) {
-    throw new Error("nomeUsuario não pode ser vazio ou undefined");
-  }
+  const usuario = await this.prisma.usuario.findUnique({
+    where: { email }, // agora email sempre será string válida
+  });
 
-    const usuario = await this.prisma.usuario.findUnique({
-  where: { nome_usuario: nomeUsuario },
-  select: {
-    id: true,
-    nome_usuario: true,
-    senha_hash: true,
-    tipo: true,
-    email: true,
-    status: true,
-    empresaId: true, // <= garante que o campo vem
-    data_criacao: true,
-    data_atualizacao: true,
-    data_exclusao: true
-  }
-});
+  return usuario ? UsuarioMap.toDomain(usuario) : null;
+}
 
+  async buscarPorTokenRecuperacao(token: string): Promise<Usuario | null> {
+    const usuario = await this.prisma.usuario.findFirst({
+      where: { tokenRecuperacao: token },
+    });
     if (!usuario) {
       return null;
     }
@@ -77,6 +69,15 @@ console.log("usuarios encontrados:", usuarios.length);
     });
     return UsuarioMap.toDomain(usuarioAtualizado);
   }
+
+  async buscarPorNomeUsuario(nomeUsuario: string): Promise<Usuario | null> {
+  const usuario = await this.prisma.usuario.findUnique({
+    where: { nome_usuario: nomeUsuario },
+  });
+  if (!usuario) return null;
+  return UsuarioMap.toDomain(usuario);
+}
+
 
   async deletar(id: string): Promise<boolean> {
     const usuario = await this.prisma.usuario.delete({

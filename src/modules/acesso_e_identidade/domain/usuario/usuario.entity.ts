@@ -11,7 +11,8 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
   private _status: StatusUsuario; // Status do usuário
   private _email: string | null; // Opcional, para usuários que possuem email
   private _empresaId: string;
-  private _tokenRecuperacao?: string | null; // Opcional, para recuperação de senha
+  private _tokenRecuperacao: string | null; // Opcional, para recuperação de senha
+  private _tokenRecuperacaoExpiracao: Date | null;
   private _dataCriacao: Date;
   private _dataAtualizacao: Date;
   private _dataExclusao: Date | null;
@@ -23,6 +24,8 @@ class Usuario extends Entity<IUsuario> implements IUsuario {
   public get email(): string | null { return this._email; } // Pode ser null se não houver email
   public get empresaId(): string { return this._empresaId; }
   public get status(): StatusUsuario { return this._status; }
+  public get tokenRecuperacao(): string | null { return this._tokenRecuperacao; }
+  public get tokenRecuperacaoExpiracao(): Date | null { return this._tokenRecuperacaoExpiracao; }
   public get dataCriacao(): Date { return this._dataCriacao; }
   public get dataAtualizacao(): Date { return this._dataAtualizacao; }
   public get dataExclusao(): Date | null { return this._dataExclusao; }
@@ -81,6 +84,8 @@ private set nomeUsuario(username: string) {
     this.email = user.email; // Pode ser null, então não usa setter
     this.empresaId = user.empresaId;
     this.status = user.status; // Usa o setter para validar status
+    this._tokenRecuperacao = user.tokenRecuperacao ?? null;
+    this._tokenRecuperacaoExpiracao = user.tokenRecuperacaoExpiracao ?? null;
 
     this.dataCriacao = user.dataCriacao;
     this.dataAtualizacao = user.dataAtualizacao;
@@ -113,6 +118,8 @@ public static async criarUsuario(props: CriarUsuarioProps, id?: string): Promise
     email: props.email || null, // Pode ser null se não houver email
     status: StatusUsuario.ATIVO,
     empresaId: props.empresaId,
+    tokenRecuperacao: null,
+    tokenRecuperacaoExpiracao: null,
     dataCriacao: new Date(),
     dataAtualizacao: new Date(),
     dataExclusao: null,
@@ -130,6 +137,8 @@ public static async criarUsuario(props: CriarUsuarioProps, id?: string): Promise
       email: this.email,
       status: this.status,
       empresaId: this.empresaId,
+      tokenRecuperacao: this.tokenRecuperacao,
+      tokenRecuperacaoExpiracao: this.tokenRecuperacaoExpiracao,
       dataCriacao: this.dataCriacao,
       dataAtualizacao: this.dataAtualizacao,
       dataExclusao: this.dataExclusao,
@@ -146,13 +155,23 @@ public static async criarUsuario(props: CriarUsuarioProps, id?: string): Promise
   }
 
   // --- Métodos de Comportamento da Entidade ---
-  public alterarSenha(novaSenha: string): void {
+  public async alterarSenha(novaSenha: string): Promise<void> {
     if (!novaSenha || novaSenha.trim() === '') {
       throw new Error("Nova senha não pode ser vazia.");
     }
-    // TODO: Integrar com serviço de hash de senha
-    this.senhaHash = novaSenha; // Hash da nova senha
+    const saltRounds = 10;
+    this.senhaHash = await bcrypt.hash(novaSenha, saltRounds);
     this.dataAtualizacao = new Date();
+  }
+
+  public gerarTokenRecuperacaoSenha(): void {
+    this._tokenRecuperacao = randomUUID();
+    this._tokenRecuperacaoExpiracao = new Date(Date.now() + 3600000); // 1 hour
+  }
+
+  public limparTokenRecuperacaoSenha(): void {
+    this._tokenRecuperacao = null;
+    this._tokenRecuperacaoExpiracao = null;
   }
 
   public ativar(): void {
