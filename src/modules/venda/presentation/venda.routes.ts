@@ -24,7 +24,7 @@ const vendaController = new VendaController(
 
 // Rotas
 vendaRoutes.post("/venda", authMiddleware, vendaController.create.bind(vendaController)); // criar venda
-vendaRoutes.get("/venda/:id", authMiddleware,  vendaController.findById.bind(vendaController)); // buscar por id
+vendaRoutes.get("/venda/:id",  vendaController.findById.bind(vendaController)); // buscar por id
 vendaRoutes.get("/vendas", authMiddleware, vendaController.findAll.bind(vendaController)); // listar todas
 
 export { vendaRoutes };
