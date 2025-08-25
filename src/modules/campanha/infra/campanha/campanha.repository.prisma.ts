@@ -50,28 +50,18 @@ async recuperarPorUuid(id: string, empresaId: string): Promise<Campanha | null> 
   console.log("DADOS RECUPERADOS", empresaId);
 
   const campanhaPrisma = await this.prisma.campanha.findFirst({
-    where: { empresaId ,id },
+    where: { empresaId, id },
     include: {
       formulario: {
-        select:{
-          titulo: true
-        },
-        include: {
+        include: { // usamos apenas include
           perguntas: {
             include: {
-              pergunta: {
-                select: {
-                  id: true,
-                  tipo: true,
-                  texto: true,
-                  opcoes: true,
-                }
-              } // inclui tipo, texto, opcoes
-            }
-          }
-        }
-      }
-    }
+              pergunta: true, // inclui todos os campos da pergunta
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!campanhaPrisma) return null;
@@ -80,6 +70,7 @@ async recuperarPorUuid(id: string, empresaId: string): Promise<Campanha | null> 
 
   return CampanhaMap.toDomainWithFormulario(campanhaPrisma);
 }
+
 
 
 
