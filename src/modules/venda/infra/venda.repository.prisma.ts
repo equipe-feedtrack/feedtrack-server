@@ -65,6 +65,8 @@ const createdVenda = await prisma.venda.create({
     return vendas.map(VendaMap.toDomain);
   }
 
+  
+
   async buscarNovasVendas(empresaId: string, produtoId: string): Promise<Venda[]> {
     const vendas = await prisma.venda.findMany({
       where: {
@@ -80,4 +82,8 @@ const createdVenda = await prisma.venda.create({
 
     return vendas.map(VendaMap.toDomain);
   }
+
+  async deletar(id: string): Promise<void> {
+  await prisma.venda.delete({ where: { id } });
+}
 }

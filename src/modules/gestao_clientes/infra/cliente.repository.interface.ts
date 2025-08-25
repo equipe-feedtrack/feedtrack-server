@@ -13,7 +13,7 @@ export interface IClienteRepository {
    * @param id O ID do Cliente a ser recuperado.
    * @returns A entidade Cliente (ICliente), ou null se não encontrada.
    */
-  recuperarPorUuid(id: string): Promise<Cliente | null>;
+  recuperarPorUuid(id: string, empresaId: string): Promise<Cliente | null>;
 
   /**
    * Atualiza um Cliente existente no mecanismo de persistência.
@@ -52,5 +52,5 @@ export interface IClienteRepository {
    * @param id O ID do Cliente a ser excluído.
    * @returns Verdadeiro se a exclusão for bem-sucedida, falso caso contrário.
    */
-  deletar(id: string): Promise<boolean>;
+  deletar(id: string, empresaId: string): Promise<boolean>;
 }

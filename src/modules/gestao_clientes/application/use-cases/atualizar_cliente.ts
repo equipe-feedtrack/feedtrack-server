@@ -17,7 +17,7 @@ export class AtualizarClienteUseCase implements IUseCase<AtualizarClienteInputDT
 
   async execute(input: AtualizarClienteInputDTO): Promise<ClienteResponseDTO> {
     // 1. Recuperar a entidade existente do banco de dados.
-    const cliente = await this._clienteRepository.recuperarPorUuid(input.id);
+    const cliente = await this._clienteRepository.recuperarPorUuid(input.id, input.empresaId);
     if (!cliente) {
       // Lança uma exceção se o cliente não for encontrado.
       throw new Error(`Cliente com ID ${input.id} não encontrado.`);

@@ -106,6 +106,42 @@ private set templateMensagem(value: string) {
     this._formulario = value;
   }
 
+
+  public atualizarTitulo(novoTitulo: string) {
+    if (!novoTitulo || novoTitulo.trim() === "") {
+      throw new Error("Título da campanha não pode ser vazio");
+    }
+    this._titulo = novoTitulo;
+    this.dataAtualizacao = new Date();
+  }
+
+  public atualizarDescricao(novaDescricao?: string) {
+    this._descricao = novaDescricao;
+    this.dataAtualizacao = new Date();
+  }
+
+  public atualizarTemplate(novoTemplate: string) {
+    if (!novoTemplate || novoTemplate.trim() === "") {
+      throw new Error("Template da mensagem não pode ser vazio");
+    }
+    this._templateMensagem = novoTemplate;
+    this.dataAtualizacao = new Date();
+  }
+
+  public atualizarFormulario(formularioId: string) {
+    if (!formularioId || formularioId.trim() === "") {
+      throw new Error("ID do formulário não pode ser vazio");
+    }
+    this._formularioId = formularioId;
+    this.dataAtualizacao = new Date();
+  }
+
+  public atualizarCanalEnvio(novoCanalEnvio: CanalEnvio) {
+    this._canalEnvio = novoCanalEnvio;
+    this.dataAtualizacao = new Date();
+  }
+
+
   // Construtor privado: Garante que a entidade seja criada em um estado válido
   private constructor(props: ICampanha) {
     super(props.id); // Chamada ao construtor da Entity base

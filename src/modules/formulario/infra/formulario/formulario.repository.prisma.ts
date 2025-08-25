@@ -61,15 +61,26 @@ const formulariosDb = await this.prisma.formulario.findMany({
     return formulariosDb.map(FormularioMap.toDomain);
   }
 
-  async atualizar(formulario: Formulario): Promise<void> {
-    const dadosFormulario = FormularioMap.toPersistence(formulario);
-    const { id, ...dadosEscalares } = dadosFormulario;
+async atualizar(formulario: Formulario): Promise<void> {
+  const dadosFormulario = FormularioMap.toPersistence(formulario);
+  const { id, ...dadosEscalares } = dadosFormulario;
 
-    await this.prisma.formulario.update({
-      where: { id: formulario.id },
-      data: dadosEscalares,
-    });
-  }
+  await this.prisma.formulario.update({
+    where: { id: formulario.id },
+    data: {
+      ...dadosEscalares,
+      perguntas: {
+        deleteMany: {}, // limpa todos os vínculos anteriores
+        create: formulario.perguntas.map((p) => ({
+          pergunta: { connect: { id: p.id } },
+        })),
+      },
+    },
+  });
+}
+
+
+
 
   async existe(id: string): Promise<boolean> {
     const count = await this.prisma.formulario.count({

@@ -152,7 +152,7 @@ campanhaRouter.get('/campanha/:id/empresa/:empresaId', campanhaController.buscar
  *       500:
  *         description: Erro interno do servidor.
  */
-campanhaRouter.put('/atualizar-campanha/:id', authMiddleware, validationMiddleware(AtualizarCampanhaValidationDTO), campanhaController.atualizar);
+campanhaRouter.patch('/atualizar-campanha/:id', authMiddleware, validationMiddleware(AtualizarCampanhaValidationDTO), campanhaController.atualizar);
 
 /**
  * @swagger

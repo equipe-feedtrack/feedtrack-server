@@ -29,7 +29,9 @@ export class AtualizarFormularioUseCase implements IUseCase<AtualizarFormularioI
     if (typeof input.titulo === 'string') {
       formulario.atualizarTitulo(input.titulo);
     }
-    // Adicionar outros métodos de atualização para descricao, ativo, etc.
+    if (typeof input.descricao === "string") {
+  formulario.atualizarDescricao(input.descricao);
+}
 
     // 3. Sincronizar a lista de perguntas, se fornecida.
     if (Array.isArray(input.idsPerguntas)) {

@@ -407,7 +407,7 @@ clienteRouter.get('/cliente/:id', authMiddleware, clienteController.buscarPorId)
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.put('/atualizar-cliente/:id', authMiddleware, clienteController.atualizar);
+clienteRouter.put('/atualizar-cliente/:id/:empresaId', authMiddleware, clienteController.atualizar);
 
 /**
  * @swagger
@@ -430,7 +430,7 @@ clienteRouter.put('/atualizar-cliente/:id', authMiddleware, clienteController.at
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.delete('/deletar-cliente/:id', authMiddleware, clienteController.deletar);
+clienteRouter.delete('/deletar-cliente/:id/:empresaId', authMiddleware, clienteController.deletar);
 
 
 export { clienteRouter };

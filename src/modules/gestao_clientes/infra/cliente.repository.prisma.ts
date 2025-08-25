@@ -11,18 +11,33 @@ export class ClienteRepositoryPrisma extends PrismaRepository implements IClient
   constructor(prismaClient: PrismaClient) {
     super(prismaClient);
   }
-  async deletar(id: string): Promise<boolean> {
-    try {
-      const clienteDeletado = await this._datasource.cliente.delete({
-        where: { id },
-      });
+async deletar(id: string, empresaId: string): Promise<boolean> {
+  try {
+    // 1️⃣ Recupera o cliente para validar a empresa
+    const cliente = await this._datasource.cliente.findUnique({
+      where: { id },
+      select: { empresaId: true },
+    });
 
-      return !!clienteDeletado;
-    } catch (error) {
-      // Se não encontrou, retorna false
-      return false;
+    if (!cliente) return false; // cliente não existe
+    if (cliente.empresaId !== empresaId) {
+      throw new Error("Cliente não pertence a esta empresa.");
     }
+
+    // 2️⃣ Deleta o cliente (cascade cuida das vendas)
+    await this._datasource.cliente.delete({
+      where: { id }, 
+    });
+
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
+}
+
+
+
 
 
   async buscarClientesParaCampanha(segmento: SegmentoAlvo): Promise<Cliente[]> {

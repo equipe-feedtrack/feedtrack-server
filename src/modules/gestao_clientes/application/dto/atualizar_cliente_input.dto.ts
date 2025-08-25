@@ -7,5 +7,5 @@ export interface AtualizarClienteInputDTO {
   telefone?: string;
   cidade?: string | null;
   status?: StatusCliente;
-  empresaId?: string;
+  empresaId: string;
 }

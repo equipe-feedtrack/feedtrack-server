@@ -54,18 +54,6 @@ export class AtualizarCampanhaValidationDTO {
     @IsOptional()
     descricao?: string;
 
-    @IsEnum(TipoCampanha)
-    @IsOptional()
-    tipoCampanha?: TipoCampanha;
-
-    @IsEnum(SegmentoAlvo)
-    @IsOptional()
-    segmentoAlvo?: SegmentoAlvo;
-
-    @IsDateString()
-    @IsOptional()
-    dataFim?: Date;
-
     @IsString()
     @IsOptional()
     templateMensagem?: string;
@@ -78,7 +66,4 @@ export class AtualizarCampanhaValidationDTO {
     @IsOptional()
     formularioId?: string;
 
-    @IsBoolean()
-    @IsOptional()
-    ativo?: boolean;
 }

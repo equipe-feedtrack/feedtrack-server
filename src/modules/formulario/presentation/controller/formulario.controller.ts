@@ -80,6 +80,9 @@ export class FormularioController {
       const { id } = req.params;
       const inputDTO = { id, ...req.body };
 
+      console.log('Input DTO:', inputDTO);
+
+
       const formularioAtualizadoDTO = await this._atualizarFormularioUseCase.execute(inputDTO);
       res.status(200).json(formularioAtualizadoDTO);
     } catch (error: any) {

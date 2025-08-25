@@ -73,6 +73,7 @@ async buscarTodos(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
       const usuarioExistente = await this.buscarUsuarioPorIdUseCase.execute(id);
+      console.log(usuarioExistente)
       if (!usuarioExistente) {
         return res.status(404).json({ message: 'Usuário não encontrado.' });
       }

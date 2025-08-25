@@ -193,7 +193,7 @@ model Venda {
   dataVenda DateTime  @default(now()) @map("data_venda")
   
   clienteId String
-  cliente   Cliente   @relation(fields: [clienteId], references: [id])
+  cliente   Cliente   @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 
   empresaId String
   empresa   Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)

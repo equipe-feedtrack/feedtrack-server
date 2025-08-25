@@ -48,6 +48,7 @@ class Cliente extends Entity<ICliente> {
       throw new ClienteExceptions.TelefoneObrigatorioParaClienteException();
     }
     this._telefone = value;
+    
   }
 
   public get estado(): string | null {
