@@ -67,6 +67,13 @@
             animation: fadeIn 0.5s forwards;
         }
 
+        .produto-formulario{
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px;
+        }
+
         @keyframes fadeIn {
             to {
                 opacity: 1;
@@ -210,7 +217,7 @@
 <body>
     <div class="container" id="formContainer">
         <h1>Deixe seu Feedback</h1>
-        <p class="subtitle">Sua opinião sobre o produto <strong id="produtoNome"></strong> nos ajuda a melhorar.</p>
+        <p class="subtitle">Sua opinião nos ajuda a melhorar.</p>
 
         <div id="loader" class="loader">
             <div class="spinner"></div>
@@ -232,81 +239,77 @@
     </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const formContainer = document.getElementById("formContainer");
-        const thankYouContainer = document.getElementById("thankYouContainer");
-        const formFeedback = document.getElementById("formFeedback");
-        const perguntasContainer = document.getElementById("perguntasContainer");
-        const submitButton = document.getElementById("submitButton");
-        const loader = document.getElementById("loader");
-        const produtoNomeEl = document.getElementById("produtoNome");
+document.addEventListener('DOMContentLoaded', () => {
+    const formContainer = document.getElementById("formContainer");
+    const thankYouContainer = document.getElementById("thankYouContainer");
+    const formFeedback = document.getElementById("formFeedback");
+    const perguntasContainer = document.getElementById("perguntasContainer");
+    const submitButton = document.getElementById("submitButton");
+    const loader = document.getElementById("loader");
 
-        // Variáveis para guardar os dados para o payload final
-        let clienteNome = '';
-        let produtoNome = '';
-        let funcionarioNome = '';
-        let vendaId = ''; // Declarada aqui para ser acessível no evento de submit
-        let empresaId = ''; // Declarada aqui para ser acessível no evento de submit
+    let clienteNome = '';
+    let vendaId = '';
+    let empresaId = '';
 
-        async function fetchFormularioData() {
-            // Captura os IDs da URL uma única vez
-            const url = new URL(window.location.href);
-            const pathSegments = url.pathname.split("/");
+    async function fetchFormularioData() {
+        const url = new URL(window.location.href);
+        const pathSegments = url.pathname.split("/");
 
-            empresaId = pathSegments[pathSegments.indexOf("empresa") + 1] || ""; // Atribui à variável de escopo mais alto
-            const campanhaId = pathSegments[pathSegments.indexOf("campanha") + 1] || "";
-            vendaId = pathSegments[pathSegments.indexOf("venda") + 1] || ""; // Atribui à variável de escopo mais alto
+        empresaId = pathSegments[pathSegments.indexOf("empresa") + 1] || "";
+        const campanhaId = pathSegments[pathSegments.indexOf("campanha") + 1] || "";
+        vendaId = pathSegments[pathSegments.indexOf("venda") + 1] || "";
 
-            if (!empresaId || !campanhaId || !vendaId) {
-                loader.innerHTML = "<p>Erro: IDs de empresa, campanha ou venda não encontrados na URL.</p>";
-                return;
-            }
+        if (!empresaId || !campanhaId || !vendaId) {
+            loader.innerHTML = "<p>Erro: IDs de empresa, campanha ou venda não encontrados na URL.</p>";
+            return;
+        }
 
-            try {
-                // Realiza as duas buscas em paralelo para otimizar o tempo de carregamento
-                const [campanhaRes, vendaRes] = await Promise.all([
-                    fetch(`/api/v1/campanha/${campanhaId}/empresa/${empresaId}`),
-                    fetch(`/api/v1/venda/${vendaId}`) // Novo fetch para os dados da venda
-                ]);
+        try {
+            const [campanhaRes, vendaRes] = await Promise.all([
+                fetch(`/api/v1/campanha/${campanhaId}/empresa/${empresaId}`),
+                fetch(`/api/v1/venda/${vendaId}`)
+            ]);
 
-                if (!campanhaRes.ok) throw new Error('Falha ao buscar dados da campanha');
-                if (!vendaRes.ok) throw new Error('Falha ao buscar dados da venda');
-                
-                const campanhaData = await campanhaRes.json();
-                const vendaData = await vendaRes.json();
+            if (!campanhaRes.ok) throw new Error('Falha ao buscar dados da campanha');
+            if (!vendaRes.ok) throw new Error('Falha ao buscar dados da venda');
 
-                console.log("DADOS DA CAMPANHA:", campanhaData);
-                console.log("DADOS DA VENDA:", vendaData);
+            const campanhaData = await campanhaRes.json();
+            const vendaData = await vendaRes.json();
 
-                // Preenche os nomes usando os dados da venda
-                clienteNome = vendaData.cliente?.nome || 'N/A';
-                console.log("Nome do cliente:", clienteNome);
-                produtoNome = vendaData.produto?.nome || 'desconhecido';
-                produtoNomeEl.textContent = produtoNome;
-                funcionarioNome = vendaData.cliente?.vendedorResponsavel || 'N/A';
+            clienteNome = vendaData.cliente?.nome || 'N/A';
+            const produtos = vendaData.produto || [];
 
-                // Renderiza as perguntas do formulário usando os dados da campanha
-                perguntasContainer.innerHTML = ''; // limpa container
-                for (const [index, pergunta] of (campanhaData.formulario?.perguntas || []).entries()) {
+            perguntasContainer.innerHTML = '';
+
+            produtos.forEach((produto, indexProduto) => {
+                const produtoDiv = document.createElement('div');
+                produtoDiv.className = 'produto-formulario';
+                produtoDiv.dataset.produtoId = produto.id || ''; // corrigido aqui
+
+                const title = document.createElement('h3');
+                title.textContent = `Feedback para: ${produto.nome}`;
+                produtoDiv.appendChild(title);
+
+                (campanhaData.formulario?.perguntas || []).forEach((pergunta, indexPergunta) => {
                     const div = document.createElement("div");
                     div.className = "pergunta";
-                    div.style.animationDelay = `${index * 0.1}s`;
+                    div.style.animationDelay = `${indexPergunta * 0.1}s`;
 
                     const label = document.createElement("label");
                     label.textContent = pergunta.texto;
-                    label.htmlFor = pergunta.id;
+                    label.htmlFor = `${produto.nome}_${pergunta.id}`;
                     div.appendChild(label);
 
                     const tipo = (pergunta.tipo || '').toLowerCase();
 
-                    if (tipo === "nota" && Array.isArray(pergunta.opcoes)) {
+                    if(tipo === "nota" && Array.isArray(pergunta.opcoes)) {
                         const starContainer = document.createElement('div');
                         starContainer.className = 'star-rating';
 
                         const hiddenInput = document.createElement('input');
                         hiddenInput.type = 'hidden';
-                        hiddenInput.id = pergunta.id;
-                        hiddenInput.name = pergunta.id;
+                        hiddenInput.id = `${produto.nome}_${pergunta.id}`;
+                        hiddenInput.name = `${produto.nome}_${pergunta.id}`;
                         hiddenInput.dataset.tipo = tipo;
                         hiddenInput.required = true;
 
@@ -326,7 +329,7 @@
 
                         starContainer.addEventListener('click', (e) => {
                             const star = e.target.closest('.star');
-                            if (star) {
+                            if(star) {
                                 const value = star.dataset.value;
                                 hiddenInput.value = value;
                                 starContainer.querySelectorAll('.star').forEach(s => {
@@ -337,7 +340,7 @@
 
                         starContainer.addEventListener('mouseover', (e) => {
                             const star = e.target.closest('.star');
-                            if (star) {
+                            if(star) {
                                 const hoverValue = star.dataset.value;
                                 starContainer.querySelectorAll('.star').forEach(s => {
                                     s.classList.toggle('should-activate', s.dataset.value <= hoverValue);
@@ -349,58 +352,63 @@
                             starContainer.querySelectorAll('.star').forEach(s => s.classList.remove('should-activate'));
                         });
 
-                    } else if (tipo === "texto") {
+                    } else if(tipo === "texto") {
                         const input = document.createElement("textarea");
                         input.placeholder = "Digite sua resposta aqui...";
-                        input.id = pergunta.id;
-                        input.name = pergunta.id;
+                        input.id = `${produto.nome}_${pergunta.id}`;
+                        input.name = `${produto.nome}_${pergunta.id}`;
                         input.dataset.tipo = tipo;
                         input.required = true;
                         div.appendChild(input);
                     } else {
-                        // Fallback para outros tipos ou se o tipo for indefinido
                         const input = document.createElement("input");
                         input.type = "text";
                         input.placeholder = "Digite sua resposta...";
-                        input.id = pergunta.id;
-                        input.name = pergunta.id;
+                        input.id = `${produto.nome}_${pergunta.id}`;
+                        input.name = `${produto.nome}_${pergunta.id}`;
                         input.dataset.tipo = tipo;
                         input.required = true;
                         div.appendChild(input);
                     }
 
-                    perguntasContainer.appendChild(div);
-                }
+                    produtoDiv.appendChild(div);
+                });
 
-                loader.style.display = 'none';
-                formFeedback.style.display = 'block';
+                perguntasContainer.appendChild(produtoDiv);
+            });
 
-            } catch (err) {
-                console.error("Erro ao carregar dados:", err);
-                loader.innerHTML = `<p>Ocorreu um erro ao carregar os dados. Tente novamente mais tarde. (${err.message})</p>`;
-            }
+            loader.style.display = 'none';
+            formFeedback.style.display = 'block';
+
+        } catch (err) {
+            console.error("Erro ao carregar dados:", err);
+            loader.innerHTML = `<p>Ocorreu um erro ao carregar os dados. Tente novamente mais tarde. (${err.message})</p>`;
         }
+    }
 
+formFeedback.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitButton.disabled = true;
+    submitButton.textContent = "Enviando...";
 
-        formFeedback.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            submitButton.disabled = true;
-            submitButton.textContent = "Enviando...";
+    const produtosDivs = perguntasContainer.querySelectorAll('.produto-formulario');
 
-            const respostas = Array.from(perguntasContainer.querySelectorAll('input[type=hidden], textarea')).map(input => {
+    try {
+        for (const produtoDiv of produtosDivs) {
+            const produtoNome = produtoDiv.querySelector('h3').textContent.replace('Feedback para: ', '');
+            const inputs = produtoDiv.querySelectorAll('input[type=hidden], textarea');
+
+            const respostas = Array.from(inputs).map(input => {
                 const tipo = input.dataset.tipo;
                 const value = input.value;
-                const id = input.id;
-
-                if (tipo === "texto") return { perguntaId: id, tipo, resposta_texto: value };
-                if (tipo === "nota") return { perguntaId: id, tipo, nota: Number(value) };
-                
-                // Fallback para qualquer outro tipo
+                const id = input.id.split('_')[1];
+                if(tipo === 'texto') return { perguntaId: id, tipo, resposta_texto: value };
+                if(tipo === 'nota') return { perguntaId: id, tipo, nota: Number(value) };
                 return { perguntaId: id, tipo, resposta_texto: value };
             });
 
             const payload = {
-                vendaId, 
+                vendaId,
                 clienteNome,
                 produtoNome,
                 respostas,
@@ -409,39 +417,42 @@
 
             console.log("Payload enviado:", payload);
 
+            const res = await fetch(`/api/v1/feedback/manual/empresa/${empresaId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
 
-            try {
-                const res = await fetch(`/api/v1/feedback/manual/empresa/${empresaId}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                });
-
-                if (!res.ok) {
-                    const errorText = await res.text();
-                    throw new Error(errorText || "Falha ao enviar o feedback.");
-                }
-                
-                formContainer.style.display = 'none';
-                thankYouContainer.style.display = 'block';
-
-            } catch (err) {
-                console.error(err);
-                // Revert to a custom message box instead of alert
-                const errorDiv = document.createElement('div');
-                errorDiv.textContent = "Erro ao enviar feedback: " + err.message;
-                errorDiv.style.color = 'red';
-                errorDiv.style.marginTop = '10px';
-                formFeedback.appendChild(errorDiv);
-
-                submitButton.disabled = false;
-                submitButton.textContent = "Enviar Feedback";
+            if(!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || "Falha ao enviar o feedback.");
             }
-        });
+        }
 
-        // Inicia o processo
-        fetchFormularioData();
-    });
+        formContainer.style.display = 'none';
+        thankYouContainer.style.display = 'block';
+
+    } catch(err) {
+        console.error(err);
+        const errorDiv = document.createElement('div');
+        errorDiv.textContent = "Erro ao enviar feedback: " + err.message;
+        errorDiv.style.color = 'red';
+        errorDiv.style.marginTop = '10px';
+        formFeedback.appendChild(errorDiv);
+
+        submitButton.disabled = false;
+        submitButton.textContent = "Enviar Feedback";
+    }
+});
+
+
+    fetchFormularioData();
+});
 </script>
+
+
+
+
+
 </body>
 </html>

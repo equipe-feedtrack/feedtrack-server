@@ -1,5 +1,5 @@
 export interface CriarVendaDTO {
   clienteId: string;
-  produtoId: string;
+  produtoId: string[];
   empresaId: string;
 }

@@ -53,7 +53,7 @@ private substituirPlaceholders(template: string, dados: {
       // Substituir placeholders
       const conteudoFinal = this.substituirPlaceholders(campanha.templateMensagem ?? '', {
         nomeCliente: venda.cliente?.nome ?? "Cliente",
-        nomeProduto: venda.produto?.nome ?? "Produto",
+        nomeProduto: venda.produto?.map(e => e.nome).join(", ") ?? "Produto",
         nomeEmpresa: empresa.props.nome ?? "Empresa",
       });
 

@@ -188,6 +188,23 @@ model Cliente {
   @@map("clientes")
 }
 
+model Venda {
+  id        String    @id @default(uuid())
+  dataVenda DateTime  @default(now()) @map("data_venda")
+  
+  clienteId String
+  cliente   Cliente   @relation(fields: [clienteId], references: [id])
+
+  empresaId String
+  empresa   Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  produtos  VendaProduto[]   // relação N:N com produtos
+
+  envioid   EnvioFormulario[]
+
+  @@map("vendas")
+}
+
 model Produto {
   id              String    @id @default(uuid())
   nome            String
@@ -201,29 +218,22 @@ model Produto {
   empresaId       String
   empresa         Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
-  vendas          Venda[]
+  vendas          VendaProduto[]   // relação N:N com vendas
 
   @@map("produtos")
 }
 
-model Venda {
-  id        String    @id 
-  dataVenda DateTime  @default(now()) @map("data_venda")
-  
-  clienteId String
-  cliente   Cliente   @relation(fields: [clienteId], references: [id])
-
+// Tabela de junção para N:N entre Venda e Produto
+model VendaProduto {
+  vendaId   String
   produtoId String
-  produto   Produto   @relation(fields: [produtoId], references: [id])
 
-  empresaId String
-  empresa   Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  venda   Venda   @relation(fields: [vendaId], references: [id], onDelete: Cascade)
+  produto Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
 
-  envioid   EnvioFormulario[]
-
-  @@map("vendas")
+  @@id([vendaId, produtoId])
+  @@map("venda_produtos")
 }
-
 
 model Pergunta {
   id              String    @id @default(uuid())
