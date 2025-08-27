@@ -18,7 +18,7 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
   constructor() {
     // As credenciais devem vir de variáveis de ambiente, nunca diretamente no código!
     this.apiUrl = process.env.WHATSAPP_API_URL || 'https://waha.feedtrack.site/api/sendText';
-    this.feedbackUrl = 'http://localhost:3006/api/v1/resposta-formulario';// VINCULAR O LINK REAL QUE IRÁ GERAR A PÁGINA DE FEEDBACK'
+    this.feedbackUrl = 'https://server.feedtrack.site/api/v1/resposta-formulario';// VINCULAR O LINK REAL QUE IRÁ GERAR A PÁGINA DE FEEDBACK'
 
     if (!this.apiUrl || !this.feedbackUrl) {
       throw new Error("As variáveis de ambiente WHATSAPP_API_URL e FEEDBACK_URL devem ser configuradas.");
