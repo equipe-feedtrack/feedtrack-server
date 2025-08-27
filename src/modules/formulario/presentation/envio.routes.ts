@@ -5,8 +5,6 @@ import { EnvioController } from './controller/envio.controller';
 // Use Cases
 import { DispararEnvioEmMassaRealtimeUseCase } from '../application/use-cases/envio/dispararEnvioEmMassa.use-case';
 import { DispararEnvioIndividualUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case';
-import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/use-cases/envio/retentarEnviosPendentes.use-case';
-
 // Repositórios
 import { FormularioRepositoryPrisma } from '../infra/formulario/formulario.repository.prisma';
 import { CampanhaRepositoryPrisma } from '@modules/campanha/infra/campanha/campanha.repository.prisma';
@@ -47,14 +45,16 @@ const dispararEnvioIndividualUseCase = new DispararEnvioIndividualUseCase(
   EmpresaRepository,
   vendaRepository
 );
-// instância correta:
 const dispararEnvioEmMassaUseCase = new DispararEnvioEmMassaRealtimeUseCase(
   envioRepository,
   vendaRepository,
   campanhaRepository,
   whatsappGateway,
-  emailGateway
+  emailGateway,
+  EmpresaRepository
 );
+
+
 
 // Controlador
 const envioController = new EnvioController(

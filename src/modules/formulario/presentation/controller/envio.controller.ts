@@ -37,13 +37,14 @@ export class EnvioController {
    */
 public dispararEmMassa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { campanhaId, intervalo, empresaId, produtoId } = req.body;
+    const { campanhaId, empresaId, produtoId } = req.body;
+    console.log(`Recebido pedido de envio em massa para campanhaId: ${campanhaId}`);
+
 
     await this.dispararEnvioEmMassaUseCase.execute(
       campanhaId,
       empresaId,
       produtoId,
-      { intervaloChecagemMinutos: intervalo }
     );
 
     res.status(200).json({ message: 'Disparo em massa iniciado com sucesso.' });
