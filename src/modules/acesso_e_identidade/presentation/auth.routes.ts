@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { UsuarioRepositoryPrisma } from '../infra/usuario/usuario.repository.prisma';
 import { LoginUseCase } from '../application/use-cases/loginUseCase';
 import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const prismaClient = new PrismaClient();
 const usuarioRepository = new UsuarioRepositoryPrisma(prismaClient);
@@ -53,10 +55,12 @@ authRouter.post('/login', async (req, res, next) => {
       tipo: usuario.tipo // se tiver papel/tipo de usuário
     };
 
+    const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  throw new Error("JWT_SECRET não está definido no .env");
+}
     // Gera o token
-    const token = jwt.sign(payload, process.env.JWT_SECRET || "seu_segredo_aqui", {
-      expiresIn: "1h", // expira em 1 hora (pode mudar)
-    });
+const token = jwt.sign(payload, jwtSecret, { expiresIn: "10h" });
 
     // Retorna usuário + token
     res.json({

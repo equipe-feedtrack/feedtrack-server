@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
 
 export function validationMiddleware<T>(type: any): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -37,9 +39,13 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
   }
 
   try {
-    const secret = process.env.JWT_SECRET || "seu_segredo_aqui";
+const secret = process.env.JWT_SECRET;
+if (!secret) {
+  throw new Error("JWT_SECRET não está definido no .env");
+}
 
-    const decoded = jwt.verify(token, secret);
+const decoded = jwt.verify(token, secret);
+
 
     // Se quiser, pode salvar o payload decodificado no req para usar depois
     (req as any).user = decoded;
