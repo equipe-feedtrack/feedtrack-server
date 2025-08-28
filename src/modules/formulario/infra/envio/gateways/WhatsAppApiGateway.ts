@@ -16,8 +16,10 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
   private readonly feedbackUrl: string;
 
   constructor() {
-    // As credenciais devem vir de variáveis de ambiente, nunca diretamente no código!
-    this.apiUrl = process.env.WHATSAPP_API_URL || 'https://waha.feedtrack.site/api/sendText';
+    if (!process.env.WHATSAPP_API_URL) {
+      throw new Error("A variável de ambiente WHATSAPP_API_URL deve ser configurada.");
+    }
+    this.apiUrl = process.env.WHATSAPP_API_URL
     this.feedbackUrl = 'https://server.feedtrack.site/api/v1/resposta-formulario';// VINCULAR O LINK REAL QUE IRÁ GERAR A PÁGINA DE FEEDBACK'
 
     if (!this.apiUrl || !this.feedbackUrl) {
@@ -43,14 +45,14 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
 
       // Monta o corpo da requisição conforme a documentação da API que você usar
       const payload = {
-        "chatId": `55${destinatario}@c.us`, // Exemplo para o formato de chat ID
-        "text": mensagemCompleta,
-        "session": "default"
+        "phone": `55${destinatario}`, // Exemplo para o formato de chat ID
+        "message": mensagemCompleta,
       };
 
       const headers = {
 
         'Content-Type': 'application/json',
+        'Client-Token': process.env.ZAPI_SECRET
 
       };
 
