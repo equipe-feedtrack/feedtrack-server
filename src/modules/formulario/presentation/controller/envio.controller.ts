@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { DispararEnvioEmMassaRealtimeUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case';
 import { DispararEnvioIndividualUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case';
+import { ListarEnviosPorEmpresaUseCase } from '@modules/formulario/application/use-cases/envio/listarEnviosPorEmpresa.use-case';
 
 
 
@@ -12,6 +13,7 @@ export class EnvioController {
   constructor(
     private readonly dispararEnvioIndividualUseCase: DispararEnvioIndividualUseCase,
     private readonly dispararEnvioEmMassaUseCase: DispararEnvioEmMassaRealtimeUseCase,
+    private readonly listarEnviosPorEmpresaUseCase: ListarEnviosPorEmpresaUseCase
   ) {}
 
   /**
@@ -53,20 +55,15 @@ public dispararEmMassa = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
+  public listarEnviosPorEmpresa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { empresaId } = req.params;
 
-  // /**
-  //  * @description Manipulador para retentar envios pendentes (usado por jobs).
-  //  * Rota: POST /envios/retentar
-  //  */
-  // public retentarPendentes = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  //   try {
-  //     const { clienteId, campanhaId } = req.body;
-  //     // Passa os parâmetros opcionais para o use-case
-  //     await this.retentarEnviosPendentesUseCase.execute({ clienteId, campanhaId });
-  //     res.status(200).json({ message: 'Retentativa de envios pendentes concluída.' });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+      console.log(`Listando envios para empresaId: ${empresaId}`);
+      const envios = await this.listarEnviosPorEmpresaUseCase.execute(empresaId);
+      res.status(200).json(envios);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
-

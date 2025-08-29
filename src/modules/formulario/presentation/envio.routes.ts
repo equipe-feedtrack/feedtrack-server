@@ -5,6 +5,7 @@ import { EnvioController } from './controller/envio.controller';
 // Use Cases
 import { DispararEnvioEmMassaRealtimeUseCase } from '../application/use-cases/envio/dispararEnvioEmMassa.use-case';
 import { DispararEnvioIndividualUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case';
+import { ListarEnviosPorEmpresaUseCase } from '../application/use-cases/envio/listarEnviosPorEmpresa.use-case';
 // Repositórios
 import { FormularioRepositoryPrisma } from '../infra/formulario/formulario.repository.prisma';
 import { CampanhaRepositoryPrisma } from '@modules/campanha/infra/campanha/campanha.repository.prisma';
@@ -54,12 +55,15 @@ const dispararEnvioEmMassaUseCase = new DispararEnvioEmMassaRealtimeUseCase(
   EmpresaRepository
 );
 
+const listarEnviosPorEmpresaUseCase = new ListarEnviosPorEmpresaUseCase(envioRepository);
+
 
 
 // Controlador
 const envioController = new EnvioController(
   dispararEnvioIndividualUseCase,
-  dispararEnvioEmMassaUseCase
+  dispararEnvioEmMassaUseCase,
+  listarEnviosPorEmpresaUseCase
 );
 
 
@@ -172,5 +176,34 @@ envioRouter.post('/envio/massa', authMiddleware, envioController.dispararEmMassa
  *         description: Erro interno do servidor.
  */
 // envioRouter.post('/envio/retentar', envioController.retentarPendentes);
+
+  /**
+ * @swagger
+ * /envios/{empresaId}:
+ *   get:
+ *     summary: Lista todos os envios de uma empresa
+ *     tags: [Envios]
+ *     parameters:
+ *       - in: path
+ *         name: empresaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da empresa
+ *     responses:
+ *       200:
+ *         description: Lista de envios da empresa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Envio'
+ *       400:
+ *         description: Dados de entrada inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+  envioRouter.get('/envios/:empresaId', authMiddleware, envioController.listarEnviosPorEmpresa);
 
 export { envioRouter };

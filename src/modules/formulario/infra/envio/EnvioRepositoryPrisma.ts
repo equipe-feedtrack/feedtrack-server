@@ -134,4 +134,13 @@ export class EnvioRepositoryPrisma implements IEnvioRepository {
 
     await this.prisma.$transaction(operacoes);
   }
+
+  async buscarPorEmpresaId(empresaId: string): Promise<Envio[]> {
+    const envios = await this.prisma.envioFormulario.findMany({
+      where: {
+        empresaId,
+      },
+    });
+    return envios.map(EnvioMap.toDomain);
+  }
 }
