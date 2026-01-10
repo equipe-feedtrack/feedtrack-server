@@ -40,7 +40,7 @@ export class EmailGateway implements IEmailGateway {
         </div>
       `;
 
-      const emailResponse = await fetch('https://sendemails-lqua.onrender.com/send-email', {
+      const emailResponse = await fetch('https://sendmail.feedtrack.site/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
