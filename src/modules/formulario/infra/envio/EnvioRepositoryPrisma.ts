@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { IEnvioRepository } from "./IEnvioRepository";
 import { EnvioMap } from "../mappers/EnvioMap";
 
@@ -17,14 +17,6 @@ export class EnvioRepositoryPrisma implements IEnvioRepository {
  async salvar(envio: Envio): Promise<void> {
    const dadosParaPersistencia = EnvioMap.toPersistence(envio);
    console.log('Dados para persistência:', envio.id);
-
-   const usuarioExiste = await this.prisma.usuario.findUnique({
-  where: { id: envio.usuarioId }
-});
-
-if (!usuarioExiste) {
-  throw new Error(`Usuário com ID ${envio.usuarioId} não encontrado.`);
-}
 
    
    await this.prisma.envioFormulario.upsert({
@@ -85,16 +77,16 @@ if (!usuarioExiste) {
   * @returns Uma lista de entidades de domínio Envio pendentes.
   */
  
-  async buscarPendentesPorCliente(clienteId: string): Promise<Envio[]> {
-    const rawEnvios = await this.prisma.envioFormulario.findMany({
+    public async checarSeEnvioJaFoiFeito(campanhaId: string, vendaId: string): Promise<boolean> {
+    const existe = await this.prisma.envioFormulario.findFirst({
       where: {
-        clienteId,
-        status: 'PENDENTE',
-      },
+        campanhaId,
+        vendaId
+      }
     });
-    return rawEnvios.map(EnvioMap.toDomain);
-  }
 
+    return !!existe;
+  }
   /**
    * Busca envios pendentes para uma campanha específica.
    *
@@ -141,5 +133,14 @@ if (!usuarioExiste) {
     });
 
     await this.prisma.$transaction(operacoes);
+  }
+
+  async buscarPorEmpresaId(empresaId: string): Promise<Envio[]> {
+    const envios = await this.prisma.envioFormulario.findMany({
+      where: {
+        empresaId,
+      },
+    });
+    return envios.map(EnvioMap.toDomain);
   }
 }

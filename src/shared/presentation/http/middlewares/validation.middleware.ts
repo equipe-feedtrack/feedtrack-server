@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
 
 export function validationMiddleware<T>(type: any): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -19,3 +22,38 @@ export function validationMiddleware<T>(type: any): (req: Request, res: Response
     });
   };
 }
+
+
+export function authMiddleware(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers["authorization"];
+
+  if (!authHeader) {
+    return res.status(401).json({ message: "Token não informado" });
+  }
+
+  // Geralmente vem como "Bearer <token>"
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Token inválido" });
+  }
+
+  try {
+const secret = process.env.JWT_SECRET;
+if (!secret) {
+  throw new Error("JWT_SECRET não está definido no .env");
+}
+
+const decoded = jwt.verify(token, secret);
+
+
+    // Se quiser, pode salvar o payload decodificado no req para usar depois
+    (req as any).user = decoded;
+
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Token inválido ou expirado" });
+  }
+}
+
+

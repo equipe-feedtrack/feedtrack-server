@@ -3,91 +3,84 @@ import { Formulario } from "../../domain/formulario/formulario.entity";
 import { FormularioMap } from "../mappers/formulario.map";
 import { IFormularioRepository } from "./formulario.repository.interface";
 
-
-export class FormularioRepositoryPrisma implements IFormularioRepository<Formulario> {
+export class FormularioRepositoryPrisma implements IFormularioRepository {
   constructor(private prisma: PrismaClient) {}
-  
-  
-  async inserir(formulario: Formulario): Promise<void> {
-    const dadosFormulario = FormularioMap.toPersistence(formulario);
 
-    await this.prisma.formulario.create({
-      data: {
-        ...dadosFormulario,
-        perguntas: {
-          create: formulario.perguntas.map((p, index) => ({
-            ordemNaLista: index, // Fornece o valor para o campo obrigatório.
-            pergunta: {
-              connect: { id: p.id },
-            },
-          })),
+async inserir(formulario: Formulario): Promise<void> {
+  const dadosFormulario = FormularioMap.toPersistence(formulario);
+
+  await this.prisma.formulario.create({
+    data: {
+      ...dadosFormulario,
+      perguntas: {
+        create: formulario.perguntas.map((p) => ({
+          pergunta: { connect: { id: p.id } },
+        })),
+      },
+    },
+  });
+}
+
+
+async recuperarPorUuid(id: string, empresaId: string): Promise<Formulario | null> {
+  const formularioDb = await this.prisma.formulario.findFirst({
+    where: {
+      id,
+      empresaId,
+    },
+    include: {
+      perguntas: {
+        include: {
+          pergunta: true,
         },
       },
-    });
-  }
+    },
+  });
+
+  if (!formularioDb) return null;
+
+  return FormularioMap.toDomain(formularioDb);
+}
 
 
-  recuperarTodos(): Promise<Formulario[]> {
-    throw new Error("Method not implemented.");
-  }
-  
-  async recuperarPorUuid(id: string): Promise<Formulario | null> {
-    const formularioDb = await this.prisma.formulario.findUnique({
-      where: { id },
-      // ✅ CORREÇÃO: Para uma relação N-N explícita, o include precisa ser aninhado
-      // para buscar os dados da Pergunta através da tabela de junção.
+  // Lista todos os formulários de uma empresa
+  async listar(empresaId: string): Promise<Formulario[]> {
+const formulariosDb = await this.prisma.formulario.findMany({
+  where: { empresaId },
+  include: {
+    perguntas: {
       include: {
-        perguntas: {
-          include: {
-            pergunta: true,
-          },
-        },
+        pergunta: true, // isso traz os dados completos da pergunta
       },
-    });
+    },
+  },
+});
 
-    if (!formularioDb) return null;
 
-    // O Mapper lida com a conversão da estrutura aninhada para o domínio.
-    return FormularioMap.toDomain(formularioDb);
-  }
-  
-  async listar(filtros?: { ativo?: boolean }): Promise<Formulario[]> {
-    const formulariosDb = await this.prisma.formulario.findMany({
-      where: {
-        ativo: filtros?.ativo,
-      },
-      include: {
-        perguntas: {
-          include: {
-            pergunta: true,
-          },
-        },
-      },
-    });
-    return formulariosDb.map(form => FormularioMap.toDomain(form));
+
+    return formulariosDb.map(FormularioMap.toDomain);
   }
 
+async atualizar(formulario: Formulario): Promise<void> {
+  const dadosFormulario = FormularioMap.toPersistence(formulario);
+  const { id, ...dadosEscalares } = dadosFormulario;
 
-   async atualizar(formulario: Formulario): Promise<void> {
-    const dadosFormulario = FormularioMap.toPersistence(formulario);
-    const { id, ...dadosEscalares } = dadosFormulario;
+  await this.prisma.formulario.update({
+    where: { id: formulario.id },
+    data: {
+      ...dadosEscalares,
+      perguntas: {
+        deleteMany: {}, // limpa todos os vínculos anteriores
+        create: formulario.perguntas.map((p) => ({
+          pergunta: { connect: { id: p.id } },
+        })),
+      },
+    },
+  });
+}
 
-    await this.prisma.formulario.update({
-        where: { id: formulario.id },
-        data: {
-            ...dadosEscalares,
-            perguntas: {
-                deleteMany: {},
-                create: formulario.perguntas.map((p, index) => ({
-                    ordemNaLista: index,
-                    pergunta: {
-                        connect: { id: p.id }
-                    }
-                }))
-            }
-        }
-    });
-  }
+
+
 
   async existe(id: string): Promise<boolean> {
     const count = await this.prisma.formulario.count({
@@ -97,10 +90,6 @@ export class FormularioRepositoryPrisma implements IFormularioRepository<Formula
   }
 
   async deletar(id: string): Promise<void> {
-    // Garante que as entradas na tabela de junção sejam deletadas primeiro.
-    await this.prisma.perguntasOnFormularios.deleteMany({
-        where: { formularioId: id }
-    });
     await this.prisma.formulario.delete({
       where: { id },
     });

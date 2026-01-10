@@ -14,7 +14,47 @@ const swaggerDefinition = {
     },
   ],
   components: {
-    schemas: {},
+    schemas: {
+      Envio: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            format: 'uuid',
+          },
+          status: {
+            type: 'string',
+            enum: ['PENDENTE', 'ENVIADO', 'FALHA'],
+          },
+          tentativasEnvio: {
+            type: 'integer',
+          },
+          ultimaMensagemErro: {
+            type: 'string',
+          },
+          dataCriacao: {
+            type: 'string',
+            format: 'date-time',
+          },
+          dataEnvio: {
+            type: 'string',
+            format: 'date-time',
+          },
+          campanhaId: {
+            type: 'string',
+            format: 'uuid',
+          },
+          vendaId: {
+            type: 'string',
+            format: 'uuid',
+          },
+          empresaId: {
+            type: 'string',
+            format: 'uuid',
+          },
+        },
+      },
+    },
   },
 };
 

@@ -5,9 +5,8 @@ import { BuscarTodosFeedbacksUseCase } from '@modules/feedbacks/application/use-
 import { CriarFeedbackUseCase } from '@modules/feedbacks/application/use-cases/criarFeedbackUseCase';
 import { ExcluirLogicamenteFeedbackUseCase } from '@modules/feedbacks/application/use-cases/excluirFeedbackUseCase';
 import { Request, Response, NextFunction } from 'express';
-
-
-
+import { CriarFeedbackManualUseCase } from '@modules/feedbacks/application/use-cases/criarFeedbackManualUseCase';
+import { CriarFeedbackManualProps } from '@modules/feedbacks/domain/feedback.types';
 
 /**
  * @description O `FeedbackController` gerencia a lógica de tratamento de requisições
@@ -20,6 +19,7 @@ export class FeedbackController {
     private readonly buscarFeedbackPorEnvioUseCase: BuscarFeedbackPorEnvioUseCase,
     private readonly excluirLogicamenteFeedbackUseCase: ExcluirLogicamenteFeedbackUseCase,
     private readonly buscarTodosFeedbacksUseCase: BuscarTodosFeedbacksUseCase,
+    private readonly criarFeedbackManualUseCase: CriarFeedbackManualUseCase,
   ) {}
 
   /**
@@ -34,6 +34,29 @@ export class FeedbackController {
       next(error); // Encaminha o erro para o middleware de tratamento de erros do Express
     }
   };
+
+  /**
+   * @description Manipulador para criar um novo feedback manual.
+   */
+  public criarManual = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { empresaId } = req.params;
+      const { clienteNome, produtoNome, respostas, vendaId } = req.body;
+
+      const feedback = await this.criarFeedbackManualUseCase.execute({
+        clienteNome: clienteNome,
+        produtoNome: produtoNome,
+        respostas,
+        vendaId,
+        empresaId
+      });
+
+      res.status(201).json(feedback);
+    } catch (error) {
+      next(error);
+    }
+  };
+
 
   /**
    * @description Manipulador para buscar um feedback pelo ID do envio.
@@ -54,8 +77,11 @@ export class FeedbackController {
   };
 
   public buscarTodos = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+
+    const empresaId = req.params.empresaId;
+
     try {
-      const feedbacks = await this.buscarTodosFeedbacksUseCase.execute();
+      const feedbacks = await this.buscarTodosFeedbacksUseCase.execute(empresaId);
       res.status(200).json(feedbacks);
     } catch (error) {
       next(error);

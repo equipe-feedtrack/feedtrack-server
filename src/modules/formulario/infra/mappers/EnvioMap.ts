@@ -1,7 +1,7 @@
 // src/modules/formulario/infra/mappers/envio.map.ts
 
-import { EnvioFormulario as EnvioPrisma, Prisma, StatusFormulario } from '@prisma/client';
-import { Envio } from '@modules/formulario/domain/envioformulario/envio.entity.ts';
+import { EnvioFormulario as EnvioPrisma, Prisma } from '@prisma/client';
+import { Envio } from '@modules/formulario/domain/envioformulario/envio.entity';
 import { IEnvio } from '@modules/formulario/domain/envioformulario/envioFormulario.types';
 
 export class EnvioMap {
@@ -12,11 +12,9 @@ export class EnvioMap {
     const envioProps: IEnvio = {
       id: raw.id,
       status: raw.status,
-      feedbackId: null, // Esta propriedade agora existe e é mapeada
-      clienteId: raw.clienteId ?? '',
-      formularioId: raw.formularioId ?? '',
       campanhaId: raw.campanhaId ?? '',
-      usuarioId: raw.usuarioId ?? '',
+      vendaId: raw.vendaId ?? '',
+      empresaId: raw.empresaId ?? '', // <<< adicionado
       dataCriacao: raw.dataCriacao,
       dataEnvio: raw.dataEnvio,
       tentativasEnvio: raw.tentativasEnvio,
@@ -36,11 +34,11 @@ export class EnvioMap {
       dataEnvio: envio.dataEnvio,
       tentativasEnvio: envio.tentativasEnvio,
       ultimaMensagemErro: envio.ultimaMensagemErro,
+
       // Conecta as relações com as outras entidades
-      cliente: { connect: { id: envio.clienteId } },
-      formulario: { connect: { id: envio.formularioId } },
       campanha: { connect: { id: envio.campanhaId } },
-      usuario: { connect: { id: envio.usuarioId } },
+      venda: { connect: { id: envio.vendaId } },
+      empresa: { connect: { id: envio.empresaId } }, // <<< adicionado
     };
   }
 }

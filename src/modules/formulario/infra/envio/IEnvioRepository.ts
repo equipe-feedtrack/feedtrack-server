@@ -1,4 +1,4 @@
-import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity.ts";
+import { Envio } from "@modules/formulario/domain/envioformulario/envio.entity";
 import { Cliente } from "@modules/gestao_clientes/domain/cliente.entity";
 
 
@@ -9,22 +9,21 @@ export interface IEnvioRepository {
   atualizar(envio: Envio): Promise<void>;
   salvarVarios(envios: Envio[]): Promise<void>;
   buscarPendentes(): Promise<Envio[]>;
-  buscarPendentesPorCliente(clienteId: string): Promise<Envio[]>;
+  // buscarPendentesPorCliente(clienteId: string): Promise<Envio[]>;
   buscarPendentesPorCampanha(campanhaId: string): Promise<Envio[]>;
   buscarPendentes(): Promise<Envio[]>;
+  checarSeEnvioJaFoiFeito(campanhaId: string, vendaId: string): Promise<boolean>;
+  buscarPorEmpresaId(empresaId: string): Promise<Envio[]>;
 }
 
 // src/application/gateways/IWhatsAppGateway.ts
 export interface IWhatsAppGateway {
-  enviar(destinatario: string | null, conteudo: string, formularioId: string, clienteId:string): Promise<void>;
+  enviar(destinatario: string | null, conteudo: string, vendaId: string, campanhaId: string, empresaId: string ): Promise<void>;
 }
 
 export interface IEmailGateway {
-  enviar(destinatario: string | null, conteudo: string, clienteId: string, formularioId: string ): Promise<void>;
+  enviar(destinatario: string | null, conteudo: string, vendaId: string, campanhaId: string, empresaId: string ): Promise<void>;
 }
 
-// src/application/services/IFeedbackService.ts
-export interface IFeedbackService {
-  iniciarColeta(formularioId: string, clienteId: string): Promise<string>; // Retorna o feedbackId
-}
+
 

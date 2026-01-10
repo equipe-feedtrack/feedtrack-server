@@ -10,6 +10,8 @@ export enum TipoPergunta {
   MULTIPLA_ESCOLHA = "multipla_escolha"
 }
 
+
+
 type KeysDatasControle = keyof IDatasControle;
 
 export { IDatasControle, KeysDatasControle }

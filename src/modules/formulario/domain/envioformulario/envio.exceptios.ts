@@ -54,6 +54,15 @@ class EnvioInvalidoUsuario extends EnvioExceptions {
     }
 }
 
+class EnvioInvalidoProduto extends EnvioExceptions {
+    constructor(message:string = '⚠️ "ID do produto é obrigatório para associar."') {
+        super(message);
+        this.name = 'EnvioInvalido'
+        this.message = message;
+        Object.setPrototypeOf(this, new.target.prototype);
+    }
+}
+
 export {
     EnvioExceptions,
     EnvioInvalidoFeedback,
@@ -61,4 +70,5 @@ export {
     EnvioInvalidoFormulario,
     EnvioInvalidoCampanha,
     EnvioInvalidoUsuario,
+    EnvioInvalidoProduto
 }

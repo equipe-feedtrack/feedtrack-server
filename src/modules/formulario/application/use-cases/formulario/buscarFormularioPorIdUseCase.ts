@@ -3,15 +3,21 @@ import { FormularioResponseDTO } from "../../dto/formulario/FormularioResponseDT
 import { IFormularioRepository } from "@modules/formulario/infra/formulario/formulario.repository.interface";
 import { Formulario } from "@modules/formulario/domain/formulario/formulario.entity";
 import { FormularioMap } from "@modules/formulario/infra/mappers/formulario.map";
-export class BuscarFormularioPorIdUseCase implements IUseCase<string, FormularioResponseDTO | null> {
-  private readonly _formularioRepository: IFormularioRepository<Formulario>;
+// DTO de input para buscar formulário
+interface BuscarFormularioInput {
+  id: string;
+  empresaId: string;
+}
 
-  constructor(formularioRepository:  IFormularioRepository<Formulario>) {
-    this._formularioRepository = formularioRepository;
-  }
+export class BuscarFormularioPorIdUseCase 
+  implements IUseCase<BuscarFormularioInput, FormularioResponseDTO | null> 
+{
+  constructor(private readonly _formularioRepository: IFormularioRepository) {}
 
-  async execute(id: string): Promise<FormularioResponseDTO | null> {
-    const formulario = await this._formularioRepository.recuperarPorUuid(id);
+  async execute(input: BuscarFormularioInput): Promise<FormularioResponseDTO | null> {
+    const { id, empresaId } = input;
+
+    const formulario = await this._formularioRepository.recuperarPorUuid(id, empresaId);
 
     if (!formulario) {
       return null;

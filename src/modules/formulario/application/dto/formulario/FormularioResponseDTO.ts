@@ -5,6 +5,7 @@ export interface FormularioResponseDTO {
   titulo: string;
   descricao?: string;
   ativo: boolean;
+  empresaId: string;
   dataCriacao: string; // Data no formato ISO 8601
   dataAtualizacao: string; // Data no formato ISO 8601
 

@@ -8,6 +8,7 @@ export interface ProdutoResponseDTO {
     descricao: string;
     valor: number;
     ativo: boolean;
+    empresaId: string;
     dataCriacao: string; // Convertido para formato string ISO (YYYY-MM-DDTHH:mm:ss.sssZ)
     dataAtualizacao: string; // Convertido para formato string ISO
     dataExclusao?: string | null; // Convertido para string ISO, pode ser null

@@ -3,11 +3,9 @@ import { StatusFormulario } from "@prisma/client";
 export interface IEnvio {
   id: string;
   status: StatusFormulario;
-  feedbackId: string | null;
-  clienteId: string;
-  formularioId: string;
   campanhaId: string;
-  usuarioId: string ;
+  empresaId: string;
+  vendaId: string;
   dataCriacao: Date;
   dataEnvio: Date | null;
   tentativasEnvio: number;
@@ -20,3 +18,5 @@ export type CriarEnvioProps = Omit<
 >;
 
 export type RecuperarEnvioProps = IEnvio;
+
+export type AtualizarEnvioProps = Partial<Omit<IEnvio, 'id' | 'dataCriacao'>>;

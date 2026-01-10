@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { DispararEnvioEmMassaUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case';
+import { DispararEnvioEmMassaRealtimeUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case';
 import { DispararEnvioIndividualUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case';
-import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/use-cases/envio/retentarEnviosPendentes.use-case';
+import { ListarEnviosPorEmpresaUseCase } from '@modules/formulario/application/use-cases/envio/listarEnviosPorEmpresa.use-case';
+
 
 
 /**
@@ -11,8 +12,8 @@ import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/
 export class EnvioController {
   constructor(
     private readonly dispararEnvioIndividualUseCase: DispararEnvioIndividualUseCase,
-    private readonly dispararEnvioEmMassaUseCase: DispararEnvioEmMassaUseCase,
-    private readonly retentarEnviosPendentesUseCase: RetentarEnviosPendentesUseCase,
+    private readonly dispararEnvioEmMassaUseCase: DispararEnvioEmMassaRealtimeUseCase,
+    private readonly listarEnviosPorEmpresaUseCase: ListarEnviosPorEmpresaUseCase
   ) {}
 
   /**
@@ -21,8 +22,11 @@ export class EnvioController {
    */
   public dispararIndividual = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { clienteId, campanhaId, usuarioId } = req.body;
-      await this.dispararEnvioIndividualUseCase.execute({ clienteId, campanhaId, usuarioId });
+      const { campanhaId, vendaId, empresaId } = req.body;
+      console.log(`Recebido pedido de envio individual para vendaId: ${vendaId}`);
+      
+      
+      await this.dispararEnvioIndividualUseCase.execute({ campanhaId, vendaId, empresaId });
       res.status(200).json({ message: 'Envio individual disparado com sucesso.' });
     } catch (error) {
       next(error);
@@ -33,28 +37,33 @@ export class EnvioController {
    * @description Manipulador para disparar um envio em massa de um formulário.
    * Rota: POST /envios/massa
    */
-  public dispararEmMassa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { campanhaId, quantidade, intervalo } = req.body;
-      await this.dispararEnvioEmMassaUseCase.execute(campanhaId, { quantidade, intervalo });
-      res.status(200).json({ message: 'Disparo em massa iniciado com sucesso.' });
-    } catch (error) {
-      next(error);
-    }
-  };
+public dispararEmMassa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { campanhaId, empresaId, produtoId } = req.body;
+    console.log(`Recebido pedido de envio em massa para campanhaId: ${campanhaId}`);
 
-  /**
-   * @description Manipulador para retentar envios pendentes (usado por jobs).
-   * Rota: POST /envios/retentar
-   */
-  public retentarPendentes = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+
+    await this.dispararEnvioEmMassaUseCase.execute(
+      campanhaId,
+      empresaId,
+      produtoId,
+    );
+
+    res.status(200).json({ message: 'Disparo em massa iniciado com sucesso.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+  public listarEnviosPorEmpresa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { clienteId, campanhaId } = req.body;
-      // Passa os parâmetros opcionais para o use-case
-      await this.retentarEnviosPendentesUseCase.execute({ clienteId, campanhaId });
-      res.status(200).json({ message: 'Retentativa de envios pendentes concluída.' });
+      const { empresaId } = req.params;
+
+      console.log(`Listando envios para empresaId: ${empresaId}`);
+      const envios = await this.listarEnviosPorEmpresaUseCase.execute(empresaId);
+      res.status(200).json(envios);
     } catch (error) {
       next(error);
     }
-  };
+  }
 }

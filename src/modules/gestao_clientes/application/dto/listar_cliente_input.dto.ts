@@ -5,5 +5,7 @@ import { StatusCliente } from "@modules/gestao_clientes/domain/cliente.types";
 export interface ListarClientesInputDTO {
   status?: StatusCliente;
   segmentoAlvo?: SegmentoAlvo;
+  empresaId?: string;
+
   // Outros filtros como nome, cidade, etc., podem ser adicionados aqui.
 }

@@ -1,18 +1,14 @@
-import { IRepository } from "@shared/infra/repository.inteface";
 import { Formulario } from "../../domain/formulario/formulario.entity";
 
-export interface IFormularioRepository<T>  {
+export interface IFormularioRepository {
+  listar(empresaId: string): Promise<Formulario[]>;
 
-  /**
-   * Lista formulários, com possibilidade de filtros.
-   */
-  listar(filtros?: { ativo?: boolean }): Promise<Formulario[]>;
-  inserir(formulario: Formulario): Promise<void>;
-  atualizar(formulario: Formulario): Promise<void>; 
-  recuperarPorUuid(id: string): Promise<Formulario | null>;
-  listar(filtros?: { ativo?: boolean }): Promise<Formulario[]>;
-  deletar(id: string): Promise<void>;
-  existe(id: string): Promise<boolean>;
-
+  inserir(formulario: Formulario, empresaId: string): Promise<void>;
+  atualizar(formulario: Formulario, empresaId: string): Promise<void>;
   
+  // Alterado para receber empresaId
+  recuperarPorUuid(id: string, empresaId: string): Promise<Formulario | null>;
+  
+  deletar(id: string, empresaId: string): Promise<void>; // também pode ser alterado
+  existe(id: string, empresaId: string): Promise<boolean>; // idem
 }

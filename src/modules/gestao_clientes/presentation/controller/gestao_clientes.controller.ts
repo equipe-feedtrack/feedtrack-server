@@ -17,7 +17,6 @@ import { CriarClienteUseCase } from "@modules/gestao_clientes/application/use-ca
 import { DeletarClienteUseCase } from "@modules/gestao_clientes/application/use-cases/deletar_cliente";
 import { ListarClientesUseCase } from "@modules/gestao_clientes/application/use-cases/listar_clientes";
 import { ClienteExceptions } from "@modules/gestao_clientes/domain/cliente.exception";
-import { GerenciarProdutosClienteUseCase } from '@modules/gestao_clientes/application/use-cases/gerenciarProdutosCliente.use-case';
 
 
 // Exceções personalizadas (se tiver)
@@ -31,7 +30,6 @@ export class ClienteController {
     private readonly _buscarClientePorIdUseCase: BuscarClientePorIdUseCase,
     private readonly _atualizarClienteUseCase: AtualizarClienteUseCase,
     private readonly _deletarClienteUseCase: DeletarClienteUseCase,
-    private readonly _gerenciarProdutosClienteUseCase: GerenciarProdutosClienteUseCase
   ) { }
 
   /**
@@ -69,8 +67,8 @@ export class ClienteController {
    */
   public buscarPorId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
-      const clienteDTO = await this._buscarClientePorIdUseCase.execute(id);
+      const { id, empresaId } = req.params;
+      const clienteDTO = await this._buscarClientePorIdUseCase.execute({id, empresaId});
 
       if (!clienteDTO) {
         res.status(404).json({ message: 'Cliente não encontrado.' });
@@ -86,64 +84,40 @@ export class ClienteController {
    * Lida com a requisição para atualizar um cliente existente.
    * Rota: PUT /clientes/:id
    */
-  public atualizar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { id } = req.params;
-      // Combina o ID da rota com os dados do corpo da requisição.
-      const inputDTO = { id, ...req.body };
+public atualizar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id, empresaId } = req.params; // pega ID e empresaId da URL
+    const inputDTO = { id, empresaId, ...req.body }; // combina com dados do corpo
 
-      const clienteAtualizadoDTO = await this._atualizarClienteUseCase.execute(inputDTO);
-      res.status(200).json(clienteAtualizadoDTO);
-    } catch (error: any) {
-      // Trata erros específicos, como cliente não encontrado.
-      if (error instanceof ClienteExceptions.ClienteNaoEncontrado) {
-        res.status(404).json({ message: error.message });
-      }
-      next(error);
+    const clienteAtualizadoDTO = await this._atualizarClienteUseCase.execute(inputDTO);
+    res.status(200).json(clienteAtualizadoDTO);
+  } catch (error: any) {
+    if (error instanceof ClienteExceptions.ClienteNaoEncontrado) {
+      res.status(404).json({ message: error.message });
     }
+    next(error);
   }
+};
 
   /**
    * Lida com a requisição para deletar (logicamente) um cliente.
    * Rota: DELETE /clientes/:id
    */
-  public deletar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { id } = req.params;
-      await this._deletarClienteUseCase.execute(id);
-      // Retorna uma resposta 204 No Content, indicando sucesso sem corpo de resposta.
-      res.status(204).send();
-    } catch (error: any) {
-      if (error instanceof ClienteExceptions.ClienteNaoEncontrado) {
-        res.status(404).json({ message: error.message });
-      }
-      next(error);
+public deletar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id, empresaId } = req.params;
+
+    await this._deletarClienteUseCase.execute({ id, empresaId });
+
+    // Retorna 204 No Content
+    res.status(204).send();
+  } catch (error: any) {
+    if (error instanceof ClienteExceptions.ClienteNaoEncontrado) {
+      res.status(404).json({ message: error.message });
+      return; // importante parar a execução
     }
+    next(error);
   }
+};
 
-  public gerenciarProdutos = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { clienteId } = req.params;
-      const { action, produtoId, novoProdutoId } = req.body;
-
-      await this._gerenciarProdutosClienteUseCase.execute({
-        clienteId,
-        action,
-        produtoId,
-        novoProdutoId,
-      });
-
-      res.status(200).json({ message: 'Operação de produto concluída com sucesso.' });
-    } catch (error: any) {
-      if (error instanceof ClienteExceptions.ClienteNaoEncontrado) {
-        res.status(404).json({ message: error.message });
-        return;
-      }
-      if (error instanceof ClienteExceptions.InvalidOperationError) {
-        res.status(400).json({ message: error.message });
-        return;
-      }
-      next(error);
-    }
-  };
 }

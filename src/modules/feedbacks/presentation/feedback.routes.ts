@@ -9,6 +9,8 @@ import { ExcluirLogicamenteFeedbackUseCase } from '../application/use-cases/excl
 import { FeedbackController } from './controller/feedback.controller';
 import { BuscarTodosFeedbacksUseCase } from '../application/use-cases/buscarTodosFeedbacksUseCase';
 import path from 'path';
+import { CriarFeedbackManualUseCase } from '../application/use-cases/criarFeedbackManualUseCase';
+import { authMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -22,6 +24,7 @@ const criarFeedbackUseCase = new CriarFeedbackUseCase(feedbackRepository);
 const buscarFeedbackPorEnvioUseCase = new BuscarFeedbackPorEnvioUseCase(feedbackRepository);
 const excluirLogicamenteFeedbackUseCase = new ExcluirLogicamenteFeedbackUseCase(feedbackRepository);
 const buscarTodosFeedbacksUseCase = new BuscarTodosFeedbacksUseCase(feedbackRepository);
+const criarFeedbackManualUseCase = new CriarFeedbackManualUseCase(feedbackRepository);
 
 // O controlador é criado, recebendo os casos de uso como dependências.
 const feedbackController = new FeedbackController(
@@ -29,6 +32,7 @@ const feedbackController = new FeedbackController(
   buscarFeedbackPorEnvioUseCase,
   excluirLogicamenteFeedbackUseCase,
   buscarTodosFeedbacksUseCase,
+  criarFeedbackManualUseCase
 );
 
 
@@ -80,6 +84,55 @@ router.post('/feedback', feedbackController.criar);
 
 /**
  * @swagger
+ * /feedback/manual/empresa/{empresaId}:
+ *   post:
+ *     summary: Cria um novo feedback manual
+ *     tags: [Feedbacks]
+ *     parameters:
+ *       - in: path
+ *         name: empresaId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID da empresa.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - cliente_nome
+ *               - produto_nome
+ *               - respostas
+ *               - vendaId
+ *             properties:
+ *               cliente_nome:
+ *                 type: string
+ *                 description: Nome do cliente.
+ *               produto_nome:
+ *                 type: string
+ *                 description: Nome do produto.
+ *               vendaId:
+ *                 type: string
+ *                 description: ID da venda.
+ *               respostas:
+ *                 type: array
+ *                 description: Array de respostas do feedback.
+ *                 items:
+ *                   type: object
+ *     responses:
+ *       201:
+ *         description: Feedback criado com sucesso.
+ *       400:
+ *         description: Dados inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+router.post('/feedback/manual/empresa/:empresaId', feedbackController.criarManual);
+
+/**
+ * @swagger
  * /feedback/{envioId}:
  *   get:
  *     summary: Busca feedback por ID de envio
@@ -126,7 +179,7 @@ router.post('/feedback', feedbackController.criar);
  *       500:
  *         description: Erro interno do servidor.
  */
-router.get('/feedback/:envioId', feedbackController.buscarPorEnvioId);
+router.get('/feedback/:envioId', authMiddleware, feedbackController.buscarPorEnvioId);
 
 /**
  * @swagger
@@ -169,7 +222,7 @@ router.get('/feedback/:envioId', feedbackController.buscarPorEnvioId);
  *       500:
  *         description: Erro interno do servidor.
  */
-router.get('/feedbacks', feedbackController.buscarTodos);
+router.get('/feedbacks/empresa/:empresaId', authMiddleware, feedbackController.buscarTodos);
 
 /**
  * @swagger
@@ -192,45 +245,14 @@ router.get('/feedbacks', feedbackController.buscarTodos);
  *       500:
  *         description: Erro interno do servidor.
  */
-router.delete('/feedback/:id', feedbackController.excluirLogicamente);
+router.delete('/feedback/:id', authMiddleware, feedbackController.excluirLogicamente);
 
-router.get('/resposta-formulario/formulario/:formularioId/cliente/:clienteId', (req, res) => {
+router.get('/resposta-formulario/empresa/:empresaId/campanha/:campanhaId/venda/:vendaId', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
 
-// API para buscar dados do envio com base em formulário e cliente
-router.get('/resposta-formulario-get/formulario/:formularioId/cliente/:clienteId', async (req, res): Promise<any> => {
-  const { formularioId, clienteId } = req.params;
 
-  try {
-    const envio = await prisma.envioFormulario.findFirst({
-      where: {
-        formularioId,
-        clienteId,
-      },
-      include: {
-        cliente: true,
-        campanha: true,
-        usuario: true,
-        feedback: true,
-        formulario: {
-          include: {
-            perguntas: true, // Inclui as perguntas do formulário
-          },
-        }
-      },
-      
-    });
 
-    if (!envio) {
-      return res.status(404).json({ message: 'Envio não encontrado para esse formulário e cliente' });
-    }
 
-    res.json(envio);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erro interno no servidor' });
-  }
-});
 
 export { router as feedbackRoutes };

@@ -12,7 +12,9 @@
     "test:all": "npm run db:test:push && npm run test:unit:domain && npm run test:unit:mappers && npm run test:integration:repo",
     "migrate": "npx prisma migrate dev --schema src/main/infra/database/orm/prisma/schema.prisma",
     "reset": "npx prisma migrate reset --schema src/main/infra/database/orm/prisma/schema.prisma",
-    "studio": "npx prisma studio --schema src/main/infra/database/orm/prisma/schema.prisma"
+    "studio": "npx prisma studio --schema src/main/infra/database/orm/prisma/schema.prisma",
+    "generate": "npx prisma generate --schema src/main/infra/database/orm/prisma/schema.prisma",
+    "pull": "npx prisma db pull --schema src/main/infra/database/orm/prisma/schema.prisma"
   },
   "_moduleAliases": {
     "@modules": "dist/modules",
@@ -40,9 +42,10 @@
     "@prisma/client": "^6.12.0",
     "@types/body-parser": "^1.19.6",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^22.15.3",
-    "@types/nodemailer": "^6.4.17",
+    "@types/node": "^22.17.2",
+    "@types/nodemailer": "^6.4.19",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "@vitest/ui": "^3.1.3",
@@ -50,27 +53,35 @@
     "nodemon": "^3.1.10",
     "prisma": "^6.12.0",
     "sucrase": "^3.35.0",
+    "supertest": "^7.1.4",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
   "dependencies": {
     "@types/axios": "^0.9.36",
+    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "axios": "^1.10.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.1",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.5",
     "reflect-metadata": "^0.2.2",
-    "sqlite": "^5.1.1"
+    "sqlite": "^5.1.1",
+    "tsyringe": "^4.10.0"
   }
 }

@@ -27,7 +27,9 @@ export class RespostaDTO {
 export class CriarFeedbackDTO implements CriarFeedbackProps {
   formularioId: string;
   envioId: string;
+  vendaId: string;
   respostas: RespostaDTO[];
+  empresaId: string;
 
   constructor(data: any) {
     // Validação de campos principais
@@ -40,18 +42,25 @@ export class CriarFeedbackDTO implements CriarFeedbackProps {
     if (!Array.isArray(data.respostas) || data.respostas.length === 0) {
       throw new FeedbackExceptions.RespostaInvalida('As respostas devem ser um array não vazio.');
     }
+    if (!data.empresaId || !isUUID(data.empresaId)) {
+      throw new FeedbackExceptions.RespostaInvalida('ID da empresa deve ser um UUID válido.');
+    }
 
     this.formularioId = data.formularioId;
     this.envioId = data.envioId;
     this.respostas = data.respostas.map((r: any) => new RespostaDTO(r));
+    this.empresaId = data.empresaId;
   }
 }
 
 export interface FeedbackResponseDTO {
   id: string;
   formularioId: string | null;
-  envioId: string | null;
+  vendaId: string;
   respostas: Record<string, any>[]; // Array de respostas
   dataCriacao: string; // ISO string
   dataExclusao?: string; // ISO string ou undefined
+  clienteNome?: string | null;
+  produtoNome?: string | null;
+  empresaId: string;
 }

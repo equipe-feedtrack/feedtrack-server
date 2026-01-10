@@ -14,15 +14,26 @@ export class FeedbackRepositoryPrisma implements IFeedbackRepository {
   async salvar(feedback: Feedback): Promise<void> {
     const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
 
-await this.prisma.feedback.upsert({
-  where: { envioId: feedback.envioId }, // Usa o campo único envioId
-  create: dadosParaPersistencia,
-  update: {
-    respostas: dadosParaPersistencia.respostas,
-    dataExclusao: dadosParaPersistencia.dataExclusao,
+    await this.prisma.feedback.create({
+      data: dadosParaPersistencia,
+    });
+  }
+
+  async salvarManual(feedback: Feedback): Promise<void> {
+    const dadosParaPersistencia = FeedbackMap.toPersistence(feedback);
+
+const venda = await this.prisma.venda.findUnique({
+  where: { id: dadosParaPersistencia.vendaId },
+  select: { empresaId: true }
+});
+if (!venda) throw new Error("Venda não encontrada.");
+
+await this.prisma.feedback.create({
+  data: {
+    ...dadosParaPersistencia,
+    empresaId: venda.empresaId, // usa o FK correto
   },
 });
-
   }
 
   /**
@@ -64,25 +75,23 @@ await this.prisma.feedback.upsert({
    * @param envioId O ID do envio associado ao feedback.
    * @returns A entidade de domínio Feedback ou null se não for encontrado.
    */
-  async buscarPorEnvioId(envioId: string): Promise<Feedback | null> {
-    const raw = await this.prisma.feedback.findUnique({
-      where: { envioId },
-    });
 
-    if (!raw) {
-      return null;
+
+  async buscarTodos(empresaId: string): Promise<Feedback[]> {
+    const whereClause: any = {};
+
+    if (empresaId) {
+      whereClause.empresaId = empresaId;
     }
 
-    return FeedbackMap.toDomain(raw);
-  }
-
-  async buscarTodos(): Promise<Feedback[]> {
-    const rawFeedbacks = await this.prisma.feedback.findMany();
+    const rawFeedbacks = await this.prisma.feedback.findMany({
+      where: whereClause,
+    });
 
     if (!rawFeedbacks || rawFeedbacks.length === 0) {
       return [];
     }
-    
+
     // Mapeia cada objeto do Prisma para uma entidade de domínio.
     return rawFeedbacks.map(FeedbackMap.toDomain);
   }

@@ -9,6 +9,7 @@ interface IProduto extends IDatasControle {
     descricao: string;
     valor: number;
     ativo: boolean;
+    empresaId: string;
 
 }
 

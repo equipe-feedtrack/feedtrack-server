@@ -3,6 +3,7 @@ interface IPergunta {
     texto: string;
     tipo: string;
     ativo: boolean;
+    empresaId: string;
     opcoes?: string[] | null;
     dataCriacao: Date;
     dataAtualizacao: Date;

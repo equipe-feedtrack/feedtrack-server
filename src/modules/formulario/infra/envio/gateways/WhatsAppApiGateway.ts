@@ -16,9 +16,11 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
   private readonly feedbackUrl: string;
 
   constructor() {
-    // As credenciais devem vir de variáveis de ambiente, nunca diretamente no código!
-    this.apiUrl = process.env.WHATSAPP_API_URL || 'http://localhost:3000/api/sendText';
-    this.feedbackUrl = process.env.FEEDBACK_URL || 'http://localhost:3000/feedback'; // VINCULAR O LINK REAL QUE IRÁ GERAR A PÁGINA DE FEEDBACK'
+    if (!process.env.WHATSAPP_API_URL) {
+      throw new Error("A variável de ambiente WHATSAPP_API_URL deve ser configurada.");
+    }
+    this.apiUrl = process.env.WHATSAPP_API_URL
+    this.feedbackUrl = 'https://server.feedtrack.site/api/v1/resposta-formulario';// VINCULAR O LINK REAL QUE IRÁ GERAR A PÁGINA DE FEEDBACK'
 
     if (!this.apiUrl || !this.feedbackUrl) {
       throw new Error("As variáveis de ambiente WHATSAPP_API_URL e FEEDBACK_URL devem ser configuradas.");
@@ -31,25 +33,26 @@ export class WhatsAppApiGateway implements IWhatsAppGateway {
    * @param conteudo O conteúdo da mensagem (ex: template).
    * @param link O link base para o formulário.
    */
-  public async enviar(destinatario: string, conteudo: string, formularioId: string, clienteId: string): Promise<void> {
+  public async enviar(destinatario: string, conteudo: string, vendaId: string, empresaId: string, campanhaId: string): Promise<void> {
+    
     console.log(`[WhatsAppApiGateway] Preparando para enviar mensagem para: ${destinatario}`);
-    const link = `${this.feedbackUrl}`;
-    const linkCompleto = `${link}`
-    const mensagemCompleta = `${conteudo}\n\nResponda aqui: ${linkCompleto}`;
+    const linkCompleto = `${this.feedbackUrl}/empresa/${empresaId}/campanha/${campanhaId}/venda/${vendaId}`;
+
+    const mensagemCompleta = `${conteudo}\n\nResponda aqui:\n ${linkCompleto}`;
 
     try {
       
 
       // Monta o corpo da requisição conforme a documentação da API que você usar
       const payload = {
-        "chatId": `${destinatario}@c.us`, // Exemplo para o formato de chat ID
-        "text": mensagemCompleta,
-        "session": "default"
+        "phone": `55${destinatario}`, // Exemplo para o formato de chat ID
+        "message": mensagemCompleta,
       };
 
       const headers = {
 
         'Content-Type': 'application/json',
+        'Client-Token': process.env.ZAPI_SECRET
 
       };
 

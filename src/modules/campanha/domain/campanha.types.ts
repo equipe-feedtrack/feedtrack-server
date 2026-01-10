@@ -20,14 +20,10 @@ export interface ICampanha {
   id: string;
   titulo: string;
   descricao?: string;
-  tipoCampanha: TipoCampanha;
-  segmentoAlvo: SegmentoAlvo;
-  dataInicio: Date;
-  dataFim: Date | null;
-  templateMensagem: string;
+  templateMensagem?: string ;
   canalEnvio: CanalEnvio; // Canal de envio da campanha
   formularioId: string;
-  ativo: boolean; // Campanha é ativa ou inativa
+  empresaId: string;
   dataCriacao: Date;
   dataAtualizacao: Date;
   dataExclusao: Date | null; // Para exclusão lógica

@@ -14,10 +14,13 @@ export class FeedbackMap {
     const props: RecuperarFeedbackProps = {
       id: raw.id,
       formularioId: raw.formularioId,
-      envioId: raw.envioId, // Adicionado para consistência
       respostas: raw.respostas as Record<string, any>[],
       dataCriacao: raw.dataCriacao,
       dataExclusao: raw.dataExclusao ?? null,
+      clienteNome: raw.cliente_nome,
+      produtoNome: raw.produto_nome,
+      vendaId: raw.vendaId,
+      empresaId: raw.empresaId,
     };
     return Feedback.recuperar(props);
   }
@@ -30,24 +33,31 @@ export class FeedbackMap {
     return {
       id: feedback.id,
       formularioId: feedback.formularioId,
-      envioId: feedback.envioId, // Adicionado para consistência
       respostas: feedback.respostas as Prisma.InputJsonValue,
       dataCriacao: feedback.dataCriacao,
       dataExclusao: feedback.dataExclusao ?? null,
+      cliente_nome: feedback.clienteNome,
+      produto_nome: feedback.produtoNome,
+      vendaId: feedback.vendaId,
+      empresaId: feedback.empresaId,
     };
   }
 
   /**
    * Converte a entidade de domínio para um DTO de resposta da API.
    */
-  public static toResponseDTO(feedback: Feedback): FeedbackResponseDTO {
-    return {
-      id: feedback.id,
-      formularioId: feedback.formularioId,
-      envioId: feedback.envioId, // Adicionado para consistência
-      respostas: feedback.respostas,
-      dataCriacao: feedback.dataCriacao.toISOString(),
-      dataExclusao: feedback.dataExclusao ? feedback.dataExclusao.toISOString() : undefined,
-    };
-  }
+public static toResponseDTO(feedback: Feedback): FeedbackResponseDTO {
+  return {
+    id: feedback.id,
+    formularioId: feedback.formularioId,
+    vendaId: feedback.vendaId,
+    respostas: feedback.respostas,
+    dataCriacao: feedback.dataCriacao.toISOString(),
+    dataExclusao: feedback.dataExclusao ? feedback.dataExclusao.toISOString() : undefined,
+    clienteNome: feedback.clienteNome,
+    produtoNome: feedback.produtoNome,
+    empresaId: feedback.empresaId,
+  };
+}
+
 }

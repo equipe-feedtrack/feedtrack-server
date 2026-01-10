@@ -27,7 +27,7 @@ describe('FormularioRepositoryPrisma (Integration Tests)', () => {
     // 2. Criação dos Dados Base (Perguntas)
     await prisma.pergunta.createMany({
       data: [
-        { id: PERGUNTA_ID_1, texto: 'Qual sua satisfação com o atendimento?', tipo: 'nota', opcoes: undefined, ativo: true },
+        { id: PERGUNTA_ID_1, texto: 'Qual sua satisfação com o atendimento?', tipo: 'texto', ativo: true },
         { id: PERGUNTA_ID_2, texto: 'Você recomendaria nosso serviço?', tipo: 'multipla_escolha', opcoes: ['Sim', 'Não'], ativo: true },
       ],
     });

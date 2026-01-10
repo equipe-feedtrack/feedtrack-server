@@ -3,10 +3,9 @@ import { PrismaClient } from '@prisma/client';
 import { EnvioController } from './controller/envio.controller';
 
 // Use Cases
-import { DispararEnvioEmMassaUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioEmMassa.use-case';
+import { DispararEnvioEmMassaRealtimeUseCase } from '../application/use-cases/envio/dispararEnvioEmMassa.use-case';
 import { DispararEnvioIndividualUseCase } from '@modules/formulario/application/use-cases/envio/dispararEnvioIndividual.use-case';
-import { RetentarEnviosPendentesUseCase } from '@modules/formulario/application/use-cases/envio/retentarEnviosPendentes.use-case';
-
+import { ListarEnviosPorEmpresaUseCase } from '../application/use-cases/envio/listarEnviosPorEmpresa.use-case';
 // Repositórios
 import { FormularioRepositoryPrisma } from '../infra/formulario/formulario.repository.prisma';
 import { CampanhaRepositoryPrisma } from '@modules/campanha/infra/campanha/campanha.repository.prisma';
@@ -16,6 +15,9 @@ import { EnvioRepositoryPrisma } from '../infra/envio/EnvioRepositoryPrisma';
 // Gateways
 import { WhatsAppApiGateway } from '../infra/envio/gateways/WhatsAppApiGateway';
 import { EmailGateway } from '../infra/envio/gateways/EmailApiGateway';
+import { VendaRepositoryPrisma } from '@modules/venda/infra/venda.repository.prisma';
+import { EmpresaRepositoryPrisma } from '@modules/empresa/infra/empresa.repository.prisma';
+import { authMiddleware } from '@shared/presentation/http/middlewares/validation.middleware';
 
 
 // --- INICIALIZAÇÃO DE DEPENDÊNCIAS ---
@@ -23,9 +25,12 @@ const prisma = new PrismaClient();
 
 // Repositórios
 const envioRepository = new EnvioRepositoryPrisma(prisma);
-const clienteRepository = new ClienteRepositoryPrisma(prisma);
 const campanhaRepository = new CampanhaRepositoryPrisma(prisma);
-const formularioRepository = new FormularioRepositoryPrisma(prisma);
+const vendaRepository = new VendaRepositoryPrisma();
+const EmpresaRepository = new EmpresaRepositoryPrisma();
+
+
+
 
 // Gateways
 const emailGateway = new EmailGateway();
@@ -33,34 +38,34 @@ const whatsappGateway = new WhatsAppApiGateway();
 
 // Casos de Uso
 const dispararEnvioIndividualUseCase = new DispararEnvioIndividualUseCase(
-  envioRepository,
-  clienteRepository,
+    envioRepository,
   campanhaRepository,
-  formularioRepository,
-  whatsappGateway, // Injetando o gateway de WhatsApp
-  emailGateway // Injetando o gateway de e-mail
+ // Injetando o gateway de e-mail
+  whatsappGateway,// Injetando o gateway de WhatsApp
+    emailGateway,
+  EmpresaRepository,
+  vendaRepository
 );
-const dispararEnvioEmMassaUseCase = new DispararEnvioEmMassaUseCase(
+const dispararEnvioEmMassaUseCase = new DispararEnvioEmMassaRealtimeUseCase(
   envioRepository,
-  clienteRepository,
+  vendaRepository,
   campanhaRepository,
-  emailGateway, // Injetando o gateway de e-mail
-  whatsappGateway // Injetando o gateway de WhatsApp
-);
-const retentarEnviosPendentesUseCase = new RetentarEnviosPendentesUseCase(
-  envioRepository,
-  campanhaRepository,
-  clienteRepository,
+  whatsappGateway,
   emailGateway,
-  whatsappGateway
+  EmpresaRepository
 );
+
+const listarEnviosPorEmpresaUseCase = new ListarEnviosPorEmpresaUseCase(envioRepository);
+
+
 
 // Controlador
 const envioController = new EnvioController(
   dispararEnvioIndividualUseCase,
   dispararEnvioEmMassaUseCase,
-  retentarEnviosPendentesUseCase
+  listarEnviosPorEmpresaUseCase
 );
+
 
 // ====================================================================
 // DEFINIÇÃO DAS ROTAS
@@ -104,7 +109,7 @@ const envioRouter = Router();
  *         description: Erro interno do servidor.
  */
 // Rota para disparo individual
-envioRouter.post('/envio/individual', envioController.dispararIndividual);
+envioRouter.post('/envio/individual', authMiddleware, envioController.dispararIndividual);
 
 // Rota para disparo em massa
 /**
@@ -122,6 +127,7 @@ envioRouter.post('/envio/individual', envioController.dispararIndividual);
  *             required:
  *               - campanhaId
  *               - usuarioId
+ *               - produtoId
  *             properties:
  *               campanhaId:
  *                 type: string
@@ -129,6 +135,9 @@ envioRouter.post('/envio/individual', envioController.dispararIndividual);
  *               usuarioId:
  *                 type: string
  *                 description: ID do usuário que está disparando o envio.
+ *               produtoId:
+ *                 type: string
+ *                 description: ID do produto associado ao envio.
  *     responses:
  *       200:
  *         description: Envios em massa disparados com sucesso.
@@ -137,7 +146,7 @@ envioRouter.post('/envio/individual', envioController.dispararIndividual);
  *       500:
  *         description: Erro interno do servidor.
  */
-envioRouter.post('/envio/massa', envioController.dispararEmMassa);
+envioRouter.post('/envio/massa', authMiddleware, envioController.dispararEmMassa);
 
 // Rota para retentativa de envios
 /**
@@ -166,6 +175,35 @@ envioRouter.post('/envio/massa', envioController.dispararEmMassa);
  *       500:
  *         description: Erro interno do servidor.
  */
-envioRouter.post('/envio/retentar', envioController.retentarPendentes);
+// envioRouter.post('/envio/retentar', envioController.retentarPendentes);
+
+  /**
+ * @swagger
+ * /envios/{empresaId}:
+ *   get:
+ *     summary: Lista todos os envios de uma empresa
+ *     tags: [Envios]
+ *     parameters:
+ *       - in: path
+ *         name: empresaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da empresa
+ *     responses:
+ *       200:
+ *         description: Lista de envios da empresa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Envio'
+ *       400:
+ *         description: Dados de entrada inválidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+  envioRouter.get('/envios/:empresaId', authMiddleware, envioController.listarEnviosPorEmpresa);
 
 export { envioRouter };

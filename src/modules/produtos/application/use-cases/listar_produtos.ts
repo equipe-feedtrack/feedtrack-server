@@ -4,8 +4,7 @@ import { ProdutoResponseDTO } from '../dto/produto_response.dto';
 
 export interface ListarProdutosInput {
   ativo?: boolean; // Exemplo de filtro
-  cliente_id?: string; // Exemplo de filtro
-  // Adicione outros filtros conforme necessário
+  empresaId: string; // Exemplo de filtro
 }
 
 export class ListarProdutosUseCase {

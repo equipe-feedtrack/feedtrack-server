@@ -13,7 +13,7 @@ import { AtualizarClienteUseCase } from "../application/use-cases/atualizar_clie
 import { DeletarClienteUseCase } from "../application/use-cases/deletar_cliente";
 import { ClienteController } from "./controller/gestao_clientes.controller";
 import { Router } from "express";
-import { GerenciarProdutosClienteUseCase } from "../application/use-cases/gerenciarProdutosCliente.use-case";
+import { authMiddleware } from "@shared/presentation/http/middlewares/validation.middleware";
 
 // 1. Instanciar o Prisma Client
 const PrismaRepository = new PrismaClient();
@@ -23,12 +23,11 @@ const clienteRepository = new ClienteRepositoryPrisma(PrismaRepository);
 const produtoRepository = new ProdutoRepositoryPrisma(PrismaRepository); // O CriarClienteUseCase precisa disto
 
 // 3. Instanciar os Casos de Uso, injetando os repositórios
-const criarClienteUseCase = new CriarClienteUseCase(clienteRepository, produtoRepository);
+const criarClienteUseCase = new CriarClienteUseCase(clienteRepository);
 const listarClientesUseCase = new ListarClientesUseCase(clienteRepository);
 const buscarClientePorIdUseCase = new BuscarClientePorIdUseCase(clienteRepository);
-const atualizarClienteUseCase = new AtualizarClienteUseCase(clienteRepository, produtoRepository);
+const atualizarClienteUseCase = new AtualizarClienteUseCase(clienteRepository);
 const deletarClienteUseCase = new DeletarClienteUseCase(clienteRepository);
-const gerenciarProdutosClienteUseCase = new GerenciarProdutosClienteUseCase(clienteRepository, produtoRepository);
 
 // 4. Instanciar o Controller, injetando os casos de uso
 const clienteController = new ClienteController(
@@ -37,7 +36,6 @@ const clienteController = new ClienteController(
   buscarClientePorIdUseCase,
   atualizarClienteUseCase,
   deletarClienteUseCase,
-  gerenciarProdutosClienteUseCase
 );
 
 // ====================================================================
@@ -149,7 +147,7 @@ const clienteRouter = Router();
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.post('/cliente', clienteController.criar);
+clienteRouter.post('/cliente', authMiddleware, clienteController.criar);
 
 /**
  * @swagger
@@ -221,7 +219,7 @@ clienteRouter.post('/cliente', clienteController.criar);
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.get('/clientes',clienteController.listar);
+clienteRouter.get('/clientes', authMiddleware, clienteController.listar);
 
 /**
  * @swagger
@@ -293,7 +291,7 @@ clienteRouter.get('/clientes',clienteController.listar);
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.get('/cliente/:id', clienteController.buscarPorId);
+clienteRouter.get('/cliente/:id', authMiddleware, clienteController.buscarPorId);
 
 /**
  * @swagger
@@ -409,7 +407,7 @@ clienteRouter.get('/cliente/:id', clienteController.buscarPorId);
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.put('/atualizar-cliente/:id', clienteController.atualizar);
+clienteRouter.put('/atualizar-cliente/:id/:empresaId', authMiddleware, clienteController.atualizar);
 
 /**
  * @swagger
@@ -432,48 +430,7 @@ clienteRouter.put('/atualizar-cliente/:id', clienteController.atualizar);
  *       500:
  *         description: Erro interno do servidor.
  */
-clienteRouter.delete('/deletar-cliente/:id', clienteController.deletar);
+clienteRouter.delete('/deletar-cliente/:id/:empresaId', authMiddleware, clienteController.deletar);
 
-/**
- * @swagger
- * /cliente/{clienteId}/produtos:
- *   post:
- *     summary: Gerencia produtos associados a um cliente (adicionar/remover)
- *     tags: [Clientes]
- *     parameters:
- *       - in: path
- *         name: clienteId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID do cliente.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               idsProdutosParaAdicionar:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: IDs de produtos para adicionar ao cliente (opcional).
- *               idsProdutosParaRemover:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: IDs de produtos para remover do cliente (opcional).
- *     responses:
- *       200:
- *         description: Produtos do cliente atualizados com sucesso.
- *       400:
- *         description: Dados inválidos.
- *       404:
- *         description: Cliente ou produto não encontrado.
- *       500:
- *         description: Erro interno do servidor.
- */
-clienteRouter.post('/:clienteId/produtos', (req, res, next) => clienteController.gerenciarProdutos(req, res, next));
 
 export { clienteRouter };

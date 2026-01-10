@@ -35,6 +35,7 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
     await prisma.clientesOnProdutos.deleteMany({});
     await prisma.cliente.deleteMany({});
     await prisma.produto.deleteMany({});
+    await prisma.pessoa.deleteMany({});
 
     // 2. Criação dos Dados Base (Produtos)
     await prisma.produto.createMany({
@@ -44,17 +45,23 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
       ],
     });
 
-    // 3. Criação dos Clientes e CONEXÃO das Relações
+    // 3. Criação de Pessoas para os Clientes
+    const pessoa1 = await prisma.pessoa.create({ data: { nome: 'Pessoa Cliente 1', email: 'cliente1@example.com', telefone: '11911111111' } });
+    const pessoa2 = await prisma.pessoa.create({ data: { nome: 'Pessoa Cliente 2', email: 'cliente2@example.com', telefone: '11922222222' } });
+    const pessoa3 = await prisma.pessoa.create({ data: { nome: 'Pessoa Cliente 3', email: 'cliente3@example.com', telefone: '11933333333' } });
+
+    // 4. Criação dos Clientes e CONEXÃO das Relações
     await prisma.cliente.create({
       data: {
         id: CLIENTE_ID_1,
-        nome: 'Cliente Ativo Teste', email: 'ativo@example.com', telefone: '11111111111',
+        nome: 'Cliente Ativo Teste',
+        pessoaId: pessoa1.id,
         cidade: 'Cidade Teste', status: StatusUsuario.ATIVO, vendedorResponsavel: 'Vendedor Teste',
         dataCriacao: dataAntiga, dataAtualizacao: dataAntiga,
         produtos: {
           create: [
-            { produto: { connect: { id: PRODUTO_ID_1 } } },
-            { produto: { connect: { id: PRODUTO_ID_2 } } },
+            { produtoId: PRODUTO_ID_1 },
+            { produtoId: PRODUTO_ID_2 },
           ],
         },
       },
@@ -63,24 +70,26 @@ describe('ClienteRepositoryPrisma (Integration Tests)', () => {
     await prisma.cliente.create({
       data: {
         id: CLIENTE_ID_2,
-        nome: 'Cliente Antigo', email: 'antigo@example.com', telefone: '22222222222',
+        nome: 'Cliente Antigo',
+        pessoaId: pessoa2.id,
         cidade: 'Cidade Antiga', status: StatusUsuario.ATIVO, vendedorResponsavel: 'Vendedor Antigo',
         dataCriacao: dataAntiga, dataAtualizacao: dataAntiga,
-        produtos: { create: [{ produto: { connect: { id: PRODUTO_ID_1 } } }] },
+        produtos: { create: [{ produtoId: PRODUTO_ID_1 }] },
       },
     });
     
     await prisma.cliente.create({
       data: {
         id: CLIENTE_ID_3,
-        nome: 'Cliente Novo', email: 'novo@example.com', telefone: '33333333333',
+        nome: 'Cliente Novo',
+        pessoaId: pessoa3.id,
         cidade: 'Cidade Nova', status: StatusUsuario.ATIVO, vendedorResponsavel: 'Vendedor Novo',
         dataCriacao: dataRecente, dataAtualizacao: dataRecente,
-        produtos: { create: [{ produto: { connect: { id: PRODUTO_ID_1 } } }] },
+        produtos: { create: [{ produtoId: PRODUTO_ID_1 }] },
       },
     });
 
-    // 4. Recupera as entidades para usar nos testes
+    // 5. Recupera as entidades para usar nos testes
     const p1 = await prisma.produto.findUnique({ where: { id: PRODUTO_ID_1 } });
     const p2 = await prisma.produto.findUnique({ where: { id: PRODUTO_ID_2 } });
     if (p1 && p2) {

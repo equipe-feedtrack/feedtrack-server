@@ -2,19 +2,26 @@ import { ICampanhaRepository } from "@modules/campanha/infra/campanha/campanha.r
 import { IUseCase } from "@shared/application/use-case/usecase.interface";
 import { CampanhaNaoEncontradaException } from "../exceptions/campanha.exception";
 
-export class DeletarCampanhaUseCase implements IUseCase<string, void> {
+export interface DeletarCampanhaInput {
+  id: string;
+  empresaId: string;
+}
+
+export class DeletarCampanhaUseCase implements IUseCase<DeletarCampanhaInput, void> {
   private readonly _campanhaRepository: ICampanhaRepository;
 
   constructor(campanhaRepository: ICampanhaRepository) {
     this._campanhaRepository = campanhaRepository;
   }
 
-  async execute(id: string): Promise<void> {
-    const existe = await this._campanhaRepository.existe(id);
+  async execute(input: DeletarCampanhaInput): Promise<void> {
+    const { id, empresaId } = input;
+
+    const existe = await this._campanhaRepository.existe(id, empresaId);
     if (!existe) {
       throw new CampanhaNaoEncontradaException();
     }
 
-    await this._campanhaRepository.deletar(id);
+    await this._campanhaRepository.deletar(id, empresaId);
   }
 }

@@ -16,19 +16,14 @@ export class ListarClientesUseCase implements IUseCase<ListarClientesInputDTO | 
    * @param filtros Um objeto opcional com os filtros a serem aplicados.
    * @returns Uma promessa que resolve com um array de DTOs de cliente.
    */
-  async execute(filtros?: ListarClientesInputDTO): Promise<ClienteResponseDTO[]> {
-    let clientes;
+async execute(filtros?: ListarClientesInputDTO): Promise<ClienteResponseDTO[]> {
+  const clientes = await this._clienteRepository.listar({
+    status: filtros?.status,
+    empresaId: filtros?.empresaId, // aqui usamos o empresaId
+  });
 
-    // Se um filtro de segmento for fornecido, ele tem prioridade.
-    if (filtros?.segmentoAlvo) {
-      clientes = await this._clienteRepository.buscarPorSegmento(filtros.segmentoAlvo);
-    } else {
-      // Caso contrário, usa o método de listagem geral do repositório,
-      // passando os filtros disponíveis (como o status).
-      clientes = await this._clienteRepository.listar({ status: filtros?.status });
-    }
-    
-    // Mapeia a lista de entidades de domínio para uma lista de DTOs de resposta.
-    return clientes.map(cliente => ClienteMap.toResponseDTO(cliente));
-  }
+  return clientes.map(cliente => ClienteMap.toResponseDTO(cliente));
+}
+
+
 }

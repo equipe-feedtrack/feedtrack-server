@@ -7,6 +7,7 @@ import { DeletarProdutoUseCase } from '@modules/produtos/application/use-cases/d
 import { AtualizarProdutoUseCase } from '@modules/produtos/application/use-cases/atualizar_produto';
 import { BuscarProdutoPorIdUseCase } from '@modules/produtos/application/use-cases/buscar_produto_por_id';
 import { CriarProdutoUseCase } from '@modules/produtos/application/use-cases/criar_produto';
+import { ReativarProdutoUseCase } from '@modules/produtos/application/use-cases/reativar_produto';
 
 // Importar DTOs de input/output
 import { AtualizarProdutoInputDTO } from '@modules/produtos/application/dto/atualizar_produto_input.dto';
@@ -22,7 +23,8 @@ export class ProdutoController {
     private readonly buscarProdutoPorIdUseCase: BuscarProdutoPorIdUseCase,
     private readonly atualizarProdutoUseCase: AtualizarProdutoUseCase,
     private readonly deletarProdutoUseCase: DeletarProdutoUseCase,
-    private readonly listarProdutosUseCase: ListarProdutosUseCase
+    private readonly listarProdutosUseCase: ListarProdutosUseCase,
+    private readonly reativarProdutoUseCase: ReativarProdutoUseCase
   ) { }
 
   // Métodos do Controlador
@@ -39,10 +41,10 @@ export class ProdutoController {
 
   public buscarProdutoPorId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
+      const { id, empresaId } = req.params;
       if (!id) throw new BadRequestError('ID do produto é obrigatório.');
 
-      const produto = await this.buscarProdutoPorIdUseCase.execute(id);
+      const produto = await this.buscarProdutoPorIdUseCase.execute(id, empresaId);
       if (!produto) throw new NotFoundError(`Produto com ID ${id} não encontrado.`);
 
       res.status(200).json(produto);
@@ -54,15 +56,15 @@ export class ProdutoController {
   public listarProdutos = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Implementar lógica de filtros a partir de req.query
-      const { ativo, cliente_id } = req.query; // Tipagem básica para filtros
+      const { ativo, empresaId } = req.query; // Tipagem básica para filtros
       let ativoBoolean: boolean | undefined;
       if (typeof ativo === 'string') {
         ativoBoolean = ativo.toLowerCase() === 'true'; // Converte "true" para true, "false" para false
       }
 
       const filtros: ListarProdutosInput = {
-        ativo: ativoBoolean, // Passa o booleano convertido
-        cliente_id: typeof cliente_id === 'string' ? cliente_id : undefined, // Garante que cliente_id é string ou undefined
+        ativo: ativoBoolean,
+        empresaId: empresaId as string 
       };
       const produtos = await this.listarProdutosUseCase.execute(filtros);
       res.status(200).json(produtos);
@@ -87,14 +89,26 @@ export class ProdutoController {
 
   public deletarProduto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params;
+      const { id, empresaId } = req.params;
       if (!id) throw new BadRequestError('ID do produto é obrigatório para exclusão.');
 
-      await this.deletarProdutoUseCase.execute(id);
-      res.json({ message: 'Produto deletado com sucesso.' });
-      res.status(204).send(); // 204 No Content para deleção bem-sucedida
+      await this.deletarProdutoUseCase.execute(id, empresaId);
+      res.status(204).send(); // 204 No Content para deleção bem-sucedida // 204 No Content para deleção bem-sucedida
     } catch (error: any) {
       next(error);
     }
   }
+
+  public reativarProduto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id, empresaId } = req.params;
+      if (!id) throw new BadRequestError('ID do produto é obrigatório para reativação.');
+
+      const produtoReativado = await this.reativarProdutoUseCase.execute(id, empresaId);
+      res.status(200).json(produtoReativado);
+    } catch (error: any) {
+      next(error);
+    }
+  }
+  
 }

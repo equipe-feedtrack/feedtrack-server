@@ -15,6 +15,7 @@ class ProdutoMap {
             dataAtualizacao: produto.dataAtualizacao,
             dataExclusao: produto.dataExclusao ?? null, 
             ativo: produto.ativo,
+            empresaId: produto.empresaId,
         };
         return Produto.recuperar(produtoProps);
     }
@@ -33,6 +34,7 @@ class ProdutoMap {
             descricao: produto.descricao,
             valor: produto.valor,
             ativo: produto.ativo,
+            empresaId: produto.empresaId,
             data_criacao: produto.dataCriacao,
             data_atualizacao: produto.dataAtualizacao,
             data_exclusao: produto.dataExclusao ?? null, // undefined na entidade -> null no DB
@@ -49,6 +51,7 @@ class ProdutoMap {
             dataAtualizacao: produto.dataAtualizacao.toISOString(), // Converte Date para string ISO
             dataExclusao: produto.dataExclusao ? produto.dataExclusao.toISOString() : undefined, // Trata null/undefined
             ativo: produto.ativo,
+            empresaId: produto.empresaId,
         };
     }
 
