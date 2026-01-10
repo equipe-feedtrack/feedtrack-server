@@ -51,6 +51,8 @@ CREATE TABLE "public"."usuarios" (
     "email" TEXT,
     "tipo" "public"."TipoUsuario" NOT NULL,
     "status" "public"."StatusUsuario" NOT NULL,
+    "token_recuperacao" TEXT,
+    "token_recuperacao_expiracao" TIMESTAMP(3),
     "data_criacao" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "data_atualizacao" TIMESTAMP(3) NOT NULL,
     "data_exclusao" TIMESTAMP(3),
@@ -96,6 +98,7 @@ CREATE TABLE "public"."clientes" (
     "nome" TEXT NOT NULL,
     "telefone" TEXT,
     "email" TEXT,
+    "estado" TEXT,
     "cidade" TEXT,
     "status" "public"."StatusUsuario" NOT NULL,
     "data_criacao" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -104,6 +107,16 @@ CREATE TABLE "public"."clientes" (
     "empresaId" TEXT NOT NULL,
 
     CONSTRAINT "clientes_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."vendas" (
+    "id" TEXT NOT NULL,
+    "data_venda" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "clienteId" TEXT NOT NULL,
+    "empresaId" TEXT NOT NULL,
+
+    CONSTRAINT "vendas_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -122,14 +135,11 @@ CREATE TABLE "public"."produtos" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."vendas" (
-    "id" TEXT NOT NULL,
-    "data_venda" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "clienteId" TEXT NOT NULL,
+CREATE TABLE "public"."venda_produtos" (
+    "vendaId" TEXT NOT NULL,
     "produtoId" TEXT NOT NULL,
-    "empresaId" TEXT NOT NULL,
 
-    CONSTRAINT "vendas_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "venda_produtos_pkey" PRIMARY KEY ("vendaId","produtoId")
 );
 
 -- CreateTable
@@ -166,7 +176,6 @@ CREATE TABLE "public"."perguntas_on_formularios" (
     "id" TEXT NOT NULL,
     "pergunta_id" TEXT NOT NULL,
     "formulario_id" TEXT NOT NULL,
-    "ordem_na_lista" INTEGER NOT NULL,
 
     CONSTRAINT "perguntas_on_formularios_pkey" PRIMARY KEY ("id")
 );
@@ -176,10 +185,7 @@ CREATE TABLE "public"."campanhas" (
     "id" TEXT NOT NULL,
     "titulo" TEXT NOT NULL,
     "descricao" TEXT,
-    "tipo_campanha" "public"."TipoCampanha" NOT NULL,
-    "segmento_alvo" "public"."SegmentoAlvo" NOT NULL,
     "canal_envio" "public"."CanalEnvio" NOT NULL DEFAULT 'EMAIL',
-    "data_fim" TIMESTAMP(3),
     "template_mensagem" TEXT NOT NULL,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "data_criacao" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -199,11 +205,8 @@ CREATE TABLE "public"."envios_formulario" (
     "ultima_mensagem_erro" TEXT,
     "data_criacao" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "data_envio" TIMESTAMP(3),
-    "formulario_id" TEXT,
-    "cliente_id" TEXT,
     "campanha_id" TEXT,
-    "usuario_id" TEXT NOT NULL,
-    "produto_id" TEXT,
+    "venda_id" TEXT,
     "empresaId" TEXT NOT NULL,
 
     CONSTRAINT "envios_formulario_pkey" PRIMARY KEY ("id")
@@ -217,10 +220,9 @@ CREATE TABLE "public"."feedbacks" (
     "data_exclusao" TIMESTAMP(3),
     "cliente_nome" TEXT,
     "produto_nome" TEXT,
-    "funcionario_nome" TEXT,
+    "venda_id" TEXT NOT NULL,
     "empresaId" TEXT NOT NULL,
     "formulario_id" TEXT,
-    "envio_id" TEXT,
 
     CONSTRAINT "feedbacks_pkey" PRIMARY KEY ("id")
 );
@@ -243,44 +245,44 @@ CREATE UNIQUE INDEX "usuarios_email_key" ON "public"."usuarios"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "funcionarios_usuario_id_key" ON "public"."funcionarios"("usuario_id");
 
--- CreateIndex
-CREATE UNIQUE INDEX "feedbacks_envio_id_key" ON "public"."feedbacks"("envio_id");
-
 -- AddForeignKey
-ALTER TABLE "public"."usuarios" ADD CONSTRAINT "usuarios_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."usuarios" ADD CONSTRAINT "usuarios_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."funcionarios" ADD CONSTRAINT "funcionarios_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."funcionarios" ADD CONSTRAINT "funcionarios_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."funcionarios" ADD CONSTRAINT "funcionarios_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."logs_atividade" ADD CONSTRAINT "logs_atividade_id_fkey" FOREIGN KEY ("id") REFERENCES "public"."usuarios"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."logs_atividade" ADD CONSTRAINT "logs_atividade_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."logs_atividade" ADD CONSTRAINT "logs_atividade_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."clientes" ADD CONSTRAINT "clientes_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."clientes" ADD CONSTRAINT "clientes_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."produtos" ADD CONSTRAINT "produtos_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."vendas" ADD CONSTRAINT "vendas_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "public"."clientes"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."vendas" ADD CONSTRAINT "vendas_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "public"."clientes"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."vendas" ADD CONSTRAINT "vendas_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."vendas" ADD CONSTRAINT "vendas_produtoId_fkey" FOREIGN KEY ("produtoId") REFERENCES "public"."produtos"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."produtos" ADD CONSTRAINT "produtos_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."vendas" ADD CONSTRAINT "vendas_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."venda_produtos" ADD CONSTRAINT "venda_produtos_vendaId_fkey" FOREIGN KEY ("vendaId") REFERENCES "public"."vendas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."perguntas" ADD CONSTRAINT "perguntas_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."venda_produtos" ADD CONSTRAINT "venda_produtos_produtoId_fkey" FOREIGN KEY ("produtoId") REFERENCES "public"."produtos"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."formularios" ADD CONSTRAINT "formularios_empresa_id_fkey" FOREIGN KEY ("empresa_id") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."perguntas" ADD CONSTRAINT "perguntas_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."formularios" ADD CONSTRAINT "formularios_empresa_id_fkey" FOREIGN KEY ("empresa_id") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."perguntas_on_formularios" ADD CONSTRAINT "perguntas_on_formularios_pergunta_id_fkey" FOREIGN KEY ("pergunta_id") REFERENCES "public"."perguntas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -289,34 +291,22 @@ ALTER TABLE "public"."perguntas_on_formularios" ADD CONSTRAINT "perguntas_on_for
 ALTER TABLE "public"."perguntas_on_formularios" ADD CONSTRAINT "perguntas_on_formularios_formulario_id_fkey" FOREIGN KEY ("formulario_id") REFERENCES "public"."formularios"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."campanhas" ADD CONSTRAINT "campanhas_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."campanhas" ADD CONSTRAINT "campanhas_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."campanhas" ADD CONSTRAINT "campanhas_formulario_id_fkey" FOREIGN KEY ("formulario_id") REFERENCES "public"."formularios"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."envios_formulario" ADD CONSTRAINT "envios_formulario_formulario_id_fkey" FOREIGN KEY ("formulario_id") REFERENCES "public"."formularios"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."envios_formulario" ADD CONSTRAINT "envios_formulario_cliente_id_fkey" FOREIGN KEY ("cliente_id") REFERENCES "public"."clientes"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "public"."envios_formulario" ADD CONSTRAINT "envios_formulario_campanha_id_fkey" FOREIGN KEY ("campanha_id") REFERENCES "public"."campanhas"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."envios_formulario" ADD CONSTRAINT "envios_formulario_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "public"."envios_formulario" ADD CONSTRAINT "envios_formulario_venda_id_fkey" FOREIGN KEY ("venda_id") REFERENCES "public"."vendas"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."envios_formulario" ADD CONSTRAINT "envios_formulario_produto_id_fkey" FOREIGN KEY ("produto_id") REFERENCES "public"."produtos"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "public"."envios_formulario" ADD CONSTRAINT "envios_formulario_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."envios_formulario" ADD CONSTRAINT "envios_formulario_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."feedbacks" ADD CONSTRAINT "feedbacks_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."feedbacks" ADD CONSTRAINT "feedbacks_empresaId_fkey" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."feedbacks" ADD CONSTRAINT "feedbacks_formulario_id_fkey" FOREIGN KEY ("formulario_id") REFERENCES "public"."formularios"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."feedbacks" ADD CONSTRAINT "feedbacks_envio_id_fkey" FOREIGN KEY ("envio_id") REFERENCES "public"."envios_formulario"("id") ON DELETE SET NULL ON UPDATE CASCADE;
